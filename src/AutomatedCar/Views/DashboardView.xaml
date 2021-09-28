@@ -42,9 +42,9 @@
                             </Grid>
                             <Separator Height="15"></Separator>
                             <TextBlock Text="Throttle"/>
-                            <ProgressBar Value="50"></ProgressBar>
+                            <ProgressBar Value="{Binding Path=GasPedalPosition}"></ProgressBar>
                             <TextBlock Text="Brake"/>
-                            <ProgressBar Value="50"></ProgressBar>
+                            <ProgressBar Value="{Binding Path=BrakePedalPosition}"></ProgressBar>
                             <Separator Height="12"></Separator>
                             <Image
                                 Width="90" Height="90"
