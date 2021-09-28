@@ -38,6 +38,9 @@ namespace AutomatedCar
 
                 var world = World.Instance;
 
+                var game = new Game(world);
+                game.Start();
+
                 world.PopulateFromJSON($"AutomatedCar.Assets.test_world.json");
 
                 var controlledCar = new Models.AutomatedCar(480, 1425, "car_1_white.png");
@@ -59,7 +62,7 @@ namespace AutomatedCar
                 world.AddControlledCar(controlledCar2);
                 controlledCar2.Start();
 
-                desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(world) };
+                desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(game) };
                 ((MainWindow)desktop.MainWindow).FocusCar();
             }
 
