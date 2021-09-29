@@ -23,10 +23,13 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.DecreaseGasPedalPosition();
             }
+
             if (!Keyboard.IsKeyDown(Key.Down))
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
+            
+            World.Instance.ControlledCar.CalculateNextPosition();
         }
     }
 }
