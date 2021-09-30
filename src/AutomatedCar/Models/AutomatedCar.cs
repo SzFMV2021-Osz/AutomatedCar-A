@@ -12,7 +12,7 @@ namespace AutomatedCar.Models
         private const int MAX_PEDAL_POSITION = 100;
         private const double PEDAL_INPUT_MULTIPLIER = 0.01;
         private const double DRAG = 0.006; // This limits the top speed to 166 km/h
-
+        
         private int gasPedalPosition;
         private int brakePedalPosition;
         
@@ -53,6 +53,7 @@ namespace AutomatedCar.Models
             }
         }
 
+        public bool InFocus { get; set; }
         public int Revolution { get; set; }
         public Vector Velocity { get; set; }
         public Vector Acceleration { get; set; }

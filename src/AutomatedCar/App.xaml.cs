@@ -64,6 +64,7 @@ namespace AutomatedCar
 
                 desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(game) };
                 ((MainWindow)desktop.MainWindow).FocusCar();
+                game.setCarFocusHandler(((MainWindow)desktop.MainWindow).FocusCar);
             }
 
             base.OnFrameworkInitializationCompleted();

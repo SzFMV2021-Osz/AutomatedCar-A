@@ -3,11 +3,13 @@ namespace AutomatedCar
     using System;
     using AutomatedCar.Models;
     using Avalonia.Input;
-
+    
+    public delegate void CarFocusHandler();
+    
     public class Game : GameBase
     {
         private readonly World world;
-
+        private CarFocusHandler carFocusHandler;
         public Game(World world)
         {
             this.world = world;
@@ -16,6 +18,11 @@ namespace AutomatedCar
         public World World { get => this.world; }
 
         private Random Random { get; } = new Random();
+
+        public void setCarFocusHandler(CarFocusHandler carFocusHandler)
+        {
+            this.carFocusHandler = carFocusHandler;
+        }
 
         protected override void Tick()
         {
@@ -30,6 +37,7 @@ namespace AutomatedCar
             }
             
             World.Instance.ControlledCar.CalculateNextPosition();
+            carFocusHandler.Invoke();
         }
     }
 }
