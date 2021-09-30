@@ -78,7 +78,6 @@ namespace AutomatedCar.Models
         
         public void CalculateNextPosition()
         {
-            CalculateSpeed();
             double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = Speed * DRAG + (Speed > 0 ? brakeInputForce : 0);
@@ -86,6 +85,7 @@ namespace AutomatedCar.Models
             Acceleration.Y = gasInputForce;
             Velocity.Y += -(Acceleration.Y - slowingForce);
             Y += (int)Velocity.Y;
+            CalculateSpeed();
         }
         
         public void IncreaseGasPedalPosition()
