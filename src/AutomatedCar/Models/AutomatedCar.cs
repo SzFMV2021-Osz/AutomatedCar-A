@@ -3,7 +3,7 @@ namespace AutomatedCar.Models
     using Avalonia.Media;
     using SystemComponents;
 
-    public class AutomatedCar : Car
+    public class AutomatedCar : Car, IAutomatedCar
     {
         private VirtualFunctionBus virtualFunctionBus;
 
@@ -17,7 +17,9 @@ namespace AutomatedCar.Models
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
 
         public int Revolution { get; set; }
+
         public int Velocity { get; set; }
+
         public Geometry Geometry { get; set; }
 
         /// <summary>Starts the automated cor by starting the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
