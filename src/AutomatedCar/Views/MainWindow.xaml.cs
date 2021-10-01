@@ -11,7 +11,6 @@ namespace AutomatedCar.Views
         public MainWindow()
         {
             this.InitializeComponent();
-            FocusCar();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -88,8 +87,6 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
-
-            FocusCar();
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
