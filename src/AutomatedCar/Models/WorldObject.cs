@@ -5,7 +5,7 @@ namespace AutomatedCar.Models
     using Avalonia.Media;
     using ReactiveUI;
 
-    public class WorldObject : ReactiveObject
+    public class WorldObject : ReactiveObject, IWorldObject
     {
         private int x;
         private int y;
@@ -46,9 +46,9 @@ namespace AutomatedCar.Models
 
         public string RenderTransformOrigin { get; set; }
 
-        public ObservableCollection<PolylineGeometry> Geometries { get; set; } = new ();
+        public ObservableCollection<PolylineGeometry> Geometries { get; set; } = new();
 
-        public ObservableCollection<PolylineGeometry> RawGeometries { get; set; } = new ();
+        public ObservableCollection<PolylineGeometry> RawGeometries { get; set; } = new();
 
         public string Filename { get; set; }
 
