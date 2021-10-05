@@ -1,13 +1,13 @@
-﻿namespace AutomatedCar.SystemComponents.Sensors
-{
-    using AutomatedCar.Models;
-    using Avalonia;
-    using System.Collections.Generic;
+﻿using AutomatedCar.Models;
+using Avalonia;
+using System.Collections.Generic;
 
-    public class Camera : Sensor
+namespace AutomatedCar.SystemComponents.Sensors
+{
+    public class Radar : Sensor
     {
-        public Camera()
-            : base(60, 80)
+        public Radar()
+     : base(60, 200)
         {
         }
 
@@ -18,7 +18,7 @@
 
             foreach (IWorldObject currObject in relevantObjects)
             {
-                if (this.IsRelevant(currObject))
+                if (currObject.Collideable)
                 {
                     double minDistance = double.MaxValue;
                     foreach (Point currPoint in GetPoints(currObject))
@@ -34,17 +34,6 @@
             }
 
             this.closestObject = closestObject;
-        }
-
-        private bool IsRelevant(IWorldObject worldObject)
-        {
-            switch (worldObject.WorldObjectType)
-            {
-                case WorldObjectType.RoadSign: return true;
-                case WorldObjectType.Crosswalk: return true;
-                case WorldObjectType.Road: return true;
-                default: return false;
-            }
         }
     }
 }
