@@ -1,4 +1,3 @@
-using System;
 namespace AutomatedCar.Views
 {
     using AutomatedCar.Models;
@@ -77,11 +76,13 @@ namespace AutomatedCar.Views
                 new HelpWindow().Show();
                 Keyboard.Keys.Remove(Key.F1);
             }
+
             if (Keyboard.IsKeyDown(Key.F5))
             {
                 World.Instance.NextControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
+
             if (Keyboard.IsKeyDown(Key.F6))
             {
                 World.Instance.PrevControlledCar();
@@ -107,6 +108,5 @@ namespace AutomatedCar.Views
             var offsetY = World.Instance.ControlledCar.Y - (scrollViewer.Viewport.Height / 2);
             scrollViewer.Offset = new Avalonia.Vector(offsetX, offsetY);
         }
-
     }
 }
