@@ -3,11 +3,13 @@ namespace AutomatedCar
     using System;
     using AutomatedCar.Models;
     using Avalonia.Input;
-
+    
+    public delegate void CarFocusHandler();
+    
     public class Game : GameBase
     {
         private readonly World world;
-
+        private CarFocusHandler carFocusHandler;
         public Game(World world)
         {
             this.world = world;
@@ -17,62 +19,25 @@ namespace AutomatedCar
 
         private Random Random { get; } = new Random();
 
+        public void setCarFocusHandler(CarFocusHandler carFocusHandler)
+        {
+            this.carFocusHandler = carFocusHandler;
+        }
+
         protected override void Tick()
         {
-            if (Keyboard.IsKeyDown(Key.Up))
+            if (!Keyboard.IsKeyDown(Key.Up))
             {
-                this.world.ControlledCar.Y -= 5;
+                World.Instance.ControlledCar.DecreaseGasPedalPosition();
             }
 
-            if (Keyboard.IsKeyDown(Key.Down))
+            if (!Keyboard.IsKeyDown(Key.Down))
             {
-                this.world.ControlledCar.Y += 5;
+                World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
-
-            if (Keyboard.IsKeyDown(Key.Left))
-            {
-                this.world.ControlledCar.X -= 5;
-            }
-
-            if (Keyboard.IsKeyDown(Key.Right))
-            {
-                this.world.ControlledCar.X += 5;
-            }
-
-            if (Keyboard.IsKeyDown(Key.PageUp))
-            {
-                this.world.ControlledCar.Rotation += 5;
-            }
-
-            if (Keyboard.IsKeyDown(Key.PageDown))
-            {
-                this.world.ControlledCar.Rotation -= 5;
-            }
-
-            if (Keyboard.IsKeyDown(Key.D1))
-            {
-                this.world.DebugStatus.Enabled = !this.world.DebugStatus.Enabled;
-            }
-
-            if (Keyboard.IsKeyDown(Key.D2))
-            {
-                this.world.DebugStatus.Camera = !this.world.DebugStatus.Camera;
-            }
-
-            if (Keyboard.IsKeyDown(Key.D3))
-            {
-                this.world.DebugStatus.Radar = !this.world.DebugStatus.Radar;
-            }
-
-            if (Keyboard.IsKeyDown(Key.D4))
-            {
-                this.world.DebugStatus.Ultrasonic = !this.world.DebugStatus.Ultrasonic;
-            }
-
-            if (Keyboard.IsKeyDown(Key.D5))
-            {
-                this.world.DebugStatus.Rotate = !this.world.DebugStatus.Rotate;
-            }
+            
+            World.Instance.ControlledCar.CalculateNextPosition();
+            carFocusHandler.Invoke();
         }
     }
 }

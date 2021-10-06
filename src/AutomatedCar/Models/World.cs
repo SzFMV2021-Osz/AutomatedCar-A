@@ -20,6 +20,7 @@
         // public static World Instance { get { return lazySingleton.Value; } }
 
         private int controlledCarPointer = 0;
+        private DebugStatus debugStatus = new DebugStatus();
         private ObservableCollection<AutomatedCar> controlledCars = new ();
 
         public static World Instance { get; } = new World();
@@ -29,7 +30,7 @@
         public AutomatedCar ControlledCar
         {
             get => this.controlledCars[this.controlledCarPointer];
-
+            
         }
         public int ControlledCarPointer
         {
@@ -47,6 +48,7 @@
         }
         public void NextControlledCar()
         {
+            controlledCars[controlledCarPointer].InFocus = false;
             if (this.controlledCarPointer < this.controlledCars.Count - 1)
             {
                 this.ControlledCarPointer += 1;
@@ -55,10 +57,13 @@
             {
                 this.ControlledCarPointer = 0;
             }
+
+            controlledCars[controlledCarPointer].InFocus = true;
             this.RaisePropertyChanged("ControlledCar");
         }
         public void PrevControlledCar()
         {
+            controlledCars[controlledCarPointer].InFocus = false;
             if (this.controlledCarPointer > 0)
             {
                 this.ControlledCarPointer -= 1;
@@ -67,15 +72,15 @@
             {
                this.ControlledCarPointer = this.controlledCars.Count - 1;
             }
+            
+            controlledCars[controlledCarPointer].InFocus = true;
             this.RaisePropertyChanged("ControlledCar");
         }
 
         public int Width { get; set; }
 
         public int Height { get; set; }
-
-        private DebugStatus debugStatus = new DebugStatus();
-
+        
         public DebugStatus DebugStatus
         {
             get => this.debugStatus;

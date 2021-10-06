@@ -9,7 +9,7 @@
 
         int Revolution { get; set; }
 
-        int Velocity { get; set; }
+        Vector Velocity { get; set; }
 
         VirtualFunctionBus VirtualFunctionBus { get; }
 

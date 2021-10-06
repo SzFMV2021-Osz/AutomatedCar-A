@@ -10,9 +10,7 @@ namespace AutomatedCar.Views
     {
         public MainWindow()
         {
-
             this.InitializeComponent();
-            FocusCar();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -21,12 +19,12 @@ namespace AutomatedCar.Views
             base.OnKeyDown(e);
             if (Keyboard.IsKeyDown(Key.Up))
             {
-                World.Instance.ControlledCar.Y -= 5;
+                World.Instance.ControlledCar.IncreaseGasPedalPosition();
             }
 
             if (Keyboard.IsKeyDown(Key.Down))
             {
-                World.Instance.ControlledCar.Y += 5;
+                World.Instance.ControlledCar.IncreaseBrakePedalPosition();
             }
 
             if (Keyboard.IsKeyDown(Key.Left))
@@ -89,8 +87,6 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
-
-            FocusCar();
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
