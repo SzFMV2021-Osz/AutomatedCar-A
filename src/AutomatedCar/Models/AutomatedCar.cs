@@ -5,7 +5,7 @@ namespace AutomatedCar.Models
     using System;
     using SystemComponents;
 
-    public class AutomatedCar : Car
+    public class AutomatedCar : Car, IAutomatedCar
     {
         private const int PEDAL_OFFSET = 16;
         private const int MIN_PEDAL_POSITION = 0;
@@ -55,6 +55,7 @@ namespace AutomatedCar.Models
 
         public bool InFocus { get; set; }
         public int Revolution { get; set; }
+
         public Vector Velocity { get; set; }
         public Vector Acceleration { get; set; }
         public Geometry Geometry { get; set; }

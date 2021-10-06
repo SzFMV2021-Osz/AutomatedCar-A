@@ -8,9 +8,9 @@ namespace AutomatedCar.Models
         Crosswalk,
         Other,
         ParkingSpace,
-        Predestrian,
+        Pedestrian,
         Road,
-        RoadSgin,
+        RoadSign,
         Tree,
     }
 }
