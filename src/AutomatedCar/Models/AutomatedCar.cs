@@ -15,7 +15,8 @@ namespace AutomatedCar.Models
         
         private int gasPedalPosition;
         private int brakePedalPosition;
-        
+
+
         private VirtualFunctionBus virtualFunctionBus;
 
         public AutomatedCar(int x, int y, string filename)
@@ -25,6 +26,8 @@ namespace AutomatedCar.Models
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
             this.ZIndex = 10;
+            this.ExternalGearbox = new ExternalGearbox(this);
+
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -53,9 +56,12 @@ namespace AutomatedCar.Models
             }
         }
 
+       
+
         public bool InFocus { get; set; }
         public int Revolution { get; set; }
 
+        public ExternalGearbox ExternalGearbox { get; set; }
         public Vector Velocity { get; set; }
         public Vector Acceleration { get; set; }
         public Geometry Geometry { get; set; }
@@ -84,7 +90,26 @@ namespace AutomatedCar.Models
             double slowingForce = Speed * DRAG + (Speed > 0 ? brakeInputForce : 0);
             
             Acceleration.Y = gasInputForce;
-            Velocity.Y += -(Acceleration.Y - slowingForce);
+            if (ExternalGearbox.CurrentExternalGear == 3)
+            {
+                Velocity.Y += -(Acceleration.Y - slowingForce);
+            }
+            else if (ExternalGearbox.CurrentExternalGear == 1)
+            {
+                Velocity.Y += Acceleration.Y - slowingForce;
+            }
+            else
+            {
+                if (Velocity.Y < 0) //In neutral gear, the car can stop whether it goes forward or backward
+                {
+                    Velocity.Y += slowingForce;
+                }
+                else
+                {
+                    Velocity.Y -= slowingForce;
+                }
+
+            }
             Y += (int)Velocity.Y;
             CalculateSpeed();
         }
@@ -100,7 +125,9 @@ namespace AutomatedCar.Models
             int newPosition = this.gasPedalPosition - PEDAL_OFFSET;
             this.GasPedalPosition = BoundPedalPosition(newPosition);
         }
+
         
+
         public void IncreaseBrakePedalPosition()
         {
             int newPosition = this.brakePedalPosition + PEDAL_OFFSET;
