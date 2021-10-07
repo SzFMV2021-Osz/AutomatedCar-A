@@ -6,7 +6,7 @@ namespace AutomatedCar.SystemComponents
     public class VirtualFunctionBus : GameBase
     {
         private List<SystemComponent> components = new List<SystemComponent>();
-        public IReadOnlyCollisionDetectionPacket CollisionDetectionPacket { get; set; }
+        public ICollisionDetectionPacket CollisionDetectionPacket { get; set; }
         public void RegisterComponent(SystemComponent component)
         {
             this.components.Add(component);

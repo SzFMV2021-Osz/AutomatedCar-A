@@ -2,6 +2,8 @@ namespace AutomatedCar.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using Avalonia;
     using Avalonia.Media;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
@@ -29,6 +31,8 @@ namespace AutomatedCar.Models
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
+            this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
+            this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
             this.sensors = new List<ISensor>();
             this.ZIndex = 10;
         }
@@ -81,6 +85,16 @@ namespace AutomatedCar.Models
         public void Stop()
         {
             this.virtualFunctionBus.Stop();
+        }
+
+        public void NpcCollisionEventHandler(object o, EventArgs args)
+        {
+            Debug.WriteLine($"Collision with an NPC!");
+        }
+
+        public void ObjectCollisionEventHandler(object o, EventArgs args)
+        {
+            Debug.WriteLine($"Collision with a static object!");
         }
 
         public void SetSensors()

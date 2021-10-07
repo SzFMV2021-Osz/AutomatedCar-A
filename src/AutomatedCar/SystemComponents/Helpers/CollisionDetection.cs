@@ -12,7 +12,18 @@
     {
         private CollisionDetectionPacket collisionPacket;
 
-        public CollisionDetection(VirtualFunctionBus virtualFunctionBus) : base(virtualFunctionBus)
+        /// <summary>
+        /// Event, which fires when the controlled car collides with an npc.
+        /// </summary>
+        public event EventHandler OnCollisionWithNpc;
+
+        /// <summary>
+        /// Event, which fires when the controlled car collides with a static object (fe.: tree).
+        /// </summary>
+        public event EventHandler OnCollisionWithStaticObject;
+
+        public CollisionDetection(VirtualFunctionBus virtualFunctionBus)
+            : base(virtualFunctionBus)
         {
             this.collisionPacket = new CollisionDetectionPacket();
             virtualFunctionBus.CollisionDetectionPacket = collisionPacket;
@@ -25,15 +36,13 @@
         {
             AutomatedCar car = World.Instance.ControlledCar;
 
-            foreach (var item in CollideableObjects())
+            foreach (WorldObject item in CollideableObjects())
             {
-                foreach (var point in item.Geometries[0].Points)
+                foreach (Point point in item.Geometries[0].Points)
                 {
                     if (GetCarPoints(car).FillContains(new Point(point.X + item.X, point.Y + item.Y)))
                     {
-                        //TODO: Alert 
-                        bool collision = true;
-
+                        this.collisionPacket.TypeOfCollision = DetermineCollisionType(item);
                     }
                 }
             }
@@ -42,6 +51,20 @@
         public List<WorldObject> CollideableObjects()
         {
             return World.Instance.WorldObjects.Where(x => x.Collideable).ToList();
+        }
+
+        public CollisionType DetermineCollisionType(WorldObject collidingObject)
+        {
+            if (collidingObject is Car)
+            {
+                this.OnCollisionWithNpc?.Invoke(this, null);
+                return CollisionType.NPC;
+            }
+            else
+            {
+                this.OnCollisionWithStaticObject?.Invoke(this, null);
+                return CollisionType.StaticObject;
+            }
         }
 
         public PolylineGeometry GetCarPoints(AutomatedCar car)
