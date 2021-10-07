@@ -1,13 +1,13 @@
-﻿using AutomatedCar.Models;
-using Avalonia;
-using System.Collections.Generic;
-
-namespace AutomatedCar.SystemComponents.Sensors
+﻿namespace AutomatedCar.SystemComponents.Sensors
 {
-    public class Radar : Sensor
+    using System.Collections.Generic;
+    using AutomatedCar.Models;
+    using Avalonia;
+
+    public sealed class Radar : Sensor
     {
         public Radar()
-     : base(60, 200)
+            : base(60, 200)
         {
         }
 

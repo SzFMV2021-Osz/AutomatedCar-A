@@ -1,16 +1,17 @@
 ﻿namespace AutomatedCar.SystemComponents.Sensors
 {
+    using System;
+    using System.Collections.Generic;
     using AutomatedCar.Models;
     using Avalonia;
     using Avalonia.Media;
-    using System;
-    using System.Collections.Generic;
 
-    public class Sensor
+    public abstract class Sensor : ISensor
     {
-        private readonly int ANGLEOFVIEW;
-        private readonly int DISTANCE;
         protected IWorldObject closestObject;
+
+        private readonly int angleOfView;
+        private readonly int distance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Sensor"/> class.
@@ -25,19 +26,23 @@
             }
             else
             {
-                this.ANGLEOFVIEW = angleOfView;
-                this.DISTANCE = distance * 50;  // 1 meter is 50 pixel
+                this.angleOfView = angleOfView;
+                this.distance = distance * 50;  // 1 meter is 50 pixel
             }
         }
 
+        public Point RelativeLocation { get; set; }
+
         public List<IWorldObject> RelevantObjects(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car)
         {
-            double radius = this.DISTANCE * Math.Tan(this.ConvertToRadians(this.ANGLEOFVIEW / 2));
+            double radius = this.distance * Math.Tan(this.ConvertToRadians(this.angleOfView / 2));
             double sin = Math.Sin(this.ConvertToRadians(car.Rotation));
             double cos = Math.Cos(this.ConvertToRadians(car.Rotation));
 
-            Point pointToConvert1 = new (-radius, -this.DISTANCE);
-            Point pointToConvert2 = new (+radius, -this.DISTANCE);
+            Point location = new (car.X + this.RelativeLocation.X, car.Y + this.RelativeLocation.Y);
+
+            Point pointToConvert1 = new (-radius, -this.distance);
+            Point pointToConvert2 = new (+radius, -this.distance);
 
             Point convertedPoint1 = new ((pointToConvert1.X * cos) - (pointToConvert1.Y * sin), (pointToConvert1.X * sin) + (pointToConvert1.Y * cos));
             Point convertedPoint2 = new ((pointToConvert2.X * cos) - (pointToConvert2.Y * sin), (pointToConvert2.X * sin) + (pointToConvert2.Y * cos));
@@ -67,19 +72,10 @@
             return relevantObjects;
         }
 
-        protected virtual void FindClosestObject(IEnumerable<IWorldObject> relevantObjects, IAutomatedCar car)
-        {
-        }
-
-        protected double DistanceBetween(Point a, Point b)
-        {
-            return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
-        }
-
         protected static List<Point> GetPoints(IWorldObject wo)
         {
-            Point basePoint = new(wo.X, wo.Y);
-            List<Point> points = new();
+            Point basePoint = new (wo.X, wo.Y);
+            List<Point> points = new ();
             try
             {
                 foreach (Geometry geometry in wo.RawGeometries)
@@ -96,6 +92,15 @@
             }
 
             return points;
+        }
+
+        protected virtual void FindClosestObject(IEnumerable<IWorldObject> relevantObjects, IAutomatedCar car)
+        {
+        }
+
+        protected double DistanceBetween(Point a, Point b)
+        {
+            return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
         }
 
         private double ConvertToRadians(double angle)

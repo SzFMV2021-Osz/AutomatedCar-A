@@ -1,10 +1,10 @@
 ﻿namespace AutomatedCar.SystemComponents.Sensors
 {
+    using System.Collections.Generic;
     using AutomatedCar.Models;
     using Avalonia;
-    using System.Collections.Generic;
 
-    public class Camera : Sensor
+    public sealed class Camera : Sensor
     {
         public Camera()
             : base(60, 80)
