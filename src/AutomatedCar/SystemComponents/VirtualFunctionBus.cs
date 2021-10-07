@@ -1,11 +1,12 @@
 namespace AutomatedCar.SystemComponents
 {
+    using AutomatedCar.SystemComponents.Helpers;
     using System.Collections.Generic;
 
     public class VirtualFunctionBus : GameBase
     {
         private List<SystemComponent> components = new List<SystemComponent>();
-
+        public IReadOnlyCollisionDetectionPacket CollisionDetectionPacket { get; set; }
         public void RegisterComponent(SystemComponent component)
         {
             this.components.Add(component);
