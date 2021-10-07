@@ -7,7 +7,7 @@
     {
         Geometry Geometry { get; set; }
 
-        int Revolution { get; }
+        int Revolution { get; set; }
 
         Vector Velocity { get; set; }
 

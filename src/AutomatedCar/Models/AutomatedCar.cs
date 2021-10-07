@@ -75,7 +75,7 @@ namespace AutomatedCar.Models
                 return this.revolution;
             }
 
-            private set
+            set
             {
                 this.RaiseAndSetIfChanged(ref this.revolution, value);
             }
