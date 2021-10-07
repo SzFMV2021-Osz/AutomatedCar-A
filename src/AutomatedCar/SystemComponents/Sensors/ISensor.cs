@@ -1,10 +1,9 @@
-﻿using AutomatedCar.Models;
-using System.Collections.Generic;
-
-namespace AutomatedCar.SystemComponents.Sensors
+﻿namespace AutomatedCar.SystemComponents.Sensors
 {
+    using Avalonia;
+
     public interface ISensor
     {
-        List<IWorldObject> RelevantObjects(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car);
+        Point RelativeLocation { get; set; }
     }
 }
