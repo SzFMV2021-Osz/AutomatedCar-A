@@ -1,39 +1,32 @@
 ﻿namespace AutomatedCar.SystemComponents.Sensors
 {
-    using System.Collections.Generic;
     using AutomatedCar.Models;
-    using Avalonia;
+    using AutomatedCar.SystemComponents.Packets;
 
     public sealed class Radar : Sensor
     {
-        public Radar()
-            : base(60, 200)
+        public Radar(VirtualFunctionBus virtualFunctionBus)
+            : base(virtualFunctionBus, 60, 200)
         {
+            this.sensorPacket = new RadarPacket();
+            virtualFunctionBus.RadarPacket = (IRadarPacket)this.sensorPacket;
         }
 
-        protected override void FindClosestObject(IEnumerable<IWorldObject> relevantObjects, IAutomatedCar car)
+        public override void Process()
         {
-            Point carPoint = new (car.X, car.Y);
-            IWorldObject closestObject = null;
-
-            foreach (IWorldObject currObject in relevantObjects)
-            {
-                if (currObject.Collideable)
-                {
-                    double minDistance = double.MaxValue;
-                    foreach (Point currPoint in GetPoints(currObject))
-                    {
-                        double currDistance = this.DistanceBetween(carPoint, currPoint);
-                        if (currDistance < minDistance)
-                        {
-                            minDistance = currDistance;
-                            closestObject = currObject;
-                        }
-                    }
-                }
-            }
-
-            this.closestObject = closestObject;
+            IAutomatedCar car = World.Instance.ControlledCar;
+            this.CalculateSensorArea(car);
+            this.FindObjectsInSensorArea(World.Instance.WorldObjects, car);
+            this.FilterRelevantObjects();
+            this.FindClosestObject(car);
         }
+
+        protected override bool IsRelevant(IWorldObject worldObject)
+        {
+            return worldObject.Collideable;
+        }
+
+        // TODO for later PR  Meghatározni a legközelebbi, sávon belüli (lateral offset alapján) objektum helyzetét.
+        // TODO for later PR Az automata vészfékező számára releváns objektumok(az autó középvonala felé halad, látjuk) kiválogatása és visszaadása.
     }
 }

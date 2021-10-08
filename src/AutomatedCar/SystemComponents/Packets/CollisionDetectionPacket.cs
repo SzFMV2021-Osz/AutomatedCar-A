@@ -1,7 +1,5 @@
 ﻿namespace AutomatedCar.SystemComponents.Helpers
 {
-    using System;
-    using Avalonia;
     using ReactiveUI;
 
     /// <summary>
