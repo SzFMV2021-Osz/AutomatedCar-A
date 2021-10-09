@@ -10,6 +10,7 @@ namespace AutomatedCar
     {
         private readonly World world;
         private CarFocusHandler carFocusHandler;
+
         public Game(World world)
         {
             this.world = world;
@@ -35,8 +36,8 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
-            
-            World.Instance.ControlledCar.CalculateNextPosition(new Vector() { X = -1, Y = -1});
+
+            World.Instance.ControlledCar.PowerTrain();
             World.Instance.ControlledCar.CalculateRevolutions();
             carFocusHandler.Invoke();
         }

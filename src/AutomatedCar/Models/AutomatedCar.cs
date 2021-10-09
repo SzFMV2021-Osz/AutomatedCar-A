@@ -39,7 +39,15 @@ namespace AutomatedCar.Models
             { 2000, 100 },
             { 3000, 150 },
             { 4000, 200 },
-            { 5000, 250}
+            { 5000, 250},
+        };
+
+        private Dictionary<int, double> GearRatioLookupTable = new Dictionary<int, double>()
+        {
+            { 1, 2.66 },
+            { 2, 1.78 },
+            { 3, 1.30 },
+            { 4, 1.00 },
         };
 
         public AutomatedCar(int x, int y, string filename)
@@ -142,12 +150,13 @@ namespace AutomatedCar.Models
             this.CalculateSpeed();
         }
 
-        public void CalculateNextPosition(Vector directionVector)
+        public void PowerTrain()
         {
             double maxTorqueAtRPM = this.LookupTorqueCurve(this.Revolution);
             double currentTorque = (this.gasPedalPosition / 100) * maxTorqueAtRPM;
 
-            double driveForce = (DIFFERENTIAL_RATIO * TRANSMISSION_EFFICIENCY * 1.30 * currentTorque) / 0.34;
+            double driveForce = (DIFFERENTIAL_RATIO * TRANSMISSION_EFFICIENCY *
+                this.GearRatioLookupTable[this.innerGear] * currentTorque) / WHEEL_RADIUS;
             driveForce /= CAR_MASS;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
