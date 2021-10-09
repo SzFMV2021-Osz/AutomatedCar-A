@@ -36,7 +36,7 @@ namespace AutomatedCar
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
             
-            World.Instance.ControlledCar.CalculateNextPosition();
+            World.Instance.ControlledCar.CalculateNextPosition(new Vector() { X = -1, Y = -1});
             World.Instance.ControlledCar.CalculateRevolutions();
             carFocusHandler.Invoke();
         }

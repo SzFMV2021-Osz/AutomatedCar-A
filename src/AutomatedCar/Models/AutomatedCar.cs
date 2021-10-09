@@ -18,6 +18,12 @@ namespace AutomatedCar.Models
         private const double DRAG = 0.006; // This limits the top speed to 166 km/h
         private const int IDLE_RPM = 800;
         private const int NEUTRAL_RPM_MULTIPLIER = 100;
+        private const int PIXEL_METER_RATIO = 50;
+
+        private const int CAR_MASS = 1500;
+        private const double TRANSMISSION_EFFICIENCY = 0.7;
+        private const double WHEEL_RADIUS = 0.34;
+        private const double DIFFERENTIAL_RATIO = 3.42;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -26,6 +32,15 @@ namespace AutomatedCar.Models
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
+
+        private Dictionary<int, int> TorqueLookupTable = new Dictionary<int, int>()
+        {
+            { 1000, 50 },
+            { 2000, 100 },
+            { 3000, 150 },
+            { 4000, 200 },
+            { 5000, 250}
+        };
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -127,6 +142,29 @@ namespace AutomatedCar.Models
             this.CalculateSpeed();
         }
 
+        public void CalculateNextPosition(Vector directionVector)
+        {
+            double maxTorqueAtRPM = this.LookupTorqueCurve(this.Revolution);
+            double currentTorque = (this.gasPedalPosition / 100) * maxTorqueAtRPM;
+
+            double driveForce = (DIFFERENTIAL_RATIO * TRANSMISSION_EFFICIENCY * 1.30 * currentTorque) / 0.34;
+            driveForce /= CAR_MASS;
+            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
+
+            this.Acceleration.Y = driveForce;
+            this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
+            this.Y += (int)this.Velocity.Y;
+
+            this.CalculateSpeed();
+        }
+
+        public double LookupTorqueCurve(double rpm)
+        {
+            int rounded_rpm = TorqueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(rpm - x)).First();
+            return TorqueLookupTable[rounded_rpm];
+        }
+
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;
@@ -187,6 +225,16 @@ namespace AutomatedCar.Models
         private int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
+        }
+
+        private int ConvertMetresToPixels(double metres)
+        {
+            return (int)(metres * PIXEL_METER_RATIO);
+        }
+
+        private int ConvertPixelsToMeter(double pixels)
+        {
+            return (int)(pixels / PIXEL_METER_RATIO);
         }
     }
 }
