@@ -25,6 +25,7 @@ namespace AutomatedCar.Models
         private int revolution;
         private int innerGear = 1;      //manually set until inner gearbox is implemented
 
+
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
         private CollisionDetection collisionDetection;
