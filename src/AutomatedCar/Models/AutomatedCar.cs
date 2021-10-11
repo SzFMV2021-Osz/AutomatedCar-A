@@ -29,7 +29,8 @@ namespace AutomatedCar.Models
         private int brakePedalPosition;
         private int revolution;
         private int innerGear = 1;      //manually set until inner gearbox is implemented
-
+        private int engineForce;
+        private int currentTorque;
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
@@ -141,17 +142,17 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
-            double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double driveForce = GenerateEngineForce();
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
 
-            this.Acceleration.Y = gasInputForce;
+            this.Acceleration.Y = driveForce;
             this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
             this.Y += (int)this.Velocity.Y;
             this.CalculateSpeed();
         }
 
-        public void PowerTrain()
+        public double GenerateEngineForce()
         {
             double maxTorqueAtRPM = this.LookupTorqueCurve(this.Revolution);
             double currentTorque = (this.gasPedalPosition * maxTorqueAtRPM) / 100; // The
@@ -160,14 +161,7 @@ namespace AutomatedCar.Models
                 this.GearRatioLookupTable[this.innerGear] * currentTorque) / WHEEL_RADIUS;
             driveForce /= CAR_MASS;
 
-            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
-            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
-
-            this.Acceleration.Y = driveForce;
-            this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
-            this.Y += (int)this.Velocity.Y;
-
-            this.CalculateSpeed();
+            return driveForce;
         }
 
         public double LookupTorqueCurve(double rpm)
