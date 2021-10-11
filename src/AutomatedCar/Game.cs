@@ -39,7 +39,7 @@ namespace AutomatedCar
 
             World.Instance.ControlledCar.PowerTrain();
             World.Instance.ControlledCar.CalculateRevolutions();
-            carFocusHandler.Invoke();
+            this.carFocusHandler.Invoke();
         }
     }
 }

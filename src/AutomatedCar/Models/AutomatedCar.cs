@@ -30,6 +30,7 @@ namespace AutomatedCar.Models
         private int revolution;
         private int innerGear = 1;      //manually set until inner gearbox is implemented
 
+
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
 
@@ -153,11 +154,12 @@ namespace AutomatedCar.Models
         public void PowerTrain()
         {
             double maxTorqueAtRPM = this.LookupTorqueCurve(this.Revolution);
-            double currentTorque = (this.gasPedalPosition / 100) * maxTorqueAtRPM;
+            double currentTorque = (this.gasPedalPosition * maxTorqueAtRPM) / 100; // The
 
             double driveForce = (DIFFERENTIAL_RATIO * TRANSMISSION_EFFICIENCY *
                 this.GearRatioLookupTable[this.innerGear] * currentTorque) / WHEEL_RADIUS;
             driveForce /= CAR_MASS;
+
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
 
