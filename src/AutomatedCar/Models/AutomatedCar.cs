@@ -24,7 +24,8 @@ namespace AutomatedCar.Models
         private int brakePedalPosition;
         private int revolution;
         private int innerGear = 1;      //manually set until inner gearbox is implemented
-
+        private int engineForce;
+        private int currentTorque;
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
@@ -133,11 +134,11 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
-            double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double driveForce = GenerateEngineForce();
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
 
-            this.Acceleration.Y = gasInputForce;
+            this.Acceleration.Y = driveForce;
             this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
             this.Y += (int)this.Velocity.Y;
             this.CalculateSpeed();
