@@ -108,13 +108,19 @@ namespace AutomatedCar.Models
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
 
             double slowingForce = Speed * DRAG + (Speed > 0 ? brakeInputForce : 0);
-            
             Acceleration.Y = gasInputForce;
-            if (ExternalGearbox.CurrentExternalGear == 3)
+            GearHandlingForVelocity(slowingForce);
+            Y += (int)Velocity.Y;
+            CalculateSpeed();
+        }
+
+        private void GearHandlingForVelocity(double slowingForce)
+        {
+            if (ExternalGearbox.CurrentExternalGear == ExternalGearbox.Gear.D)
             {
                 Velocity.Y += -(Acceleration.Y - slowingForce);
             }
-            else if (ExternalGearbox.CurrentExternalGear == 1)
+            else if (ExternalGearbox.CurrentExternalGear == ExternalGearbox.Gear.R)
             {
                 Velocity.Y += Acceleration.Y - slowingForce;
             }
@@ -128,10 +134,7 @@ namespace AutomatedCar.Models
                 {
                     Velocity.Y -= slowingForce;
                 }
-
             }
-            Y += (int)Velocity.Y;
-            CalculateSpeed();
         }
 
         public void IncreaseGasPedalPosition()
