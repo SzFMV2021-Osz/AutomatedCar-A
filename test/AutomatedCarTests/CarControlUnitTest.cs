@@ -17,7 +17,6 @@ namespace Tests
         {
             automatedCar = new AutomatedCar(100, 100, "car_1_white.png");
             this.output = output;
-
         }
 
         [Fact]
@@ -53,7 +52,6 @@ namespace Tests
             for (int i = 0; i < 3; i++)
             {
                 automatedCar.ExternalGearbox.ExternalUpshift();
-
             }
 
             for (int i = 0; i < 10; i++)
