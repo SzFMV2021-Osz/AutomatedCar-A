@@ -22,7 +22,7 @@
                 externalGearbox.ExternalUpshift();
             }
 
-            Assert.Equal(3, externalGearbox.CurrentExternalGear);
+            Assert.Equal(ExternalGearbox.Gear.D, externalGearbox.CurrentExternalGear);
         }
 
         [Fact]
@@ -38,7 +38,7 @@
                 externalGearbox.ExternalDownshift();
             }
 
-            Assert.Equal(1, externalGearbox.CurrentExternalGear);
+            Assert.Equal(ExternalGearbox.Gear.R, externalGearbox.CurrentExternalGear);
         }
     }
 }

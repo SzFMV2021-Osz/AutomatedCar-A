@@ -7,7 +7,8 @@
 
     public class ExternalGearbox : ReactiveObject
     {
-        private int currentExternalGear = 0;  //0: P, 1: R, 2: N, 3: D
+        public enum Gear { P = 0, R = 1, N = 2, D = 3 }
+        private Gear currentExternalGear = Gear.P;
         private AutomatedCar automatedCar;
 
         public ExternalGearbox(AutomatedCar automatedCar)
@@ -15,7 +16,7 @@
             this.automatedCar = automatedCar;
         }
 
-        public int CurrentExternalGear
+        public Gear CurrentExternalGear
         {
             get
             {
@@ -29,9 +30,9 @@
 
         public void ExternalUpshift()
         {
-            if (CurrentExternalGear != 3)
+            if (CurrentExternalGear != Gear.D)
             {
-                if ((automatedCar.Velocity.Y <= 0 && CurrentExternalGear == 2) || automatedCar.Speed == 0 || CurrentExternalGear == 1)
+                if ((automatedCar.Velocity.Y <= 0 && CurrentExternalGear == Gear.N) || automatedCar.Speed == 0 || CurrentExternalGear == Gear.R)
                 {
                     CurrentExternalGear += 1;
                 }
@@ -42,7 +43,7 @@
         {
             if (CurrentExternalGear != 0)
             {
-                if ((automatedCar.Velocity.Y >= 0 && CurrentExternalGear == 2) || automatedCar.Speed == 0 || CurrentExternalGear == 3)
+                if ((automatedCar.Velocity.Y >= 0 && CurrentExternalGear == Gear.N) || automatedCar.Speed == 0 || CurrentExternalGear == Gear.D)
                 {
                     CurrentExternalGear -= 1;
                 }
