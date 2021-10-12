@@ -1,50 +1,30 @@
 ﻿namespace AutomatedCar.SystemComponents.Sensors
 {
-    using System.Collections.Generic;
     using AutomatedCar.Models;
-    using Avalonia;
+    using AutomatedCar.SystemComponents.Packets;
 
     public sealed class Camera : Sensor
     {
-        public Camera()
-            : base(60, 80)
+        public Camera(VirtualFunctionBus virtualFunctionBus)
+            : base(virtualFunctionBus, 60, 80)
         {
+            this.sensorPacket = new CameraPacket();
+            virtualFunctionBus.CameraPacket = (ICameraPacket)this.sensorPacket;
         }
 
-        protected override void FindClosestObject(IEnumerable<IWorldObject> relevantObjects, IAutomatedCar car)
+        public override void Process()
         {
-            Point carPoint = new (car.X, car.Y);
-            IWorldObject closestObject = null;
-
-            foreach (IWorldObject currObject in relevantObjects)
-            {
-                if (this.IsRelevant(currObject))
-                {
-                    double minDistance = double.MaxValue;
-                    foreach (Point currPoint in GetPoints(currObject))
-                    {
-                        double currDistance = this.DistanceBetween(carPoint, currPoint);
-                        if (currDistance < minDistance)
-                        {
-                            minDistance = currDistance;
-                            closestObject = currObject;
-                        }
-                    }
-                }
-            }
-
-            this.closestObject = closestObject;
+            IAutomatedCar car = World.Instance.ControlledCar;
+            this.CalculateSensorArea(car);
+            this.FindObjectsInSensorArea(World.Instance.WorldObjects, car);
+            this.FilterRelevantObjects();
+            this.FindClosestObject(car);
         }
 
-        private bool IsRelevant(IWorldObject worldObject)
+        // "A kamerára a sávtartóautomatika (LKA) és a táblafelismerő (TSR) épül, így annak a szenzornak az útelemek és a táblák relevánsak."
+        protected override bool IsRelevant(IWorldObject worldObject)
         {
-            switch (worldObject.WorldObjectType)
-            {
-                case WorldObjectType.RoadSign: return true;
-                case WorldObjectType.Crosswalk: return true;
-                case WorldObjectType.Road: return true;
-                default: return false;
-            }
+            return worldObject.Filename.Contains("Road");
         }
     }
 }
