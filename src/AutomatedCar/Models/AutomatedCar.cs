@@ -125,6 +125,7 @@ namespace AutomatedCar.Models
             this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
             this.Y += (int)this.Velocity.Y;
             this.CalculateSpeed();
+            this.CalculateRevolutions();
         }
 
         public void IncreaseGasPedalPosition()
@@ -151,7 +152,7 @@ namespace AutomatedCar.Models
             this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
         }
 
-        public void CalculateRevolutions()
+        private void CalculateRevolutions()
         {
             if (this.gasPedalPosition > 0)
             {
