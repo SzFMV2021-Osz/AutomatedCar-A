@@ -24,10 +24,9 @@
             for (int i = 0; i < 10; i++)
             {
                 car.IncreaseGasPedalPosition();
-                car.Speed++;
             }
 
-            car.CalculateRevolutions();
+            car.CalculateNextPosition();
 
             // Assert
             Assert.True(car.Revolution > rpmBefore);
@@ -43,10 +42,9 @@
             for (int i = 0; i < 10; i++)
             {
                 car.IncreaseBrakePedalPosition();
-                car.Speed--;
             }
 
-            car.CalculateRevolutions();
+            car.CalculateNextPosition();
 
             // Assert
             Assert.True(car.Revolution < rpmBefore);
@@ -65,7 +63,7 @@
                 car.Speed--;
             }
 
-            car.CalculateRevolutions();
+            car.CalculateNextPosition();
 
             // Assert
             Assert.True(car.Revolution < rpmBefore);
