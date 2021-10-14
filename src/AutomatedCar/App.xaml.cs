@@ -51,6 +51,7 @@ namespace AutomatedCar
                 controlledCar.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(36, 240), new Point(36, 180) }, false));
                 controlledCar.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(72, 240), new Point(72, 180) }, false));
                 controlledCar.SetSensors();
+                controlledCar.SetLaneKeepingAssistant();
                 world.AddControlledCar(controlledCar);
                 controlledCar.Start();
 
@@ -62,6 +63,7 @@ namespace AutomatedCar
                 controlledCar2.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(72, 240), new Point(72, 180) }, false));
                 controlledCar2.Rotation = -90;
                 controlledCar2.SetSensors();
+                controlledCar2.SetLaneKeepingAssistant();
                 world.AddControlledCar(controlledCar2);
                 controlledCar2.Start();
 

@@ -1,5 +1,6 @@
 ﻿namespace AutomatedCar.SystemComponents.Packets
 {
+    using AutomatedCar.SystemComponents.Helpers;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -11,7 +12,7 @@
         /// <summary>
         /// Gets or sets wheter the lanekeeping is turned on or off.
         /// </summary>
-        public bool LaneKeepingEngaged { get; set; }
+        public LaneKeepingStatus LaneKeepingStatus { get; set; }
 
         /// <summary>
         /// Gets wheter the car is centered in the lane or not.

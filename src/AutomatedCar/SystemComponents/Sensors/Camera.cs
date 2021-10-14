@@ -26,6 +26,7 @@
 
         private void FilterRoads()
         {
+            ;
             ((CameraPacket)this.sensorPacket).Roads =
                 this.sensorPacket
                 .RelevantObjects

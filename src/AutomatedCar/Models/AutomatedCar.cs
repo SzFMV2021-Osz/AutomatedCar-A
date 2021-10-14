@@ -42,8 +42,6 @@ namespace AutomatedCar.Models
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
 
-            this.laneKeeping = new LaneKeeping(this.virtualFunctionBus);
-
             this.sensors = new List<ISensor>();
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
@@ -131,10 +129,22 @@ namespace AutomatedCar.Models
             this.sensors.Add(camera);
         }
 
+        public void SetLaneKeepingAssistant()
+        {
+            this.laneKeeping = new LaneKeeping(this.virtualFunctionBus);
+        }
+
         public void LaneKeeping()
         {
             //Set status of Lanekeeping
-            this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingEngaged = !this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingEngaged;
+            if (this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus == LaneKeepingStatus.Active)
+            {
+                this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Inactive;
+            }
+            else
+            {
+                this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Active;
+            }
         }
 
         public void CalculateSpeed()

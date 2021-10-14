@@ -1,5 +1,6 @@
 ﻿namespace AutomatedCar.SystemComponents.Packets
 {
+    using AutomatedCar.SystemComponents.Helpers;
     using ReactiveUI;
     using System;
     using System.Collections.Generic;
@@ -9,15 +10,14 @@
 
     public class LaneKeepingPacket : ReactiveObject, ILaneKeepingPacket
     {
-        private bool laneKeepingEngaged = false;
+        private LaneKeepingStatus laneKeepingEngaged = LaneKeepingStatus.Inactive;
         private bool carCentered = false;
 
-        public bool LaneKeepingEngaged 
-        { 
-            get => throw new NotImplementedException(); 
-            set => throw new NotImplementedException(); 
+        public LaneKeepingStatus LaneKeepingStatus {
+            get => this.laneKeepingEngaged; 
+            set => this.RaiseAndSetIfChanged(ref this.laneKeepingEngaged, value);
         }
 
-        public bool CarCentered => throw new NotImplementedException();
+        public bool CarCentered => this.carCentered;
     }
 }
