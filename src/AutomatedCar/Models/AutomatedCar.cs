@@ -9,6 +9,7 @@ namespace AutomatedCar.Models
     using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
+    using global::AutomatedCar.SystemComponents.Helpers;
 
     public class AutomatedCar : Car, IAutomatedCar
     {
@@ -28,6 +29,7 @@ namespace AutomatedCar.Models
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
         private CollisionDetection collisionDetection;
+        private LaneKeeping laneKeeping;
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -35,9 +37,13 @@ namespace AutomatedCar.Models
             this.Velocity = new Vector();
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
+
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
+
+            this.laneKeeping = new LaneKeeping(this.virtualFunctionBus);
+
             this.sensors = new List<ISensor>();
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
