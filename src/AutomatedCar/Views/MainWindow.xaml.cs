@@ -88,6 +88,12 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
+
+            if (Keyboard.IsKeyDown(Key.L))
+            {
+                World.Instance.ControlledCar.LaneKeeping();
+
+            }
         }
 
         protected override void OnKeyUp(KeyEventArgs e)

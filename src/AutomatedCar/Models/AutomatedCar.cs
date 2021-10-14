@@ -131,6 +131,12 @@ namespace AutomatedCar.Models
             this.sensors.Add(camera);
         }
 
+        public void LaneKeeping()
+        {
+            //Set status of Lanekeeping
+            this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingEngaged = !this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingEngaged;
+        }
+
         public void CalculateSpeed()
         {
             this.Speed = (int)Math.Sqrt(Math.Pow(this.Velocity.X, 2) + Math.Pow(this.Velocity.Y, 2));
