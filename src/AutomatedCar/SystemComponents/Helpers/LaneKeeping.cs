@@ -17,5 +17,18 @@
             this.laneKeepingPacket = new LaneKeepingPacket();
             virtualFunctionBus.LaneKeepingPacket = laneKeepingPacket;
         }
+
+        public override void Process()
+        {
+            if (this.laneKeepingPacket.LaneKeepingEngaged && !this.laneKeepingPacket.CarCentered) 
+            {
+                this.CenterCar();
+            }
+        }
+
+        public void CenterCar()
+        {
+
+        }
     }
 }

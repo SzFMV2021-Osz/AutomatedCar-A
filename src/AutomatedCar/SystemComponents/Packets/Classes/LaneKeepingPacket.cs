@@ -9,8 +9,8 @@
 
     public class LaneKeepingPacket : ReactiveObject, ILaneKeepingPacket
     {
-        private bool laneKeepingEngaged;
-        private bool carCentered;
+        private bool laneKeepingEngaged = false;
+        private bool carCentered = false;
 
         public bool LaneKeepingEngaged 
         { 
