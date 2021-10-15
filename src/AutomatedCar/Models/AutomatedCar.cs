@@ -20,37 +20,13 @@ namespace AutomatedCar.Models
         private const int NEUTRAL_RPM_MULTIPLIER = 100;
         private const int PIXEL_METER_RATIO = 50;
 
-        private const int CAR_MASS = 1500;
-        private const double TRANSMISSION_EFFICIENCY = 0.7;
-        private const double WHEEL_RADIUS = 0.34;
-        private const double DIFFERENTIAL_RATIO = 3.42;
-
         private int gasPedalPosition;
         private int brakePedalPosition;
         private int revolution;
         private int innerGear = 1;      //manually set until inner gearbox is implemented
-        private int engineForce;
-        private int currentTorque;
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
-
-        private Dictionary<int, int> TorqueLookupTable = new Dictionary<int, int>()
-        {
-            { 1000, 50 },
-            { 2000, 100 },
-            { 3000, 150 },
-            { 4000, 200 },
-            { 5000, 250},
-        };
-
-        private Dictionary<int, double> GearRatioLookupTable = new Dictionary<int, double>()
-        {
-            { 1, 2.66 },
-            { 2, 1.78 },
-            { 3, 1.30 },
-            { 4, 1.00 },
-        };
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -155,19 +131,19 @@ namespace AutomatedCar.Models
         public double GenerateEngineForce()
         {
             double maxTorqueAtRPM = this.LookupTorqueCurve(this.Revolution);
-            double currentTorque = (this.gasPedalPosition * maxTorqueAtRPM) / 100; // The
+            double currentTorque = (this.gasPedalPosition * maxTorqueAtRPM) / 100;
 
-            double driveForce = (DIFFERENTIAL_RATIO * TRANSMISSION_EFFICIENCY *
-                this.GearRatioLookupTable[this.innerGear] * currentTorque) / WHEEL_RADIUS;
-            driveForce /= CAR_MASS;
+            double driveForce = (CarConfig.DIFFERENTIAL_RATIO * CarConfig.TRANSMISSION_EFFICIENCY *
+                CarConfig.GearRatioLookupTable[this.innerGear] * currentTorque) / CarConfig.WHEEL_RADIUS;
+            driveForce /= CarConfig.CAR_MASS;
 
             return driveForce;
         }
 
         public double LookupTorqueCurve(double rpm)
         {
-            int rounded_rpm = TorqueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(rpm - x)).First();
-            return TorqueLookupTable[rounded_rpm];
+            int rounded_rpm = CarConfig.TorqueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(rpm - x)).First();
+            return CarConfig.TorqueLookupTable[rounded_rpm];
         }
 
         public void IncreaseGasPedalPosition()
