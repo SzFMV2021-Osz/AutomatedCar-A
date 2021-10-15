@@ -24,8 +24,6 @@ namespace AutomatedCar.Models
         private int brakePedalPosition;
         private int revolution;
         private int innerGear = 1;      //manually set until inner gearbox is implemented
-        private int engineForce;
-        private int currentTorque;
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
