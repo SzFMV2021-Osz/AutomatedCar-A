@@ -118,32 +118,14 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
-            double driveForce = GenerateEngineForce();
+            double driveForce = EnvironmentalForces.GenerateEngineForce(this.revolution, this.gasPedalPosition, this.innerGear);
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
-            double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
+            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
 
             this.Acceleration.Y = driveForce;
             this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
             this.Y += (int)this.Velocity.Y;
             this.CalculateSpeed();
-        }
-
-        public double GenerateEngineForce()
-        {
-            double maxTorqueAtRPM = this.LookupTorqueCurve(this.Revolution);
-            double currentTorque = (this.gasPedalPosition * maxTorqueAtRPM) / 100;
-
-            double driveForce = (CarConfig.DIFFERENTIAL_RATIO * CarConfig.TRANSMISSION_EFFICIENCY *
-                CarConfig.GearRatioLookupTable[this.innerGear] * currentTorque) / CarConfig.WHEEL_RADIUS;
-            driveForce /= CarConfig.CAR_MASS;
-
-            return driveForce;
-        }
-
-        public double LookupTorqueCurve(double rpm)
-        {
-            int rounded_rpm = CarConfig.TorqueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(rpm - x)).First();
-            return CarConfig.TorqueLookupTable[rounded_rpm];
         }
 
         public void IncreaseGasPedalPosition()

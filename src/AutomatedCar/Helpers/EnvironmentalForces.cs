@@ -14,14 +14,30 @@
 
         public static double AIR_DENSITIY = 1.29;
 
-        public static double CalculateAirResistance(double speed)
+        public static double GenerateEngineForce(int revs, int pedalPosition, int innerGear)
         {
-            return (FRICTION_COEFFICIENT * CAR_FRONTAL_AREA * AIR_DENSITIY * Math.Pow(speed, 2)) / 2;
+            double maxTorqueAtRPM = LookupTorqueCurve(revs);
+            double currentTorque = (pedalPosition * maxTorqueAtRPM) / 100;
+
+            double driveForce = (CarConfig.DIFFERENTIAL_RATIO * CarConfig.TRANSMISSION_EFFICIENCY *
+                CarConfig.GearRatioLookupTable[innerGear] * currentTorque) / CarConfig.WHEEL_RADIUS;
+            driveForce /= CarConfig.CAR_MASS;
+
+            return driveForce;
         }
 
-        public static double CalculateFriction(double speed)
+        public static double CalculateResistance(double speed)
         {
-            return 30 * CalculateAirResistance(speed);
+            double airResistance = (FRICTION_COEFFICIENT * CAR_FRONTAL_AREA * AIR_DENSITIY * Math.Pow(speed, 2)) / 2;
+            double friction = 30 * airResistance;
+
+            return airResistance + friction;
+        }
+
+        private static double LookupTorqueCurve(double rpm)
+        {
+            int rounded_rpm = CarConfig.TorqueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(rpm - x)).First();
+            return CarConfig.TorqueLookupTable[rounded_rpm];
         }
     }
 }
