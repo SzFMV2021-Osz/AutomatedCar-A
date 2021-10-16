@@ -14,7 +14,7 @@
             this.incomingObjects = new List<WorldObject>();
         }
 
-        public IList<WorldObject> IncomingObjects
+        public IList<WorldObject> ClosingObjects
         {
             get
             {

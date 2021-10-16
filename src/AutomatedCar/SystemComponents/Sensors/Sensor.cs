@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using AutomatedCar.Models;
@@ -14,11 +15,10 @@
     public abstract class Sensor : SystemComponent, ISensor
     {
         protected ISensorPacket sensorPacket;
-        protected readonly int distance;
+        private static readonly IList<ReferencePoint> ReferencePoints = LoadReferencePoints();
+        private readonly int distance;
         private readonly int angleOfView;
-        private static IList<ReferencePoint> referencePoints = LoadRefPoints();
-
-        public WorldObject SensorObject { get; set; }
+        private WorldObject sensorObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Sensor"/> class.
@@ -42,22 +42,14 @@
 
         public Point RelativeLocation { get; set; }
 
-        protected void CalculateBasicSensorData(AutomatedCar car, IList<WorldObject> worldObjects)
+        protected static double DistanceBetween(Point from, Point to)
         {
-            World.Instance.WorldObjects.Remove(this.SensorObject);
-            this.SetSensor(car);
-            World.Instance.WorldObjects.Add(this.SensorObject);
-
-            this.FindObjectsInSensorArea(worldObjects, car);
-            this.FilterRelevantObjects();
-            this.sensorPacket.ClosestObject = this.FindClosestObject(this.sensorPacket.RelevantObjects, car);
+            return Math.Sqrt(Math.Pow(from.X - to.X, 2) + Math.Pow(from.Y - to.Y, 2));
         }
 
-        protected abstract bool IsRelevant(WorldObject worldObject);
-
-        protected WorldObject FindClosestObject(IList<WorldObject> worldObjects, AutomatedCar car)
+        protected static WorldObject FindClosestObject(IList<WorldObject> worldObjects, AutomatedCar car)
         {
-            Point carPoint = new(car.X, car.Y);
+            Point carPoint = new (car.X, car.Y);
             WorldObject closestObject = null;
 
             foreach (WorldObject currObject in worldObjects)
@@ -77,81 +69,20 @@
             return closestObject;
         }
 
-        public void SetSensor(AutomatedCar car)
+        protected void CalculateSensorData(AutomatedCar car, ObservableCollection<WorldObject> worldObjects)
         {
-            int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
+            this.SetSensor(car);
 
-            if (this.SensorObject == null)
-            {
-                this.SensorObject = new WorldObject(car.X + car.RotationPoint.X, car.Y + car.RotationPoint.Y, "sensor.png");
-                this.SensorObject.RotationPoint = new(triangleBase, this.distance + car.RotationPoint.Y - (int)this.RelativeLocation.Y);
-                this.SensorObject.Rotation = car.Rotation;
-                this.SensorObject.Collideable = false;
-                this.SensorObject.RawGeometries.Add(GetRawGeometry(triangleBase, this.distance));
-                this.SensorObject.Geometries.Add(this.GetGeometry(car));
-            }
-            else
-            {
-                this.SensorObject.X = car.X + car.RotationPoint.X;
-                this.SensorObject.Y = car.Y + car.RotationPoint.Y;
-                this.SensorObject.RotationPoint = new(triangleBase, this.distance + car.RotationPoint.Y - (int)this.RelativeLocation.Y);
-                this.SensorObject.Rotation = car.Rotation;
-                this.SensorObject.Geometries[0] = this.GetGeometry(car);
-            }
+            this.FindObjectsInSensorArea(worldObjects);
+            this.FilterRelevantObjects();
+            this.sensorPacket.ClosestObject = FindClosestObject(this.sensorPacket.RelevantObjects, car);
         }
 
-        private void FindObjectsInSensorArea(IList<WorldObject> worldObjects, AutomatedCar car)
-        {
-            List<WorldObject> detectedObjects = new List<WorldObject>();
-
-            foreach (WorldObject currObject in worldObjects)
-            {
-                foreach (Point point in GetPoints(currObject))
-                {
-                    if (this.SensorObject.Geometries[0].FillContains(point) && !detectedObjects.Contains(currObject) && !currObject.Filename.Contains("sensor"))
-                    {
-                        detectedObjects.Add(currObject);
-                    }
-                }
-            }
-
-            detectedObjects.Remove(car);
-            this.sensorPacket.DetectedObjects = detectedObjects;
-        }
-
-        private void FilterRelevantObjects()
-        {
-            this.sensorPacket.RelevantObjects = this.sensorPacket.DetectedObjects.Where(wo => this.IsRelevant(wo)).ToList();
-        }
-
-        private PolylineGeometry GetGeometry(AutomatedCar car)
-        {
-            double sin = Math.Sin(ConvertToRadians(car.Rotation));
-            double cos = Cosine(ConvertToRadians(car.Rotation));
-
-            Point pointToConvert0 = new(this.SensorObject.RawGeometries[0].Points[0].X - this.SensorObject.RotationPoint.X, this.SensorObject.RawGeometries[0].Points[0].Y - this.SensorObject.RotationPoint.Y);
-            Point pointToConvert1 = new(this.SensorObject.RawGeometries[0].Points[1].X - this.SensorObject.RotationPoint.X, this.SensorObject.RawGeometries[0].Points[1].Y - this.SensorObject.RotationPoint.Y);
-            Point pointToConvert2 = new(this.SensorObject.RawGeometries[0].Points[2].X - this.SensorObject.RotationPoint.X, this.SensorObject.RawGeometries[0].Points[2].Y - this.SensorObject.RotationPoint.Y);
-
-            Point convertedPoint0 = new((pointToConvert0.X * cos) - (pointToConvert0.Y * sin), (pointToConvert0.X * sin) + (pointToConvert0.Y * cos));
-            Point convertedPoint1 = new((pointToConvert1.X * cos) - (pointToConvert1.Y * sin), (pointToConvert1.X * sin) + (pointToConvert1.Y * cos));
-            Point convertedPoint2 = new((pointToConvert2.X * cos) - (pointToConvert2.Y * sin), (pointToConvert2.X * sin) + (pointToConvert2.Y * cos));
-
-            Point finalPoint = new(this.SensorObject.RotationPoint.X + this.SensorObject.X - this.SensorObject.RotationPoint.X, this.SensorObject.RotationPoint.Y + this.SensorObject.Y - this.SensorObject.RotationPoint.Y);
-            List<Point> points = new()
-            {
-                new Point((int)(finalPoint.X + convertedPoint0.X), (int)(finalPoint.Y + convertedPoint0.Y)),
-                new Point((int)(finalPoint.X + convertedPoint1.X), (int)(finalPoint.Y + convertedPoint1.Y)),
-                new Point((int)(finalPoint.X + convertedPoint2.X), (int)(finalPoint.Y + convertedPoint2.Y)),
-                new Point((int)(finalPoint.X + convertedPoint0.X), (int)(finalPoint.Y + convertedPoint0.Y)),
-            };
-
-            return new PolylineGeometry(points, true);
-        }
+        protected abstract bool IsRelevant(WorldObject worldObject);
 
         private static PolylineGeometry GetRawGeometry(int triangleBase, int distance)
         {
-            List<Point> points = new()
+            List<Point> points = new ()
             {
                 new Point(triangleBase, distance),
                 new Point(0, 0),
@@ -164,14 +95,13 @@
 
         private static List<Point> GetPoints(WorldObject worldObject)
         {
-            List<Point> points = new List<Point>();
-            points.Add(new(worldObject.X, worldObject.Y));
+            List<Point> points = new () { new Point(worldObject.X, worldObject.Y) };
 
-            Point refPoint = new(0, 0);
-            if (referencePoints.Any(r => r.Type + ".png" == worldObject.Filename))
+            Point refPoint = new (0, 0);
+            if (ReferencePoints.Any(r => r.Type + ".png" == worldObject.Filename))
             {
-                ReferencePoint currRefPoint = referencePoints.Where(r => r.Type + ".png" == worldObject.Filename).FirstOrDefault();
-                refPoint = new(currRefPoint.X, currRefPoint.Y);
+                ReferencePoint currRefPoint = ReferencePoints.Where(r => r.Type + ".png" == worldObject.Filename).FirstOrDefault();
+                refPoint = new (currRefPoint.X, currRefPoint.Y);
             }
 
             foreach (PolylineGeometry currGeometry in worldObject.Geometries)
@@ -185,16 +115,11 @@
             return points;
         }
 
-        private static IList<ReferencePoint> LoadRefPoints()
+        private static IList<ReferencePoint> LoadReferencePoints()
         {
             string path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\")) + @"Assets\reference_points.json";
             string jsonString = File.ReadAllText(path);
             return JsonConvert.DeserializeObject<List<ReferencePoint>>(jsonString);
-        }
-
-        private static double DistanceBetween(Point a, Point b)
-        {
-            return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
         }
 
         private static double ConvertToRadians(double angle)
@@ -203,7 +128,7 @@
         }
 
         // TODO: Code health: Investigate odd behaviour in Math.Cos
-        protected static double Cosine(double rad)
+        private static double Cosine(double rad)
         {
             double cos = 0;
 
@@ -219,6 +144,77 @@
         private static int Fact(int n)
         {
             return n <= 0 ? 1 : n * Fact(n - 1);
+        }
+
+        private void SetSensor(AutomatedCar car)
+        {
+            int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
+
+            if (this.sensorObject == null)
+            {
+                this.sensorObject = new WorldObject(car.X + car.RotationPoint.X, car.Y + car.RotationPoint.Y, "sensor.png");
+                this.sensorObject.RawGeometries.Add(GetRawGeometry(triangleBase, this.distance));
+                this.sensorObject.Collideable = false;
+                this.sensorObject.Geometries.Add(this.GetGeometry(car));
+                World.Instance.WorldObjects.Add(this.sensorObject);
+            }
+            else
+            {
+                this.sensorObject.X = car.X + car.RotationPoint.X;
+                this.sensorObject.Y = car.Y + car.RotationPoint.Y;
+                this.sensorObject.Geometries[0] = this.GetGeometry(car);
+            }
+
+            this.sensorObject.RotationPoint = new (triangleBase, this.distance + car.RotationPoint.Y - (int)this.RelativeLocation.Y);
+            this.sensorObject.Rotation = car.Rotation;
+        }
+
+        private void FindObjectsInSensorArea(ObservableCollection<WorldObject> worldObjects)
+        {
+            List<WorldObject> detectedObjects = new ();
+
+            foreach (WorldObject currObject in worldObjects)
+            {
+                foreach (Point point in GetPoints(currObject))
+                {
+                    if (this.sensorObject.Geometries[0].FillContains(point) && !detectedObjects.Contains(currObject) && !currObject.Filename.Contains("sensor"))
+                    {
+                        detectedObjects.Add(currObject);
+                    }
+                }
+            }
+
+            this.sensorPacket.DetectedObjects = detectedObjects;
+        }
+
+        private void FilterRelevantObjects()
+        {
+            this.sensorPacket.RelevantObjects = this.sensorPacket.DetectedObjects.Where(wo => this.IsRelevant(wo)).ToList();
+        }
+
+        private PolylineGeometry GetGeometry(AutomatedCar car)
+        {
+            double sin = Math.Sin(ConvertToRadians(car.Rotation));
+            double cos = Cosine(ConvertToRadians(car.Rotation));
+
+            Point pointToConvert0 = new (this.sensorObject.RawGeometries[0].Points[0].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[0].Y - this.sensorObject.RotationPoint.Y);
+            Point pointToConvert1 = new (this.sensorObject.RawGeometries[0].Points[1].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[1].Y - this.sensorObject.RotationPoint.Y);
+            Point pointToConvert2 = new (this.sensorObject.RawGeometries[0].Points[2].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[2].Y - this.sensorObject.RotationPoint.Y);
+
+            Point convertedPoint0 = new ((pointToConvert0.X * cos) - (pointToConvert0.Y * sin), (pointToConvert0.X * sin) + (pointToConvert0.Y * cos));
+            Point convertedPoint1 = new ((pointToConvert1.X * cos) - (pointToConvert1.Y * sin), (pointToConvert1.X * sin) + (pointToConvert1.Y * cos));
+            Point convertedPoint2 = new ((pointToConvert2.X * cos) - (pointToConvert2.Y * sin), (pointToConvert2.X * sin) + (pointToConvert2.Y * cos));
+
+            Point finalPoint = new (this.sensorObject.RotationPoint.X + this.sensorObject.X - this.sensorObject.RotationPoint.X, this.sensorObject.RotationPoint.Y + this.sensorObject.Y - this.sensorObject.RotationPoint.Y);
+            List<Point> points = new ()
+            {
+                new Point((int)(finalPoint.X + convertedPoint0.X), (int)(finalPoint.Y + convertedPoint0.Y)),
+                new Point((int)(finalPoint.X + convertedPoint1.X), (int)(finalPoint.Y + convertedPoint1.Y)),
+                new Point((int)(finalPoint.X + convertedPoint2.X), (int)(finalPoint.Y + convertedPoint2.Y)),
+                new Point((int)(finalPoint.X + convertedPoint0.X), (int)(finalPoint.Y + convertedPoint0.Y)),
+            };
+
+            return new PolylineGeometry(points, true);
         }
     }
 }

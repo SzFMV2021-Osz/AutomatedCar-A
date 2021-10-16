@@ -15,7 +15,7 @@
 
         public override void Process()
         {
-            this.CalculateBasicSensorData(World.Instance.ControlledCar, World.Instance.WorldObjects);
+            this.CalculateSensorData(World.Instance.ControlledCar, World.Instance.WorldObjects);
             this.FilterRoads();
         }
 
