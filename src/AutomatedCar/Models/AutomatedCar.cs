@@ -2,15 +2,15 @@ namespace AutomatedCar.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics;
+    using System.Linq;
     using Avalonia.Media;
     using global::AutomatedCar.Helpers;
     using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
 
-    public class AutomatedCar : Car, IAutomatedCar
+    public class AutomatedCar : Car
     {
         private const int PEDAL_OFFSET = 16;
         private const int MIN_PEDAL_POSITION = 0;

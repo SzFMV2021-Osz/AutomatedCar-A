@@ -16,7 +16,7 @@
         protected ISensorPacket sensorPacket;
         protected readonly int distance;
         private readonly int angleOfView;
-        private static IEnumerable<ReferencePoint> referencePoints = LoadRefPoints();
+        private static IList<ReferencePoint> referencePoints = LoadRefPoints();
 
         public WorldObject SensorObject { get; set; }
 
@@ -42,7 +42,7 @@
 
         public Point RelativeLocation { get; set; }
 
-        protected void CalculateBasicSensorData(IAutomatedCar car, IEnumerable<IWorldObject> worldObjects)
+        protected void CalculateBasicSensorData(AutomatedCar car, IList<WorldObject> worldObjects)
         {
             World.Instance.WorldObjects.Remove(this.SensorObject);
             this.SetSensor(car);
@@ -53,14 +53,14 @@
             this.sensorPacket.ClosestObject = this.FindClosestObject(this.sensorPacket.RelevantObjects, car);
         }
 
-        protected abstract bool IsRelevant(IWorldObject worldObject);
+        protected abstract bool IsRelevant(WorldObject worldObject);
 
-        protected IWorldObject FindClosestObject(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car)
+        protected WorldObject FindClosestObject(IList<WorldObject> worldObjects, AutomatedCar car)
         {
             Point carPoint = new(car.X, car.Y);
-            IWorldObject closestObject = null;
+            WorldObject closestObject = null;
 
-            foreach (IWorldObject currObject in worldObjects)
+            foreach (WorldObject currObject in worldObjects)
             {
                 double minDistance = double.MaxValue;
                 foreach (Point currPoint in GetPoints(currObject))
@@ -77,7 +77,7 @@
             return closestObject;
         }
 
-        public void SetSensor(IAutomatedCar car)
+        public void SetSensor(AutomatedCar car)
         {
             int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
 
@@ -100,11 +100,11 @@
             }
         }
 
-        private void FindObjectsInSensorArea(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car)
+        private void FindObjectsInSensorArea(IList<WorldObject> worldObjects, AutomatedCar car)
         {
-            ICollection<IWorldObject> detectedObjects = new List<IWorldObject>();
+            List<WorldObject> detectedObjects = new List<WorldObject>();
 
-            foreach (IWorldObject currObject in worldObjects)
+            foreach (WorldObject currObject in worldObjects)
             {
                 foreach (Point point in GetPoints(currObject))
                 {
@@ -124,7 +124,7 @@
             this.sensorPacket.RelevantObjects = this.sensorPacket.DetectedObjects.Where(wo => this.IsRelevant(wo)).ToList();
         }
 
-        private PolylineGeometry GetGeometry(IAutomatedCar car)
+        private PolylineGeometry GetGeometry(AutomatedCar car)
         {
             double sin = Math.Sin(ConvertToRadians(car.Rotation));
             double cos = Cosine(ConvertToRadians(car.Rotation));
@@ -162,7 +162,7 @@
             return new PolylineGeometry(points, true);
         }
 
-        private static List<Point> GetPoints(IWorldObject worldObject)
+        private static List<Point> GetPoints(WorldObject worldObject)
         {
             List<Point> points = new List<Point>();
             points.Add(new(worldObject.X, worldObject.Y));
@@ -185,7 +185,7 @@
             return points;
         }
 
-        private static IEnumerable<ReferencePoint> LoadRefPoints()
+        private static IList<ReferencePoint> LoadRefPoints()
         {
             string path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\")) + @"Assets\reference_points.json";
             string jsonString = File.ReadAllText(path);

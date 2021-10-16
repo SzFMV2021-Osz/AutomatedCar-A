@@ -19,7 +19,7 @@
             this.FilterRoads();
         }
 
-        protected override bool IsRelevant(IWorldObject worldObject)
+        protected override bool IsRelevant(WorldObject worldObject)
         {
             return worldObject.WorldObjectType == WorldObjectType.Road || worldObject.WorldObjectType == WorldObjectType.RoadSign;
         }

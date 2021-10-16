@@ -5,7 +5,7 @@ namespace AutomatedCar.Models
     using Avalonia.Media;
     using ReactiveUI;
 
-    public class WorldObject : ReactiveObject, IWorldObject
+    public class WorldObject : ReactiveObject
     {
         private int id;
         private int x;

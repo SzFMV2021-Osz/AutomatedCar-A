@@ -17,23 +17,23 @@
 
         public override void Process()
         {
-            IAutomatedCar car = World.Instance.ControlledCar;
+            AutomatedCar car = World.Instance.ControlledCar;
             this.CalculateBasicSensorData(car, World.Instance.WorldObjects);
             this.FilterIncoming(car);
         }
 
-        protected override bool IsRelevant(IWorldObject worldObject)
+        protected override bool IsRelevant(WorldObject worldObject)
         {
             return worldObject.Collideable;
         }
 
-        private void FilterIncoming(IAutomatedCar car)
+        private void FilterIncoming(AutomatedCar car)
         {
             Point carStartPoint = new Point(car.X, car.Y);
             Point carEndPoint = this.GetEndpoint(carStartPoint, car.Rotation);
 
-            ICollection<IWorldObject> incomingObjects = new List<IWorldObject>();
-            foreach (IWorldObject currObject in this.sensorPacket.RelevantObjects)
+            IList<WorldObject> incomingObjects = new List<WorldObject>();
+            foreach (WorldObject currObject in this.sensorPacket.RelevantObjects)
             {
                 if (!this.IsStationary(currObject))
                 {
@@ -50,14 +50,14 @@
             ((RadarPacket)this.sensorPacket).IncomingObjects = incomingObjects;
         }
 
-        private void FindClosestObjectInLane(IAutomatedCar car)
+        private void FindClosestObjectInLane(AutomatedCar car)
         {
             // TODO: for later PR.
             throw new NotImplementedException();
         }
 
         // TODO: Code health: Maintain this list with stationary objects. Investigate for options based on speed.
-        private bool IsStationary(IWorldObject worldObject)
+        private bool IsStationary(WorldObject worldObject)
         {
             return worldObject.WorldObjectType == WorldObjectType.Tree || worldObject.WorldObjectType == WorldObjectType.RoadSign;
         }
