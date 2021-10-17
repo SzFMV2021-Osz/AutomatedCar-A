@@ -6,15 +6,15 @@
 
     public sealed class RadarPacket : SensorPacket, IRadarPacket
     {
-        private IEnumerable<IWorldObject> incomingObjects;
-        private IWorldObject closestObjectInLane;
+        private IList<WorldObject> incomingObjects;
+        private WorldObject closestObjectInLane;
 
         public RadarPacket()
         {
-            this.incomingObjects = new List<IWorldObject>();
+            this.incomingObjects = new List<WorldObject>();
         }
 
-        public IEnumerable<IWorldObject> IncomingObjects
+        public IList<WorldObject> ClosingObjects
         {
             get
             {
@@ -27,7 +27,7 @@
             }
         }
 
-        public IWorldObject ClosestObjectInLane
+        public WorldObject ClosestObjectInLane
         {
             get
             {

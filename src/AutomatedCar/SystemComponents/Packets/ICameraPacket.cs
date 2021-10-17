@@ -5,6 +5,6 @@
 
     public interface ICameraPacket : ISensorPacket
     {
-        public IEnumerable<IWorldObject> Roads { get; set; }
+        public IList<WorldObject> Roads { get; set; }
     }
 }

@@ -4,19 +4,19 @@
     using AutomatedCar.Models;
     using ReactiveUI;
 
-    public abstract class SensorPacket : ReactiveObject, ISensorPacket
+    public abstract class SensorPacket : ReactiveObject
     {
-        private ICollection<IWorldObject> detectedObjects;
-        private ICollection<IWorldObject> relevantObjects;
-        private IWorldObject closestObject;
+        private IList<WorldObject> detectedObjects;
+        private IList<WorldObject> relevantObjects;
+        private WorldObject closestObject;
 
         public SensorPacket()
         {
-            this.detectedObjects = new List<IWorldObject>();
-            this.relevantObjects = new List<IWorldObject>();
+            this.detectedObjects = new List<WorldObject>();
+            this.relevantObjects = new List<WorldObject>();
         }
 
-        public ICollection<IWorldObject> DetectedObjects
+        public IList<WorldObject> DetectedObjects
         {
             get
             {
@@ -29,7 +29,7 @@
             }
         }
 
-        public ICollection<IWorldObject> RelevantObjects
+        public IList<WorldObject> RelevantObjects
         {
             get
             {
@@ -42,7 +42,7 @@
             }
         }
 
-        public IWorldObject ClosestObject
+        public WorldObject ClosestObject
         {
             get
             {

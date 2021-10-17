@@ -6,14 +6,14 @@
 
     public sealed class CameraPacket : SensorPacket, ICameraPacket
     {
-        private IEnumerable<IWorldObject> roads;
+        private IList<WorldObject> roads;
 
         public CameraPacket()
         {
-            this.Roads = new List<IWorldObject>();
+            this.Roads = new List<WorldObject>();
         }
 
-        public IEnumerable<IWorldObject> Roads
+        public IList<WorldObject> Roads
         {
             get
             {

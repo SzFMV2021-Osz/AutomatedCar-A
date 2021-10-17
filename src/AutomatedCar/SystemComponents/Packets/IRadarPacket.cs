@@ -5,8 +5,8 @@
 
     public interface IRadarPacket : ISensorPacket
     {
-        public IEnumerable<IWorldObject> IncomingObjects { get; set; }
+        public IList<WorldObject> ClosingObjects { get; set; }
 
-        public IWorldObject ClosestObjectInLane { get; set; }
+        public WorldObject ClosestObjectInLane { get; set; }
     }
 }
