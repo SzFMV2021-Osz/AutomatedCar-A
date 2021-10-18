@@ -22,9 +22,9 @@
 
         WorldObjectType WorldObjectType { get; set; }
 
-        int X { get; protected set; }
+        int X { get; set; }
 
-        int Y { get; protected set; }
+        int Y { get; set; }
 
         double PreciseX { get; set; }
 

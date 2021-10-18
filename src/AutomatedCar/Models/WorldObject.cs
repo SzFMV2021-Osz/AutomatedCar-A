@@ -34,14 +34,17 @@ namespace AutomatedCar.Models
         public int X
         {
             get => Convert.ToInt32(this.x);
-            set => this.RaiseAndSetIfChanged(ref this.x, value);
+            set => this.RaiseAndSetIfChanged(ref this.x, Convert.ToDouble(value));
         }
 
         public int Y
         {
-            get => this.y;
-            set => this.RaiseAndSetIfChanged(ref this.y, value);
+            get => Convert.ToInt32(this.y);
+            set => this.RaiseAndSetIfChanged(ref this.y, Convert.ToDouble(value));
         }
+
+        public double PreciseX { get => this.x; set => this.RaiseAndSetIfChanged(ref this.x, value); }
+        public double PreciseY { get => this.y; set => this.RaiseAndSetIfChanged(ref this.y, value); }
 
         public Point RotationPoint { get; set; }
 
