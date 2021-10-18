@@ -1,5 +1,6 @@
 namespace AutomatedCar.Models
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.Drawing;
     using Avalonia.Media;
@@ -7,8 +8,8 @@ namespace AutomatedCar.Models
 
     public class WorldObject : ReactiveObject, IWorldObject
     {
-        private int x;
-        private int y;
+        private double x;
+        private double y;
 
         private double rotation;
 
@@ -32,7 +33,7 @@ namespace AutomatedCar.Models
 
         public int X
         {
-            get => this.x;
+            get => Convert.ToInt32(this.x);
             set => this.RaiseAndSetIfChanged(ref this.x, value);
         }
 

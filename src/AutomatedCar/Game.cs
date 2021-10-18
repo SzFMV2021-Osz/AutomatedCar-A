@@ -35,7 +35,13 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
-            
+
+            // Move forward all the NPCs.
+            foreach (var item in World.Instance.GetAllNPCs())
+            {
+                item.StepObject();
+            }
+
             World.Instance.ControlledCar.CalculateNextPosition();
             carFocusHandler.Invoke();
         }

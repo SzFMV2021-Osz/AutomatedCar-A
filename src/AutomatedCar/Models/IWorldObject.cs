@@ -22,9 +22,13 @@
 
         WorldObjectType WorldObjectType { get; set; }
 
-        int X { get; set; }
+        int X { get; protected set; }
 
-        int Y { get; set; }
+        int Y { get; protected set; }
+
+        double PreciseX { get; set; }
+
+        double PreciseY { get; set; }
 
         int ZIndex { get; set; }
     }

@@ -13,6 +13,7 @@
     using Helpers;
     using Visualization;
     using Avalonia.Media;
+    using System.Linq;
 
     public class World : ReactiveObject
     {
@@ -32,6 +33,12 @@
             get => this.controlledCars[this.controlledCarPointer];
             
         }
+
+        public IEnumerable<AbstractNPC> GetAllNPCs()
+        {
+            return WorldObjects.OfType<AbstractNPC>();
+        }
+
         public int ControlledCarPointer
         {
             get => this.controlledCarPointer;

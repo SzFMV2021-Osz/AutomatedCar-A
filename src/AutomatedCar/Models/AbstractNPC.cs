@@ -43,7 +43,7 @@
         /// <summary>
         /// Responsible to calculate and set the object's next position.
         /// </summary>
-        protected void StepObject()
+        public void StepObject()
         {
             var timeOfMovement = DateTime.Now;
             var pixelsToMove = this.PixelsToMove(timeOfMovement);
