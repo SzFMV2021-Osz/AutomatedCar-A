@@ -35,9 +35,9 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
-            
+
             World.Instance.ControlledCar.CalculateNextPosition();
-            carFocusHandler.Invoke();
+            this.carFocusHandler.Invoke();
         }
     }
 }
