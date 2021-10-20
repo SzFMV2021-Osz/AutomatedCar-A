@@ -5,10 +5,10 @@
 
     public interface ISensorPacket
     {
-        IList<WorldObject> DetectedObjects { get; set; }
+        IWorldObject ClosestObject { get; set; }
 
-        IList<WorldObject> RelevantObjects { get; set; }
+        ICollection<IWorldObject> DetectedObjects { get; set; }
 
-        WorldObject ClosestObject { get; set; }
+        ICollection<IWorldObject> RelevantObjects { get; set; }
     }
 }

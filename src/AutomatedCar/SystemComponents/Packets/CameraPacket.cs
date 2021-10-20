@@ -1,29 +1,7 @@
 ﻿namespace AutomatedCar.SystemComponents.Packets
 {
-    using System.Collections.Generic;
-    using AutomatedCar.Models;
-    using ReactiveUI;
-
     public sealed class CameraPacket : SensorPacket, ICameraPacket
     {
-        private IList<WorldObject> roads;
-
-        public CameraPacket()
-        {
-            this.Roads = new List<WorldObject>();
-        }
-
-        public IList<WorldObject> Roads
-        {
-            get
-            {
-                return this.roads;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.roads, value);
-            }
-        }
+        // TODO extend with additional camera related fields when they are implemented.
     }
 }
