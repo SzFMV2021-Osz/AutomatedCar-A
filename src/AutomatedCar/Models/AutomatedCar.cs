@@ -2,10 +2,11 @@ namespace AutomatedCar.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Avalonia.Media;
+    using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
-    using SystemComponents;
 
     public class AutomatedCar : Car, IAutomatedCar
     {
@@ -20,6 +21,7 @@ namespace AutomatedCar.Models
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
+        private CollisionDetection collisionDetection;
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -27,10 +29,12 @@ namespace AutomatedCar.Models
             this.Velocity = new Vector();
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
+            this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
+            this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
+            this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
             this.sensors = new List<ISensor>();
             this.ZIndex = 10;
             this.ExternalGearbox = new ExternalGearbox(this);
-
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -73,25 +77,35 @@ namespace AutomatedCar.Models
 
         public Geometry Geometry { get; set; }
 
-        /// <summary>Starts the automated cor by starting the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
+        /// <summary>Starts the automated car by starting the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
         public void Start()
         {
             this.virtualFunctionBus.Start();
         }
 
-        /// <summary>Stops the automated cor by stopping the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
+        /// <summary>Stops the automated car by stopping the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
         public void Stop()
         {
             this.virtualFunctionBus.Stop();
         }
 
+        public void NpcCollisionEventHandler(object o, EventArgs args)
+        {
+            Debug.WriteLine($"Collision with an NPC!");
+        }
+
+        public void ObjectCollisionEventHandler(object o, EventArgs args)
+        {
+            Debug.WriteLine($"Collision with a static object!");
+        }
+
         public void SetSensors()
         {
-            Radar radar = new ();
+            Radar radar = new (this.virtualFunctionBus);
             radar.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.TopRight.X / 2, this.Geometry.Bounds.TopRight.Y);
             this.sensors.Add(radar);
 
-            Camera camera = new ();
+            Camera camera = new (this.virtualFunctionBus);
             camera.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.Center.X, this.Geometry.Bounds.Center.Y / 2);
             this.sensors.Add(camera);
         }
