@@ -11,7 +11,7 @@
 
     public class AutomaticEmergencyBrake : SystemComponent
     {
-        private const double MAX_DECELARATION = 9;
+        private const double MAX_DECELERATION = 9;
         private const int MIN_WARNING_SPEED = 70;
 
         private AutomaticEmergencyBrakePacket aebPacket;
@@ -93,7 +93,7 @@
         /// <returns>Distance required for braking.</returns>
         private double BrakeDistance(AutomatedCar car)
         {
-            return Math.Pow(car.Speed, 2) / (2 * this.NormalizeDecelaration(car.Speed));
+            return Math.Pow(car.Speed, 2) / (2 * this.NormalizeDeceleration(car.Speed));
         }
 
         /// <summary>
@@ -107,19 +107,19 @@
         }
 
         /// <summary>
-        /// Reaches max decelaration at 100 km/h. Normalizes the decelaration between 0 and 9.
+        /// Reaches max deceleration at 100 km/h. Normalizes the deceleration between 0 and 9.
         /// </summary>
         /// <param name="speed">Velocity of the car.</param>
         /// <returns>A real number between 0 and 9.</returns>
-        private double NormalizeDecelaration(int speed)
+        private double NormalizeDeceleration(int speed)
         {
             if (speed < 100)
             {
-                return MAX_DECELARATION * (speed / 100);
+                return MAX_DECELERATION * (speed / 100);
             }
             else
             {
-                return MAX_DECELARATION;
+                return MAX_DECELERATION;
             }
         }
     }
