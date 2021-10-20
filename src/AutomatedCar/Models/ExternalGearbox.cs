@@ -5,9 +5,10 @@
     using System;
     using SystemComponents;
 
-    public class ExternalGearbox : ReactiveObject
+    public class ExternalGearbox : ReactiveObject, IGearbox
     {
         public enum Gear { P = 0, R = 1, N = 2, D = 3 }
+
         private Gear currentExternalGear = Gear.P;
         private AutomatedCar automatedCar;
 
@@ -16,36 +17,37 @@
             this.automatedCar = automatedCar;
         }
 
-        public Gear CurrentExternalGear
+        public Gear currentGearPosition
         {
             get
             {
                 return this.currentExternalGear;
             }
+
             set
             {
                 this.RaiseAndSetIfChanged(ref this.currentExternalGear, value);
             }
         }
 
-        public void ExternalUpshift()
+        public void Upshift()
         {
-            if (CurrentExternalGear != Gear.D)
+            if (currentGearPosition != Gear.D)
             {
-                if ((automatedCar.Velocity.Y <= 0 && CurrentExternalGear == Gear.N) || automatedCar.Speed == 0 || CurrentExternalGear == Gear.R)
+                if ((automatedCar.Velocity.Y <= 0 && currentGearPosition == Gear.N) || automatedCar.Speed == 0 || currentGearPosition == Gear.R)
                 {
-                    CurrentExternalGear += 1;
+                    currentGearPosition += 1;
                 }
             }
         }
 
-        public void ExternalDownshift()
+        public void Downshift()
         {
-            if (CurrentExternalGear != 0)
+            if (currentGearPosition != 0)
             {
-                if ((automatedCar.Velocity.Y >= 0 && CurrentExternalGear == Gear.N) || automatedCar.Speed == 0 || CurrentExternalGear == Gear.D)
+                if ((automatedCar.Velocity.Y >= 0 && currentGearPosition == Gear.N) || automatedCar.Speed == 0 || currentGearPosition == Gear.D)
                 {
-                    CurrentExternalGear -= 1;
+                    currentGearPosition -= 1;
                 }
             }
         }
