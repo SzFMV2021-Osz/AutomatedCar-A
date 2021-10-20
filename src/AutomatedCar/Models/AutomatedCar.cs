@@ -61,13 +61,12 @@ namespace AutomatedCar.Models
             }
         }
 
-       
-
         public bool InFocus { get; set; }
 
         public int Revolution { get; set; }
 
-        public ExternalGearbox ExternalGearbox { get; set; }
+        public IGearbox ExternalGearbox { get; set; }
+
         public Vector Velocity { get; set; }
 
         public Vector Acceleration { get; set; }
@@ -109,32 +108,38 @@ namespace AutomatedCar.Models
 
             double slowingForce = Speed * DRAG + (Speed > 0 ? brakeInputForce : 0);
             Acceleration.Y = gasInputForce;
-            GearHandlingForVelocity(slowingForce);
+
+            Velocity.Y = GetVelocityAccordingToGear(slowingForce);
+
             Y += (int)Velocity.Y;
             CalculateSpeed();
         }
 
-        private void GearHandlingForVelocity(double slowingForce)
+        private double GetVelocityAccordingToGear(double slowingForce)
         {
-            if (ExternalGearbox.CurrentExternalGear == ExternalGearbox.Gear.D)
+            double velocity = Velocity.Y;
+
+            if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.D)
             {
-                Velocity.Y += -(Acceleration.Y - slowingForce);
+                velocity += -(Acceleration.Y - slowingForce);
             }
-            else if (ExternalGearbox.CurrentExternalGear == ExternalGearbox.Gear.R)
+            else if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R)
             {
-                Velocity.Y += Acceleration.Y - slowingForce;
+                velocity += Acceleration.Y - slowingForce;
             }
             else
             {
-                if (Velocity.Y < 0) //In neutral gear, the car can stop whether it goes forward or backward
+                if (velocity < 0) //In neutral gear, the car can stop whether it goes forward or backward
                 {
-                    Velocity.Y += slowingForce;
+                    velocity += slowingForce;
                 }
                 else
                 {
-                    Velocity.Y -= slowingForce;
+                    velocity -= slowingForce;
                 }
             }
+
+            return velocity;
         }
 
         public void IncreaseGasPedalPosition()
