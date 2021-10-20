@@ -3,7 +3,7 @@
     using AutomatedCar.Models;
     using Xunit;
 
-    public class ExternalGearboxUnitTest
+    public class ExternalGearboxUnitTest 
     {
         private ExternalGearbox externalGearbox;
         private AutomatedCar automatedCar;
@@ -19,10 +19,10 @@
         {
             for (int i = 0; i < 3; i++)
             {
-                externalGearbox.ExternalUpshift();
+                externalGearbox.Upshift();
             }
 
-            Assert.Equal(ExternalGearbox.Gear.D, externalGearbox.CurrentExternalGear);
+            Assert.Equal(ExternalGearbox.Gear.D, externalGearbox.currentGearPosition);
         }
 
         [Fact]
@@ -30,15 +30,15 @@
         {
             for (int i = 0; i < 3; i++)
             {
-                externalGearbox.ExternalUpshift();
+                externalGearbox.Upshift();
             }
 
             for (int i = 0; i < 2; i++)
             {
-                externalGearbox.ExternalDownshift();
+                externalGearbox.Downshift();
             }
 
-            Assert.Equal(ExternalGearbox.Gear.R, externalGearbox.CurrentExternalGear);
+            Assert.Equal(ExternalGearbox.Gear.R, externalGearbox.currentGearPosition);
         }
     }
 }
