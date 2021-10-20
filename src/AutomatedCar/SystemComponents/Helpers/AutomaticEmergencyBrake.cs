@@ -1,12 +1,11 @@
 ﻿namespace AutomatedCar.SystemComponents.Helpers
 {
-    using Avalonia;
-    using Models;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Avalonia;
     using Avalonia.Media;
-    using AutomatedCar.SystemComponents.Helpers;
+    using AutomatedCar.Models;
     using AutomatedCar.SystemComponents.Packets;
 
     public class AutomaticEmergencyBrake : SystemComponent
@@ -28,9 +27,9 @@
             AutomatedCar car = World.Instance.ControlledCar;
             IList<WorldObject> relevantObjects = this.virtualFunctionBus.RadarPacket.RelevantObjects;
 
-            foreach (var rObject in relevantObjects)
+            foreach (var relevantObject in relevantObjects)
             {
-                if (this.IsObjectInBrakeDistance(rObject, car))
+                if (this.IsObjectInBrakeDistance(relevantObject, car))
                 {
                     this.aebPacket.NeedEmergencyBrakeWarning = true;
                 }
@@ -48,14 +47,14 @@
         /// I added an error constant to the theoretical time distance,
         /// which helps to avoid braking in the very last second.
         /// </summary>
-        /// <param name="wObject">Object on the map.</param>
+        /// <param name="worldObject">Object on the map.</param>
         /// <param name="car">Controlled car.</param>
         /// <returns>True or False.</returns>
-        private bool IsObjectInBrakeDistance(WorldObject wObject, AutomatedCar car)
+        private bool IsObjectInBrakeDistance(WorldObject worldObject, AutomatedCar car)
         {
             double error = 1;
 
-            if (this.ObjectDistanceFromCarInTime(wObject, car) + error <= this.BrakeDistanceInTime(car))
+            if (this.ObjectDistanceFromCarInTime(worldObject, car) + error <= this.BrakeDistanceInTime(car))
             {
                 return true;
             }
@@ -66,24 +65,23 @@
         /// <summary>
         /// Calculates the distance between an object and the car using Euclidean norm (2-norm).
         /// </summary>
-        /// <param name="wObject">Object on the map.</param>
+        /// <param name="worldObject">Object on the map.</param>
         /// <param name="car">Controlled car.</param>
         /// <returns>Distance between the object and the car.</returns>
-        private double DistanceFromCar(WorldObject wObject, AutomatedCar car)
+        private double DistanceFromCar(WorldObject worldObject, AutomatedCar car)
         {
-            return Math.Sqrt(Math.Pow(wObject.X - car.X, 2) + Math.Pow(wObject.Y - car.Y, 2));
+            return Math.Sqrt(Math.Pow(worldObject.X - car.X, 2) + Math.Pow(worldObject.Y - car.Y, 2));
         }
 
         /// <summary>
         /// Calculates the time required to reach the object. t = s / v.
         /// </summary>
-        /// <param name="wObject">Object on the map.</param>
+        /// <param name="worldObject">Object on the map.</param>
         /// <param name="car">Controlled car.</param>
-        /// <returns>Time that required to reach the object..</returns>
-        private double ObjectDistanceFromCarInTime(WorldObject wObject, AutomatedCar car)
+        /// <returns>Time that required to reach the object.</returns>
+        private double ObjectDistanceFromCarInTime(WorldObject worldObject, AutomatedCar car)
         {
-            double distance = this.DistanceFromCar(wObject, car);
-            return distance / car.Speed;
+            return this.DistanceFromCar(worldObject, car) / car.Speed;
         }
 
         /// <summary>
