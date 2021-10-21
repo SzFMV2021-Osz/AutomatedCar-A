@@ -1,50 +1,36 @@
 ﻿namespace AutomatedCar.SystemComponents.Sensors
 {
-    using System.Collections.Generic;
+    using System.Linq;
     using AutomatedCar.Models;
-    using Avalonia;
+    using AutomatedCar.SystemComponents.Packets;
 
     public sealed class Camera : Sensor
     {
-        public Camera()
-            : base(60, 80)
+        public Camera(VirtualFunctionBus virtualFunctionBus)
+            : base(virtualFunctionBus, 60, 80)
         {
+            this.sensorPacket = new CameraPacket();
+            virtualFunctionBus.CameraPacket = (ICameraPacket)this.sensorPacket;
         }
 
-        protected override void FindClosestObject(IEnumerable<IWorldObject> relevantObjects, IAutomatedCar car)
+        public override void Process()
         {
-            Point carPoint = new (car.X, car.Y);
-            IWorldObject closestObject = null;
-
-            foreach (IWorldObject currObject in relevantObjects)
-            {
-                if (this.IsRelevant(currObject))
-                {
-                    double minDistance = double.MaxValue;
-                    foreach (Point currPoint in GetPoints(currObject))
-                    {
-                        double currDistance = this.DistanceBetween(carPoint, currPoint);
-                        if (currDistance < minDistance)
-                        {
-                            minDistance = currDistance;
-                            closestObject = currObject;
-                        }
-                    }
-                }
-            }
-
-            this.closestObject = closestObject;
+            this.CalculateSensorData(World.Instance.ControlledCar, World.Instance.WorldObjects);
+            this.FilterRoads();
         }
 
-        private bool IsRelevant(IWorldObject worldObject)
+        protected override bool IsRelevant(WorldObject worldObject)
         {
-            switch (worldObject.WorldObjectType)
-            {
-                case WorldObjectType.RoadSign: return true;
-                case WorldObjectType.Crosswalk: return true;
-                case WorldObjectType.Road: return true;
-                default: return false;
-            }
+            return worldObject.WorldObjectType == WorldObjectType.Road || worldObject.WorldObjectType == WorldObjectType.RoadSign;
+        }
+
+        private void FilterRoads()
+        {
+            ((CameraPacket)this.sensorPacket).Roads =
+                this.sensorPacket
+                .RelevantObjects
+                .Where(ro => ro.WorldObjectType == WorldObjectType.Road)
+                .ToList();
         }
     }
 }

@@ -19,6 +19,7 @@
         // private static readonly System.Lazy<World> lazySingleton = new System.Lazy<World> (() => new World());
         // public static World Instance { get { return lazySingleton.Value; } }
 
+        private int lastId = 0;
         private int controlledCarPointer = 0;
         private DebugStatus debugStatus = new DebugStatus();
         private ObservableCollection<AutomatedCar> controlledCars = new ();
@@ -30,7 +31,7 @@
         public AutomatedCar ControlledCar
         {
             get => this.controlledCars[this.controlledCarPointer];
-            
+
         }
 
         public int ControlledCarPointer
@@ -42,6 +43,12 @@
                 this.RaisePropertyChanged("ControlledCar");
             }
         }
+        public int GetNextId()
+        {
+            this.lastId++;
+            return this.lastId;
+        }
+
         public void AddControlledCar(AutomatedCar controlledCar)
         {
             this.controlledCars.Add(controlledCar);
@@ -73,7 +80,7 @@
             {
                this.ControlledCarPointer = this.controlledCars.Count - 1;
             }
-            
+
             controlledCars[controlledCarPointer].InFocus = true;
             this.RaisePropertyChanged("ControlledCar");
         }
@@ -81,7 +88,7 @@
         public int Width { get; set; }
 
         public int Height { get; set; }
-        
+
         public DebugStatus DebugStatus
         {
             get => this.debugStatus;
