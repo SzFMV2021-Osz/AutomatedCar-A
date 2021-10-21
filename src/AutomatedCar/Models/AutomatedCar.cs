@@ -19,7 +19,6 @@ namespace AutomatedCar.Models
         private const double DRAG = 0.006; // This limits the top speed to 166 km/h
         private const int IDLE_RPM = 800;
         private const int NEUTRAL_RPM_MULTIPLIER = 100;
-        private const int PIXEL_METER_RATIO = 50;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -204,16 +203,6 @@ namespace AutomatedCar.Models
         private int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
-        }
-
-        private int ConvertMetresToPixels(double metres)
-        {
-            return (int)(metres * PIXEL_METER_RATIO);
-        }
-
-        private int ConvertPixelsToMeter(double pixels)
-        {
-            return (int)(pixels / PIXEL_METER_RATIO);
         }
     }
 }
