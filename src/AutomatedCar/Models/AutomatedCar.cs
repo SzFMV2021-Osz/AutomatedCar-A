@@ -132,11 +132,11 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
-            double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double driveForce = EnvironmentalForces.GenerateEngineForce(this.revolution, this.gasPedalPosition, this.innerGear);
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
-            double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
+            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
 
-            this.Acceleration.Y = gasInputForce;
+            this.Acceleration.Y = driveForce;
             this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
             this.Y += (int)this.Velocity.Y;
             this.CalculateSpeed();

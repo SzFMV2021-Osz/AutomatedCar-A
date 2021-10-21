@@ -10,6 +10,7 @@ namespace AutomatedCar
     {
         private readonly World world;
         private CarFocusHandler carFocusHandler;
+
         public Game(World world)
         {
             this.world = world;

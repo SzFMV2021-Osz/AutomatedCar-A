@@ -33,6 +33,7 @@
             get => this.controlledCars[this.controlledCarPointer];
 
         }
+
         public int ControlledCarPointer
         {
             get => this.controlledCarPointer;
