@@ -4,6 +4,7 @@ namespace AutomatedCar.Models
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using Avalonia.Controls.Shapes;
     using Avalonia.Media;
     using global::AutomatedCar.Helpers;
     using global::AutomatedCar.SystemComponents;
@@ -26,7 +27,6 @@ namespace AutomatedCar.Models
         private int innerGear = 1;      //manually set until inner gearbox is implemented
 
         private VirtualFunctionBus virtualFunctionBus;
-        private ICollection<ISensor> sensors;
         private CollisionDetection collisionDetection;
 
         public AutomatedCar(int x, int y, string filename)
@@ -38,12 +38,17 @@ namespace AutomatedCar.Models
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
-            this.sensors = new List<ISensor>();
+            this.Radar = new (this.virtualFunctionBus);
+            this.Camera = new (this.virtualFunctionBus);
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
+
+        public Radar Radar { get; private set; }
+
+        public Camera Camera { get; private set; }
 
         public int GasPedalPosition
         {
@@ -116,13 +121,8 @@ namespace AutomatedCar.Models
 
         public void SetSensors()
         {
-            Radar radar = new (this.virtualFunctionBus);
-            radar.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.TopRight.X / 2, this.Geometry.Bounds.TopRight.Y);
-            this.sensors.Add(radar);
-
-            Camera camera = new (this.virtualFunctionBus);
-            camera.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.Center.X, this.Geometry.Bounds.Center.Y / 2);
-            this.sensors.Add(camera);
+            this.Radar.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.TopRight.X / 2, this.Geometry.Bounds.TopRight.Y);
+            this.Camera.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.Center.X, this.Geometry.Bounds.Center.Y / 2);
         }
 
         public void CalculateSpeed()

@@ -40,6 +40,14 @@
             }
         }
 
+        public IList<Avalonia.Point> Points
+        {
+            get
+            {
+                return this.DrawTriangle();
+            }
+        }
+
         public Point RelativeLocation { get; set; }
 
         protected static double DistanceBetween(Point from, Point to)
@@ -72,7 +80,6 @@
         protected void CalculateSensorData(AutomatedCar car, ObservableCollection<WorldObject> worldObjects)
         {
             this.SetSensor(car);
-
             this.FindObjectsInSensorArea(worldObjects);
             this.FilterRelevantObjects();
             this.sensorPacket.ClosestObject = FindClosestObject(this.sensorPacket.RelevantObjects, car);
@@ -84,10 +91,10 @@
         {
             List<Point> points = new ()
             {
-                new Point(triangleBase, distance),
                 new Point(0, 0),
                 new Point(2 * triangleBase, 0),
                 new Point(triangleBase, distance),
+                new Point(0, 0),
             };
 
             return new PolylineGeometry(points, true);
@@ -146,6 +153,20 @@
             return n <= 0 ? 1 : n * Fact(n - 1);
         }
 
+        private IList<Avalonia.Point> DrawTriangle()
+        {
+            int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
+            List<Point> points = new ()
+            {
+                new Point(0 + this.RelativeLocation.X, 0 + this.RelativeLocation.Y),
+                new Point(-triangleBase + this.RelativeLocation.X, -this.distance + this.RelativeLocation.Y),
+                new Point(triangleBase + this.RelativeLocation.X, -this.distance + this.RelativeLocation.Y),
+                new Point(0 + this.RelativeLocation.X, 0 + this.RelativeLocation.Y),
+            };
+
+            return points;
+        }
+
         private void SetSensor(AutomatedCar car)
         {
             int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
@@ -156,7 +177,6 @@
                 this.sensorObject.RawGeometries.Add(GetRawGeometry(triangleBase, this.distance));
                 this.sensorObject.Collideable = false;
                 this.sensorObject.Geometries.Add(this.GetGeometry(car));
-                World.Instance.WorldObjects.Add(this.sensorObject);
             }
             else
             {
