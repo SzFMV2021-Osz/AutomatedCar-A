@@ -217,7 +217,6 @@ namespace AutomatedCar.Models
             this.Velocity.Y -= normalizedDeceleration + slowingForce;
             this.Y += (int)this.Velocity.Y;
             this.CalculateSpeed();
-            this.CalculateRevolutions();
         }
     }
 }
