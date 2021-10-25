@@ -28,12 +28,12 @@ namespace AutomatedCar.Views
 
             if (Keyboard.IsKeyDown(Key.Left))
             {
-                World.Instance.ControlledCar.X -= 5;
+                World.Instance.ControlledCar.TurnSteeringWheelToLeft();
             }
 
             if (Keyboard.IsKeyDown(Key.Right))
             {
-                World.Instance.ControlledCar.X += 5;
+                World.Instance.ControlledCar.TurnSteeringWheelToRight();
             }
 
             if (Keyboard.IsKeyDown(Key.PageUp))
@@ -88,10 +88,12 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
+
             if (Keyboard.IsKeyDown(Key.A))
             {
                 World.Instance.ControlledCar.ExternalGearbox.Downshift();
             }
+
             if (Keyboard.IsKeyDown(Key.Q))
             {
                 World.Instance.ControlledCar.ExternalGearbox.Upshift();

@@ -4,6 +4,7 @@ namespace AutomatedCar.Models
     using System.Collections.Generic;
     using System.Diagnostics;
     using Avalonia.Media;
+    using global::AutomatedCar.Helpers;
     using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
@@ -15,6 +16,12 @@ namespace AutomatedCar.Models
         private const int MAX_PEDAL_POSITION = 100;
         private const double PEDAL_INPUT_MULTIPLIER = 0.01;
         private const double DRAG = 0.006; // This limits the top speed to 166 km/h
+
+        private const int MIN_SW_POSITION = -100;
+        private const int MAX_SW_POSITION = 100;
+        private const int SW_OFFSET = 16;
+
+        private int steeringWheelPosition;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -62,6 +69,19 @@ namespace AutomatedCar.Models
             private set
             {
                 this.RaiseAndSetIfChanged(ref this.brakePedalPosition, value);
+            }
+        }
+
+        public int SteeringWheelPosition
+        {
+            get
+            {
+                return this.steeringWheelPosition;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.steeringWheelPosition, value);
             }
         }
 
@@ -156,6 +176,11 @@ namespace AutomatedCar.Models
             return velocity;
         }
 
+        public Vector CalculateOrientaton()
+        {
+            return new Vector() { X = 0, Y = 1 };
+        }
+
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;
@@ -180,9 +205,26 @@ namespace AutomatedCar.Models
             this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
         }
 
+        public void TurnSteeringWheelToRight()
+        {
+            int newPosition = (int)this.SteeringWheelPosition + SW_OFFSET;
+            this.SteeringWheelPosition = this.BoundSteeringWheelPosition(newPosition);
+        }
+
+        public void TurnSteeringWheelToLeft()
+        {
+            int newPosition = (int)this.SteeringWheelPosition - SW_OFFSET;
+            this.SteeringWheelPosition = this.BoundSteeringWheelPosition(newPosition);
+        }
+
         private int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
+        }
+
+        private int BoundSteeringWheelPosition(int number)
+        {
+            return Math.Max(MIN_SW_POSITION, Math.Min(number, MAX_SW_POSITION));
         }
     }
 }
