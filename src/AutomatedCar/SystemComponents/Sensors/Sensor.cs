@@ -11,8 +11,8 @@
     public abstract class Sensor : SystemComponent, ISensor
     {
         protected ISensorPacket sensorPacket;
-        protected readonly int distance;
         private readonly int angleOfView;
+        private readonly int distance;
         private PolylineGeometry sensorArea;
 
         /// <summary>
@@ -37,43 +37,11 @@
 
         public Point RelativeLocation { get; set; }
 
-        protected void CalculateBasicSensorData(IAutomatedCar car, IEnumerable<IWorldObject> worldObjects)
-        {
-            this.CalculateSensorArea(car);
-            this.FindObjectsInSensorArea(worldObjects, car);
-            this.FilterRelevantObjects();
-            this.sensorPacket.ClosestObject = this.FindClosestObject(this.sensorPacket.RelevantObjects, car);
-        }
-
-        protected abstract bool IsRelevant(IWorldObject worldObject);
-
-        protected IWorldObject FindClosestObject(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car)
-        {
-            Point carPoint = new (car.X, car.Y);
-            IWorldObject closestObject = null;
-
-            foreach (IWorldObject currObject in worldObjects)
-            {
-                double minDistance = double.MaxValue;
-                foreach (Point currPoint in GetPoints(currObject))
-                {
-                    double currDistance = DistanceBetween(carPoint, currPoint);
-                    if (currDistance < minDistance)
-                    {
-                        minDistance = currDistance;
-                        closestObject = currObject;
-                    }
-                }
-            }
-
-            return closestObject;
-        }
-
-        private void CalculateSensorArea(IAutomatedCar car)
+        protected void CalculateSensorArea(IAutomatedCar car)
         {
             double radius = this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2));
             double sin = Math.Sin(ConvertToRadians(car.Rotation));
-            double cos = Cosine(ConvertToRadians(car.Rotation));
+            double cos = Math.Cos(ConvertToRadians(car.Rotation));
 
             Point location = new (car.X + this.RelativeLocation.X, car.Y + this.RelativeLocation.Y);
 
@@ -96,39 +64,68 @@
             this.sensorArea = new PolylineGeometry(points, true);
         }
 
-        private void FindObjectsInSensorArea(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car)
+        protected void FindObjectsInSensorArea(IEnumerable<IWorldObject> worldObjects, IAutomatedCar car)
         {
-            ICollection<IWorldObject> detectedObjects = new List<IWorldObject>();
-
-            foreach (IWorldObject currObject in worldObjects)
+            foreach (IWorldObject currentObj in worldObjects)
             {
-                foreach (Point point in GetPoints(currObject))
+                foreach (Point point in GetPoints(currentObj))
                 {
-                    if (this.sensorArea.FillContains(point) && !detectedObjects.Contains(currObject))
+                    if (this.sensorArea.FillContains(point) && !this.sensorPacket.DetectedObjects.Contains(currentObj))
                     {
-                        detectedObjects.Add(currObject);
+                        this.sensorPacket.DetectedObjects.Add(currentObj);
                     }
                 }
             }
 
-            detectedObjects.Remove(car);
-            this.sensorPacket.DetectedObjects = detectedObjects;
+            this.sensorPacket.DetectedObjects.Remove(car);
         }
 
-        private void FilterRelevantObjects()
+        protected void FindClosestObject(IAutomatedCar car)
+        {
+            Point carPoint = new (car.X, car.Y);
+            IWorldObject closestObject = null;
+
+            foreach (IWorldObject currObject in this.sensorPacket.RelevantObjects)
+            {
+                double minDistance = double.MaxValue;
+                foreach (Point currPoint in GetPoints(currObject))
+                {
+                    double currDistance = DistanceBetween(carPoint, currPoint);
+                    if (currDistance < minDistance)
+                    {
+                        minDistance = currDistance;
+                        closestObject = currObject;
+                    }
+                }
+            }
+
+            this.sensorPacket.ClosestObject = closestObject;
+        }
+
+        protected void FilterRelevantObjects()
         {
             this.sensorPacket.RelevantObjects = this.sensorPacket.DetectedObjects.Where(wo => this.IsRelevant(wo)).ToList();
         }
 
-        private static List<Point> GetPoints(IWorldObject worldObject)
+        protected abstract bool IsRelevant(IWorldObject worldObject);
+
+        private static List<Point> GetPoints(IWorldObject wo)
         {
-            List<Point> points = new List<Point>();
-            foreach (PolylineGeometry currGeometry in worldObject.Geometries)
+            Point basePoint = new (wo.X, wo.Y);
+            List<Point> points = new ();
+            try
             {
-                foreach (Point currPoint in currGeometry.Points)
+                foreach (Geometry geometry in wo.RawGeometries)
                 {
-                    points.Add(new Point(currPoint.X + worldObject.X, currPoint.Y + worldObject.Y));
+                    points.Add(basePoint + geometry.Bounds.Center);
+                    points.Add(basePoint + geometry.Bounds.TopLeft - geometry.Bounds.Position);
+                    points.Add(basePoint + geometry.Bounds.TopRight - geometry.Bounds.Position);
+                    points.Add(basePoint + geometry.Bounds.BottomLeft - geometry.Bounds.Position);
+                    points.Add(basePoint + geometry.Bounds.BottomRight - geometry.Bounds.Position);
                 }
+            }
+            catch (Exception)
+            {
             }
 
             return points;
@@ -142,25 +139,6 @@
         private static double ConvertToRadians(double angle)
         {
             return angle * (Math.PI / 180);
-        }
-
-        // TODO: Code health: Investigate odd behaviour in Math.Cos
-        protected static double Cosine(double rad)
-        {
-            double cos = 0;
-
-            int i;
-            for (i = 0; i < 7; i++)
-            {
-                cos += Math.Pow(-1, i) * Math.Pow(rad, 2 * i) / Fact(2 * i);
-            }
-
-            return cos;
-        }
-
-        private static int Fact(int n)
-        {
-            return n <= 0 ? 1 : n * Fact(n - 1);
         }
     }
 }

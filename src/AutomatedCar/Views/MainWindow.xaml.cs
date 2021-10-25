@@ -88,11 +88,13 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
-
-            if (Keyboard.IsKeyDown(Key.L))
+            if (Keyboard.IsKeyDown(Key.A))
             {
-                World.Instance.ControlledCar.LaneKeeping();
-
+                World.Instance.ControlledCar.ExternalGearbox.Downshift();
+            }
+            if (Keyboard.IsKeyDown(Key.Q))
+            {
+                World.Instance.ControlledCar.ExternalGearbox.Upshift();
             }
         }
 

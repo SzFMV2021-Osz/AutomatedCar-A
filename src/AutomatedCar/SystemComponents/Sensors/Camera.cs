@@ -1,6 +1,5 @@
 ﻿namespace AutomatedCar.SystemComponents.Sensors
 {
-    using System.Linq;
     using AutomatedCar.Models;
     using AutomatedCar.SystemComponents.Packets;
 
@@ -15,23 +14,17 @@
 
         public override void Process()
         {
-            this.CalculateBasicSensorData(World.Instance.ControlledCar, World.Instance.WorldObjects);
-            this.FilterRoads();
+            IAutomatedCar car = World.Instance.ControlledCar;
+            this.CalculateSensorArea(car);
+            this.FindObjectsInSensorArea(World.Instance.WorldObjects, car);
+            this.FilterRelevantObjects();
+            this.FindClosestObject(car);
         }
 
+        // "A kamerára a sávtartóautomatika (LKA) és a táblafelismerő (TSR) épül, így annak a szenzornak az útelemek és a táblák relevánsak."
         protected override bool IsRelevant(IWorldObject worldObject)
         {
-            return worldObject.WorldObjectType == WorldObjectType.Road || worldObject.WorldObjectType == WorldObjectType.RoadSign;
-        }
-
-        private void FilterRoads()
-        {
-            ;
-            ((CameraPacket)this.sensorPacket).Roads =
-                this.sensorPacket
-                .RelevantObjects
-                .Where(ro => ro.WorldObjectType == WorldObjectType.Road)
-                .ToList();
+            return worldObject.Filename.Contains("Road");
         }
     }
 }
