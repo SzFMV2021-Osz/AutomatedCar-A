@@ -11,6 +11,7 @@
     using Avalonia;
     using Avalonia.Media;
     using Newtonsoft.Json;
+    using System.Reflection;
 
     public abstract class Sensor : SystemComponent, ISensor
     {
@@ -124,8 +125,8 @@
 
         private static IList<ReferencePoint> LoadReferencePoints()
         {
-            string path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\")) + @"Assets\reference_points.json";
-            string jsonString = File.ReadAllText(path);
+            string jsonString = new StreamReader(Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream($"AutomatedCar.Assets.reference_points.json")).ReadToEnd();
             return JsonConvert.DeserializeObject<List<ReferencePoint>>(jsonString);
         }
 

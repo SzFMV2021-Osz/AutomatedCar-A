@@ -4,17 +4,21 @@ namespace Tests
     using AutomatedCar.Models;
     using System.Linq;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class CarControlUnitTest
     {
 
         private AutomatedCar automatedCar;
+        private readonly ITestOutputHelper output;
 
-        public CarControlUnitTest()
+
+        public CarControlUnitTest(ITestOutputHelper output)
         {
             automatedCar = new AutomatedCar(100, 100, "car_1_white.png");
+            this.output = output;
         }
-        
+
         [Fact]
         public void ShouldBoundGasPedalPosition()
         {
@@ -45,6 +49,11 @@ namespace Tests
         public void ShouldCalculateNextPositionAndProperties()
         {
             // given
+            for (int i = 0; i < 3; i++)
+            {
+                automatedCar.ExternalGearbox.Upshift();
+            }
+
             for (int i = 0; i < 10; i++)
             {
                 automatedCar.IncreaseGasPedalPosition();
@@ -60,6 +69,7 @@ namespace Tests
             Assert.Equal(100, automatedCar.GasPedalPosition);
             Assert.Equal(1, automatedCar.Acceleration.Y);
             Assert.True(automatedCar.Velocity.Y > -10);
+
             Assert.True(automatedCar.Y < 100);
         }
 
@@ -69,6 +79,12 @@ namespace Tests
             // given
             for (int i = 0; i < 3; i++)
             {
+                automatedCar.ExternalGearbox.Upshift();
+
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
                 automatedCar.IncreaseGasPedalPosition();
             }
             
@@ -76,6 +92,8 @@ namespace Tests
             {
                 automatedCar.CalculateNextPosition();
             }
+
+
             // when
             for (int i = 0; i < 3; i++)
             {

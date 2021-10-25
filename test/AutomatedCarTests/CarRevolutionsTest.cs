@@ -19,6 +19,7 @@
         {
             // Arrange
             int rpmBefore = car.Revolution;
+            car.ExternalGearbox.Upshift();
 
             // Act
             for (int i = 0; i < 10; i++)
