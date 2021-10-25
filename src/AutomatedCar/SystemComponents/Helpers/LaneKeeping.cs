@@ -30,7 +30,8 @@
                 && !this.laneKeepingPacket.CarCentered)
             {
                 this.CenterCar();
-                this.ChangeLaneKeepingStatus(this.cameraPacket.Roads);
+                //TODO
+                this.ChangeLaneKeepingStatus(this.cameraPacket.DetectedObjects);
             }
         }
 
