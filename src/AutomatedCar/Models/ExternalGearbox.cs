@@ -5,10 +5,10 @@
     using System;
     using SystemComponents;
 
+    public enum Gear { P = 0, R = 1, N = 2, D = 3 }
+
     public class ExternalGearbox : ReactiveObject, IGearbox
     {
-        public enum Gear { P = 0, R = 1, N = 2, D = 3 }
-
         private Gear currentExternalGear = Gear.P;
         private AutomatedCar automatedCar;
 

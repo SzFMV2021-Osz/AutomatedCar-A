@@ -149,11 +149,11 @@ namespace AutomatedCar.Models
         {
             double velocity = Velocity.Y;
 
-            if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.D)
+            if (ExternalGearbox.currentGearPosition == Gear.D)
             {
                 velocity += -(Acceleration.Y - slowingForce);
             }
-            else if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R)
+            else if (ExternalGearbox.currentGearPosition == Gear.R)
             {
                 velocity += Acceleration.Y - slowingForce;
             }
