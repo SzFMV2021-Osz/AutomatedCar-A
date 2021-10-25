@@ -3,15 +3,15 @@ namespace AutomatedCar.Models
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using Avalonia.Media;
-    using global::AutomatedCar.Helpers;
     using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Helpers;
     using global::AutomatedCar.SystemComponents.Sensors;
+    using Helpers;
     using ReactiveUI;
+    using System.Linq;
 
-    public class AutomatedCar : Car
+    public class AutomatedCar : Car, IAutomatedCar
     {
         private const int PEDAL_OFFSET = 16;
         private const int MIN_PEDAL_POSITION = 0;
@@ -24,7 +24,7 @@ namespace AutomatedCar.Models
         private int gasPedalPosition;
         private int brakePedalPosition;
         private int revolution;
-        private int innerGear = 1;      //manually set until inner gearbox is implemented
+        private int innerGear = 1; //manually set until inner gearbox is implemented
 
         private VirtualFunctionBus virtualFunctionBus;
         private ICollection<ISensor> sensors;
@@ -41,6 +41,7 @@ namespace AutomatedCar.Models
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
             this.automaticEmergencyBrake = new AutomaticEmergencyBrake(this.virtualFunctionBus);
+            this.ExternalGearbox = new ExternalGearbox(this);
             this.sensors = new List<ISensor>();
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
@@ -82,12 +83,13 @@ namespace AutomatedCar.Models
             {
                 return this.revolution;
             }
-
             set
             {
                 this.RaiseAndSetIfChanged(ref this.revolution, value);
             }
         }
+
+        public IGearbox ExternalGearbox { get; set; }
 
         public Vector Velocity { get; set; }
 
@@ -119,12 +121,14 @@ namespace AutomatedCar.Models
 
         public void SetSensors()
         {
-            Radar radar = new (this.virtualFunctionBus);
-            radar.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.TopRight.X / 2, this.Geometry.Bounds.TopRight.Y);
+            Radar radar = new(this.virtualFunctionBus);
+            radar.RelativeLocation =
+                new Avalonia.Point(this.Geometry.Bounds.TopRight.X / 2, this.Geometry.Bounds.TopRight.Y);
             this.sensors.Add(radar);
 
-            Camera camera = new (this.virtualFunctionBus);
-            camera.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.Center.X, this.Geometry.Bounds.Center.Y / 2);
+            Camera camera = new(this.virtualFunctionBus);
+            camera.RelativeLocation =
+                new Avalonia.Point(this.Geometry.Bounds.Center.X, this.Geometry.Bounds.Center.Y / 2);
             this.sensors.Add(camera);
         }
 
@@ -139,11 +143,40 @@ namespace AutomatedCar.Models
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
 
-            this.Acceleration.Y = gasInputForce;
-            this.Velocity.Y += -(this.Acceleration.Y - slowingForce);
-            this.Y += (int)this.Velocity.Y;
-            this.CalculateSpeed();
-            this.CalculateRevolutions();
+            Acceleration.Y = gasInputForce;
+
+            Velocity.Y = GetVelocityAccordingToGear(slowingForce);
+
+            Y += (int)Velocity.Y;
+            CalculateSpeed();
+            CalculateRevolutions();
+        }
+
+        private double GetVelocityAccordingToGear(double slowingForce)
+        {
+            double velocity = Velocity.Y;
+
+            if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.D)
+            {
+                velocity += -(Acceleration.Y - slowingForce);
+            }
+            else if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R)
+            {
+                velocity += Acceleration.Y - slowingForce;
+            }
+            else
+            {
+                if (velocity < 0) //In neutral gear, the car can stop whether it goes forward or backward
+                {
+                    velocity += slowingForce;
+                }
+                else
+                {
+                    velocity -= slowingForce;
+                }
+            }
+
+            return velocity;
         }
 
         public void IncreaseGasPedalPosition()
@@ -184,7 +217,8 @@ namespace AutomatedCar.Models
 
         private void IncreaseRevolutions()
         {
-            double revolutionsIncreaseRate = RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.innerGear).Item2;
+            double revolutionsIncreaseRate =
+                RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.innerGear).Item2;
             if (this.innerGear > 0)
             {
                 this.Revolution += (int)Math.Round(this.Speed * revolutionsIncreaseRate);
@@ -197,8 +231,11 @@ namespace AutomatedCar.Models
 
         private void DecreaseRevolutions()
         {
-            double revolutionsDecreaseRate = RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.innerGear).Item2 / 5;
-            var revolutionChange = this.brakePedalPosition > 0 ? this.brakePedalPosition * revolutionsDecreaseRate : Math.Pow(Math.Log(this.Speed + 1) / 20, -1.38) * revolutionsDecreaseRate;
+            double revolutionsDecreaseRate =
+                RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.innerGear).Item2 / 5;
+            var revolutionChange = this.brakePedalPosition > 0
+                ? this.brakePedalPosition * revolutionsDecreaseRate
+                : Math.Pow(Math.Log(this.Speed + 1) / 20, -1.38) * revolutionsDecreaseRate;
             int newRPM = this.revolution - (int)Math.Round(revolutionChange);
             this.Revolution = Math.Max(newRPM, IDLE_RPM);
         }
