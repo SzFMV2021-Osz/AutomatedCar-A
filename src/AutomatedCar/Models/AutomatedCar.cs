@@ -9,7 +9,7 @@ namespace AutomatedCar.Models
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
 
-    public class AutomatedCar : Car, IAutomatedCar
+    public class AutomatedCar : Car
     {
         private const int PEDAL_OFFSET = 16;
         private const int MIN_PEDAL_POSITION = 0;
