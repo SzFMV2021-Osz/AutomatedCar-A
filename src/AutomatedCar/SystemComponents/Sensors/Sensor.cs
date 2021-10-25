@@ -5,15 +5,15 @@
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using AutomatedCar.Models;
     using AutomatedCar.SystemComponents.Helpers;
     using AutomatedCar.SystemComponents.Packets;
     using Avalonia;
     using Avalonia.Media;
     using Newtonsoft.Json;
-    using System.Reflection;
 
-    public abstract class Sensor : SystemComponent, ISensor
+    public abstract class Sensor : SystemComponent
     {
         protected ISensorPacket sensorPacket;
         private static readonly IList<ReferencePoint> ReferencePoints = LoadReferencePoints();
@@ -32,23 +32,21 @@
         {
             if (angleOfView < 0 || angleOfView > 360 || distance < 0)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("Sensor initialized with invalid " + (distance < 0 ? "distance" : "angleOfView"));
             }
             else
             {
                 this.angleOfView = angleOfView;
-                this.distance = distance * 50;  // 1 meter is 50 pixel
+                this.distance = distance * 50;  // 1 meter is counted as approx 50 pixel
             }
         }
 
         public IList<Avalonia.Point> Points
         {
-            get
-            {
-                return this.DrawTriangle();
-            }
+            get => this.DrawTriangle();
         }
 
+        /// <summary>Gets or sets the sensor's location on car.</summary>
         public Point RelativeLocation { get; set; }
 
         protected static double DistanceBetween(Point from, Point to)
@@ -135,25 +133,6 @@
             return angle * (Math.PI / 180);
         }
 
-        // TODO: Code health: Investigate odd behaviour in Math.Cos
-        private static double Cosine(double rad)
-        {
-            double cos = 0;
-
-            int i;
-            for (i = 0; i < 7; i++)
-            {
-                cos += Math.Pow(-1, i) * Math.Pow(rad, 2 * i) / Fact(2 * i);
-            }
-
-            return cos;
-        }
-
-        private static int Fact(int n)
-        {
-            return n <= 0 ? 1 : n * Fact(n - 1);
-        }
-
         private IList<Avalonia.Point> DrawTriangle()
         {
             int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
@@ -216,7 +195,7 @@
         private PolylineGeometry GetGeometry(AutomatedCar car)
         {
             double sin = Math.Sin(ConvertToRadians(car.Rotation));
-            double cos = Cosine(ConvertToRadians(car.Rotation));
+            double cos = Math.Cos(ConvertToRadians(car.Rotation));
 
             Point pointToConvert0 = new (this.sensorObject.RawGeometries[0].Points[0].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[0].Y - this.sensorObject.RotationPoint.Y);
             Point pointToConvert1 = new (this.sensorObject.RawGeometries[0].Points[1].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[1].Y - this.sensorObject.RotationPoint.Y);

@@ -12,15 +12,8 @@
         /// <inheritdoc />
         public CollisionType TypeOfCollision
         {
-            get
-            {
-                return this.typeOfCollision;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.typeOfCollision, value);
-            }
+            get => this.typeOfCollision;
+            set => this.RaiseAndSetIfChanged(ref this.typeOfCollision, value);
         }
     }
 }
