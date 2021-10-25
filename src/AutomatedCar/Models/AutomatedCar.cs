@@ -40,7 +40,7 @@ namespace AutomatedCar.Models
             this.Camera = new (this.virtualFunctionBus);
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
-            this.ExternalGearbox = new ExternalGearbox(this);
+            this.ExternalGearbox = new Gearbox(this);
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -149,11 +149,11 @@ namespace AutomatedCar.Models
         {
             double velocity = Velocity.Y;
 
-            if (ExternalGearbox.currentGearPosition == Gear.D)
+            if (ExternalGearbox.CurrentExternalGearPosition == Gear.D)
             {
                 velocity += -(Acceleration.Y - slowingForce);
             }
-            else if (ExternalGearbox.currentGearPosition == Gear.R)
+            else if (ExternalGearbox.CurrentExternalGearPosition == Gear.R)
             {
                 velocity += Acceleration.Y - slowingForce;
             }

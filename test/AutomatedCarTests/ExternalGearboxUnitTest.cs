@@ -5,13 +5,13 @@
 
     public class ExternalGearboxUnitTest 
     {
-        private ExternalGearbox externalGearbox;
+        private Gearbox externalGearbox;
         private AutomatedCar automatedCar;
 
         public ExternalGearboxUnitTest()
         {
             automatedCar = new AutomatedCar(100, 100, "car_1_white.png");
-            externalGearbox = new ExternalGearbox(automatedCar);
+            externalGearbox = new Gearbox(automatedCar);
         }
 
         [Fact]
@@ -22,7 +22,7 @@
                 externalGearbox.Upshift();
             }
 
-            Assert.Equal(ExternalGearbox.Gear.D, externalGearbox.currentGearPosition);
+            Assert.Equal(Gearbox.Gear.D, externalGearbox.currentGearPosition);
         }
 
         [Fact]
@@ -38,7 +38,7 @@
                 externalGearbox.Downshift();
             }
 
-            Assert.Equal(ExternalGearbox.Gear.R, externalGearbox.currentGearPosition);
+            Assert.Equal(Gearbox.Gear.R, externalGearbox.currentGearPosition);
         }
     }
 }
