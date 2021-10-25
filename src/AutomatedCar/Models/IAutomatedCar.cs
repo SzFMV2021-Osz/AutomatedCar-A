@@ -1,7 +1,7 @@
-﻿namespace AutomatedCar.Models
+namespace AutomatedCar.Models
 {
     using Avalonia.Media;
-    using global::AutomatedCar.SystemComponents;
+    using SystemComponents;
 
     public interface IAutomatedCar : IWorldObject
     {
