@@ -34,7 +34,7 @@
             return airResistance + friction;
         }
 
-        private static double LookupTorqueCurve(double rpm)
+        public static double LookupTorqueCurve(double rpm)
         {
             int rounded_rpm = CarConfig.TorqueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(rpm - x)).First();
             return CarConfig.TorqueLookupTable[rounded_rpm];

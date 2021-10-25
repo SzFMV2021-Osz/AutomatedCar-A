@@ -1,6 +1,7 @@
 namespace Tests
 {
     using AutomatedCar;
+    using AutomatedCar.Helpers;
     using AutomatedCar.Models;
     using System.Collections.Generic;
     using System.Linq;
@@ -61,7 +62,8 @@ namespace Tests
 
             // then
             Assert.Equal(100, automatedCar.GasPedalPosition);
-            Assert.Equal(automatedCar.GenerateEngineForce(), automatedCar.Acceleration.Y);
+            Assert.Equal(EnvironmentalForces.GenerateEngineForce(automatedCar.Revolution,
+                automatedCar.GasPedalPosition, automatedCar.InnerGear), automatedCar.Acceleration.Y);
             Assert.True(automatedCar.Velocity.Y > -10);
             Assert.True(automatedCar.Y < 100);
         }
@@ -82,7 +84,8 @@ namespace Tests
 
             // when
 
-            int engineForce = (int)(this.automatedCar.GenerateEngineForce());
+            int engineForce = (int)(EnvironmentalForces.GenerateEngineForce(automatedCar.Revolution,
+                automatedCar.GasPedalPosition, automatedCar.InnerGear));
 
             // then
 
@@ -102,7 +105,7 @@ namespace Tests
 
             // when
 
-            double torque = this.automatedCar.LookupTorqueCurve(rpm);
+            double torque = EnvironmentalForces.LookupTorqueCurve(rpm);
 
             // then
 

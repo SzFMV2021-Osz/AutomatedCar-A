@@ -86,6 +86,19 @@ namespace AutomatedCar.Models
             }
         }
 
+        public int InnerGear
+        {
+            get
+            {
+                return this.innerGear;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.innerGear, value);
+            }
+        }
+
         public Vector Velocity { get; set; }
 
         public Vector Acceleration { get; set; }
