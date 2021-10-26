@@ -19,10 +19,10 @@
         {
             for (int i = 0; i < 3; i++)
             {
-                externalGearbox.Upshift();
+                externalGearbox.ExternalUpshift();
             }
 
-            Assert.Equal(Gearbox.Gear.D, externalGearbox.currentGearPosition);
+            Assert.Equal(Gear.D, externalGearbox.CurrentExternalGearPosition);
         }
 
         [Fact]
@@ -30,15 +30,15 @@
         {
             for (int i = 0; i < 3; i++)
             {
-                externalGearbox.Upshift();
+                externalGearbox.ExternalUpshift();
             }
 
             for (int i = 0; i < 2; i++)
             {
-                externalGearbox.Downshift();
+                externalGearbox.ExternalDownshift();
             }
 
-            Assert.Equal(Gearbox.Gear.R, externalGearbox.currentGearPosition);
+            Assert.Equal(Gear.R, externalGearbox.CurrentExternalGearPosition);
         }
     }
 }

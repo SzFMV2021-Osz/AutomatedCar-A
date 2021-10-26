@@ -51,7 +51,7 @@ namespace Tests
             // given
             for (int i = 0; i < 3; i++)
             {
-                automatedCar.Gearbox.Upshift();
+                automatedCar.Gearbox.ExternalUpshift();
             }
 
             for (int i = 0; i < 10; i++)
@@ -79,7 +79,7 @@ namespace Tests
             // given
             for (int i = 0; i < 3; i++)
             {
-                automatedCar.Gearbox.Upshift();
+                automatedCar.Gearbox.ExternalUpshift();
 
             }
 
