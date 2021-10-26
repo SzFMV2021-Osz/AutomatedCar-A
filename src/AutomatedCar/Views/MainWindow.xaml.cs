@@ -90,11 +90,11 @@ namespace AutomatedCar.Views
             }
             if (Keyboard.IsKeyDown(Key.A))
             {
-                World.Instance.ControlledCar.ExternalGearbox.ExternalDownshift();
+                World.Instance.ControlledCar.Gearbox.ExternalDownshift();
             }
             if (Keyboard.IsKeyDown(Key.Q))
             {
-                World.Instance.ControlledCar.ExternalGearbox.ExternalUpshift();
+                World.Instance.ControlledCar.Gearbox.ExternalUpshift();
             }
         }
 
