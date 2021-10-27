@@ -43,7 +43,7 @@ namespace AutomatedCar
             }
 
             World.Instance.ControlledCar.CalculateNextPosition();
-            carFocusHandler.Invoke();
+            this.carFocusHandler.Invoke();
         }
     }
 }

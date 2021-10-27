@@ -88,6 +88,14 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
+            if (Keyboard.IsKeyDown(Key.A))
+            {
+                World.Instance.ControlledCar.Gearbox.ExternalDownshift();
+            }
+            if (Keyboard.IsKeyDown(Key.Q))
+            {
+                World.Instance.ControlledCar.Gearbox.ExternalUpshift();
+            }
         }
 
         protected override void OnKeyUp(KeyEventArgs e)

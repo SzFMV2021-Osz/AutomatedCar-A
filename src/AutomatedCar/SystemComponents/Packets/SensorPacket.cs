@@ -4,55 +4,34 @@
     using AutomatedCar.Models;
     using ReactiveUI;
 
-    public abstract class SensorPacket : ReactiveObject, ISensorPacket
+    public abstract class SensorPacket : ReactiveObject
     {
-        private ICollection<IWorldObject> detectedObjects;
-        private ICollection<IWorldObject> relevantObjects;
-        private IWorldObject closestObject;
+        private IList<WorldObject> detectedObjects;
+        private IList<WorldObject> relevantObjects;
+        private WorldObject closestObject;
 
         public SensorPacket()
         {
-            this.detectedObjects = new List<IWorldObject>();
-            this.relevantObjects = new List<IWorldObject>();
+            this.detectedObjects = new List<WorldObject>();
+            this.relevantObjects = new List<WorldObject>();
         }
 
-        public ICollection<IWorldObject> DetectedObjects
+        public IList<WorldObject> DetectedObjects
         {
-            get
-            {
-                return this.detectedObjects;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.detectedObjects, value);
-            }
+            get => this.detectedObjects;
+            set => this.RaiseAndSetIfChanged(ref this.detectedObjects, value);
         }
 
-        public ICollection<IWorldObject> RelevantObjects
+        public IList<WorldObject> RelevantObjects
         {
-            get
-            {
-                return this.relevantObjects;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.relevantObjects, value);
-            }
+            get => this.relevantObjects;
+            set => this.RaiseAndSetIfChanged(ref this.relevantObjects, value);
         }
 
-        public IWorldObject ClosestObject
+        public WorldObject ClosestObject
         {
-            get
-            {
-                return this.closestObject;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.closestObject, value);
-            }
+            get => this.closestObject;
+            set => this.RaiseAndSetIfChanged(ref this.closestObject, value);
         }
     }
 }

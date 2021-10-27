@@ -46,7 +46,9 @@
                         </Canvas.RenderTransform>
                         <Image Width="{Binding Width}" Height="{Binding Height}"
                             Source="{Binding Filename, Converter={x:Static visualization:WorldObjectTransformer.Instance}}"/>
-                        <Polyline Stroke="#FF4000" StrokeThickness="2" Points="{Binding Geometry.Points, Mode=OneWay}" IsVisible="{Binding Path=DataContext.DebugStatus.Enabled, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <Polyline Stroke="#FF4000"  StrokeThickness="2" Points="{Binding Geometry.Points, Mode=OneWay}" IsVisible="{Binding Path=DataContext.DebugStatus.Enabled, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <Polyline Stroke="Black"    StrokeThickness="2" Points="{Binding Radar.Points}" IsVisible="{Binding Path=DataContext.DebugStatus.Radar, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <Polyline Stroke="Green" StrokeThickness="2" Points="{Binding Camera.Points}" IsVisible="{Binding Path=DataContext.DebugStatus.Camera, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                     </Canvas>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type models:WorldObject}">

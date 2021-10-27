@@ -6,10 +6,11 @@ namespace AutomatedCar.Models
     using Avalonia.Media;
     using ReactiveUI;
 
-    public class WorldObject : ReactiveObject, IWorldObject
+    public class WorldObject : ReactiveObject
     {
-        private double x;
-        private double y;
+        private int id;
+        private int x;
+        private int y;
 
         private double rotation;
 
@@ -21,6 +22,7 @@ namespace AutomatedCar.Models
             this.ZIndex = zindex;
             this.Collideable = collideable;
             this.WorldObjectType = worldObjectType;
+            this.Id = World.Instance.GetNextId();
         }
 
         public int ZIndex { get; set; }
@@ -36,6 +38,8 @@ namespace AutomatedCar.Models
             get => Convert.ToInt32(this.x);
             set => this.RaiseAndSetIfChanged(ref this.x, Convert.ToDouble(value));
         }
+
+        public int Id { get; private set; }
 
         public int Y
         {
