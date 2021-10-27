@@ -1,6 +1,7 @@
 namespace AutomatedCar.Views
 {
     using AutomatedCar.Models;
+    using AutomatedCar.SystemComponents;
     using Avalonia.Controls;
     using Avalonia.Input;
     using Avalonia.Markup.Xaml;
@@ -16,12 +17,13 @@ namespace AutomatedCar.Views
         {
             Keyboard.Keys.Add(e.Key);
             base.OnKeyDown(e);
-            if (Keyboard.IsKeyDown(Key.Up))
+            VirtualFunctionBus virtualFunctionBus = World.Instance.ControlledCar.VirtualFunctionBus;
+            if (Keyboard.IsKeyDown(Key.Up) && !virtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.IncreaseGasPedalPosition();
             }
 
-            if (Keyboard.IsKeyDown(Key.Down))
+            if (Keyboard.IsKeyDown(Key.Down) && !virtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.IncreaseBrakePedalPosition();
             }
