@@ -68,7 +68,7 @@
         }
 
         /// Recursive function only modify with extreme caution.
-        public void MoveForward(double distanceToMove)
+        private void MoveForward(double distanceToMove)
         {
             var distanceFromNextTurn = GetDistance(NextTurn);
 
@@ -111,10 +111,8 @@
         /// <summary>
         /// Responsible to calculate and set the object's next position.
         /// </summary>
-        public void StepObject()
+        public void StepObject(DateTime timeOfMovement)
         {
-            var timeOfMovement = DateTime.Now;
-
             MoveForward(PixelsToMove(timeOfMovement));
             SetRotation();
 

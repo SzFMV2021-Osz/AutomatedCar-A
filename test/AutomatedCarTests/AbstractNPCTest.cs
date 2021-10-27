@@ -89,11 +89,12 @@
         [ClassData(typeof(MovementTestDataProvider))]
         public void MovementTest(List<Vector> path, Vector expectedDestination, int speed, int expectedAmountOfMoves)
         {
-            var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = speed };
+            var startTime = DateTime.Now;
+            var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = speed, TimeOfLastMove = startTime};
             foreach (var item in Enumerable.Range(0, expectedAmountOfMoves))
             {
                 var before = new Vector(npc.X, npc.Y);
-                npc.MoveForward(speed);
+                npc.StepObject(startTime + TimeSpan.FromSeconds(item + 1));
                 var after = new Vector(npc.X, npc.Y);
                 Assert.NotEqual(before, after);
             }
