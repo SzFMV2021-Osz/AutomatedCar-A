@@ -7,6 +7,11 @@ namespace AutomatedCar.Models
         public double X { get; set; }
         public double Y { get; set; }
 
+        public Vector()
+        {
+
+        }
+
         public Vector(double x, double y)
         {
             this.X = x;
