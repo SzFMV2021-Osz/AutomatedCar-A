@@ -8,6 +8,7 @@ namespace AutomatedCar.Models
         public int CompareTo(object obj)
         {
             //TODO
+            return 1;
         }
     }
 }
