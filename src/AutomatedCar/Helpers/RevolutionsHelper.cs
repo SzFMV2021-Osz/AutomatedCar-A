@@ -12,10 +12,10 @@
         public static List<Tuple<int, double>> GearCoefficients { get; set; } = new List<Tuple<int, double>>()
         {
             new Tuple<int, double>(0, 1), // this is for N
-            new Tuple<int, double>(1, 2.5),
-            new Tuple<int, double>(2, 0.7),
-            new Tuple<int, double>(3, 0.55),
-            new Tuple<int, double>(4, 0.45),
+            new Tuple<int, double>(1, 0.8),
+            new Tuple<int, double>(2, 0.3),
+            new Tuple<int, double>(3, 0.15),
+            new Tuple<int, double>(4, 0.1),
         };
     }
 }
