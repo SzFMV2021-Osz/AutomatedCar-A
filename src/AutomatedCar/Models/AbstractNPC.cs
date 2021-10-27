@@ -12,6 +12,7 @@
     public abstract class AbstractNPC : WorldObject, INonPlayerCharacter
     {
         public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType) : base(x, y, filename, 1, true, worldObjectType)
+
         {
             this.NextTurn = this.PathCoordinates[2];
         }
@@ -103,11 +104,21 @@
         /// </summary>
         public void StepObject()
         {
+            SetRotation();
             var timeOfMovement = DateTime.Now;
 
             MoveForward(PixelsToMove(timeOfMovement));
 
             this.TimeOfLastMove = timeOfMovement;
+        }
+
+        /// <summary>
+        /// Set the rotation in degrees based on the direction
+        /// </summary>
+        /// <returns>Returns the rotation in degrees</returns>
+        public void SetRotation(){
+            var direction = GetDirection();
+            this.Rotation = Math.Atan2(direction.Y, direction.X) * (180/Math.PI) + 90;
         }
     }
 }

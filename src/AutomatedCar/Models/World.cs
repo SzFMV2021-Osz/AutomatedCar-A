@@ -23,6 +23,7 @@
         private int controlledCarPointer = 0;
         private DebugStatus debugStatus = new DebugStatus();
         private ObservableCollection<AutomatedCar> controlledCars = new ();
+        private ObservableCollection<NonPlayerCar> NpcCars = new ();
 
         public static World Instance { get; } = new World();
 
@@ -53,6 +54,12 @@
             this.controlledCars.Add(controlledCar);
             this.AddObject(controlledCar);
         }
+        public void AddNpcCar(NonPlayerCar npcCar)
+        {
+            this.NpcCars.Add(npcCar);
+            this.AddObject(npcCar);
+        }
+
         public void NextControlledCar()
         {
             controlledCars[controlledCarPointer].InFocus = false;
