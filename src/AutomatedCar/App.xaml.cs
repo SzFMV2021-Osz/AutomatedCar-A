@@ -65,17 +65,35 @@ namespace AutomatedCar
                 world.AddControlledCar(controlledCar2);
                 controlledCar2.Start();
 
-                var npccar = new Models.NonPlayerCar(330,1425, "car_1_blue.png");
-                npccar.Geometries = new ObservableCollection<PolylineGeometry>();
-                npccar.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(36, 240), new Point(36, 180) }, false));
-                npccar.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(72, 240), new Point(72, 180) }, false));
-                world.AddObject(npccar);
-                
-                var npcpedestrian = new Models.Pedestrian(1625,525, "man.png");
-                npcpedestrian.Geometries = new ObservableCollection<PolylineGeometry>();
-                npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(42, 220), new Point(42, 200) }, false));
-                npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(66, 220), new Point(66, 200) }, false));
-                world.AddObject(npcpedestrian);
+                //test for adding extra controlledcar - works
+                //var controlledCar3 = new Models.AutomatedCar(330, 1425, "car_1_blue.png");
+                //controlledCar3.Geometry = geom;
+                //controlledCar3.RotationPoint = new System.Drawing.Point(54, 120);
+                //controlledCar3.Geometries = new ObservableCollection<PolylineGeometry>();
+                //controlledCar3.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(36, 240), new Point(36, 180) }, false));
+                //controlledCar3.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(72, 240), new Point(72, 180) }, false));
+                //controlledCar3.Rotation = 45;
+                //controlledCar3.SetSensors();
+                //world.AddControlledCar(controlledCar3);
+                //controlledCar3.Start();
+
+
+
+                //var npccar = new Models.NonPlayerCar(330, 1425, "car_1_blue.png");
+                //npccar.Geometries = new ObservableCollection<PolylineGeometry>();
+                //npccar.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(36, 240), new Point(36, 180) }, false));
+                //npccar.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(72, 240), new Point(72, 180) }, false));
+                //world.AddObject(npccar);
+
+                //var npcpedestrian = new Models.Pedestrian(1625, 525, "man.png");
+                //npcpedestrian.Geometries = new ObservableCollection<PolylineGeometry>();
+                //npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(42, 220), new Point(42, 200) }, false));
+                //npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(66, 220), new Point(66, 200) }, false));
+                ////world.AddObject(npcpedestrian);
+
+                //uncomment this to not run app
+                //var npccar = new Models.NonPlayerCar(330, 1425, "car_1_blue.png");
+                //world.AddNpcCar(npccar);
 
                 desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(game) };
                 game.setCarFocusHandler(((MainWindow)desktop.MainWindow).FocusCar);

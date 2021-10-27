@@ -1,5 +1,6 @@
 ﻿namespace AutomatedCar.Models
 {
+    using global::AutomatedCar.SystemComponents;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
@@ -11,6 +12,8 @@
 
     public class Pedestrian : AbstractNPC
     {
+        private VirtualFunctionBus virtualFunctionBus;
+        public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
         public Pedestrian(int x, int y, string filename) : base(x, y, filename, WorldObjectType.Pedestrian)
         {
             var pedJsonName = "NPCPedestrian1CoordinatesPathTestWorld.json";
@@ -19,6 +22,7 @@
 
             this.PathCoordinates = JsonConvert.DeserializeObject<List<Vector>>(reader.ReadToEnd());
             this.Speed = 10;
+            this.virtualFunctionBus = new VirtualFunctionBus();
         }
     }
 }

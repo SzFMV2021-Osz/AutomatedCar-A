@@ -12,6 +12,7 @@
     public abstract class AbstractNPC : WorldObject, INonPlayerCharacter
     {
         public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType) : base(x, y, filename, 1, true, worldObjectType)
+
         {
             this.NextTurn = this.PathCoordinates[2];
         }
