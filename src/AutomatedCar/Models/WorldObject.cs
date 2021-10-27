@@ -9,8 +9,10 @@ namespace AutomatedCar.Models
     public class WorldObject : ReactiveObject
     {
         private int id;
-        private double x;
-        private double y;
+        private int x;
+        private int y;
+        private double preciseX;
+        private double preciseY;
 
         private double rotation;
 
@@ -35,20 +37,33 @@ namespace AutomatedCar.Models
 
         public int X
         {
-            get => Convert.ToInt32(this.x);
-            set => this.RaiseAndSetIfChanged(ref this.x, Convert.ToDouble(value));
+            get => this.x;
+            set => this.RaiseAndSetIfChanged(ref this.x, value);
         }
-
-        public int Id { get; private set; }
 
         public int Y
         {
-            get => Convert.ToInt32(this.y);
-            set => this.RaiseAndSetIfChanged(ref this.y, Convert.ToDouble(value));
+            get => this.y;
+            set => this.RaiseAndSetIfChanged(ref this.y, value);
         }
+        public int Id { get; private set; }
 
-        public double PreciseX { get => this.x; set => this.RaiseAndSetIfChanged(ref this.x, value); }
-        public double PreciseY { get => this.y; set => this.RaiseAndSetIfChanged(ref this.y, value); }
+        public double PreciseX { 
+            get => this.preciseX;
+            set {
+                this.preciseX = value;
+                X = Convert.ToInt32(value);
+            }
+        }
+        public double PreciseY 
+        { 
+            get => this.preciseY;
+            set
+            {
+                this.preciseY = value;
+                Y = Convert.ToInt32(value);
+            }
+        }
 
         public Point RotationPoint { get; set; }
 

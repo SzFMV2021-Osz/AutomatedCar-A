@@ -28,12 +28,12 @@ namespace AutomatedCar.Views
 
             if (Keyboard.IsKeyDown(Key.Left))
             {
-                World.Instance.ControlledCar.X -= 5;
+                World.Instance.ControlledCar.PreciseX -= 5;
             }
 
             if (Keyboard.IsKeyDown(Key.Right))
             {
-                World.Instance.ControlledCar.X += 5;
+                World.Instance.ControlledCar.PreciseX += 5;
             }
 
             if (Keyboard.IsKeyDown(Key.PageUp))
