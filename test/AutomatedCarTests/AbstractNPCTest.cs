@@ -64,6 +64,18 @@
                     1,
                     30
                 };
+                yield return new object[]
+                {
+                    new List<Vector>()
+                    {
+                        new Vector(0, 0),
+                        new Vector(3, 4),
+                        new Vector(0, 8)
+                    },
+                    new Vector(0, 8),
+                    1,
+                    10
+                };
             }
 
             IEnumerator<object[]> IEnumerable<object[]>.GetEnumerator() => GetEnumerator();
