@@ -91,9 +91,10 @@ namespace AutomatedCar
                 //npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(66, 220), new Point(66, 200) }, false));
                 ////world.AddObject(npcpedestrian);
 
-                //uncomment this to not run app
-                //var npccar = new Models.NonPlayerCar(330, 1425, "car_1_blue.png");
-                //world.AddNpcCar(npccar);
+                //comment out this two line to run app
+                var npccar = new Models.NonPlayerCar(330, 1425, "car_1_blue.png");
+                world.AddNpcCar(npccar);
+
 
                 desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(game) };
                 game.setCarFocusHandler(((MainWindow)desktop.MainWindow).FocusCar);
