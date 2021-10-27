@@ -9,8 +9,8 @@ namespace AutomatedCar.Models
     public class WorldObject : ReactiveObject
     {
         private int id;
-        private int x;
-        private int y;
+        private double x;
+        private double y;
 
         private double rotation;
 

@@ -49,7 +49,7 @@
         }
 
         // inheritdoc..
-        public DateTime TimeOfLastMove { get; set; }
+        public DateTime TimeOfLastMove { get; set; } = DateTime.Now;
 
         // inheritdoc..
         public bool IsRepeatingPath { get; set; }
