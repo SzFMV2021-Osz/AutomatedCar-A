@@ -24,7 +24,9 @@
         private int controlledCarPointer = 0;
         private DebugStatus debugStatus = new DebugStatus();
         private ObservableCollection<AutomatedCar> controlledCars = new ();
-        private ObservableCollection<NonPlayerCar> NpcCars = new ();
+
+        private delegate void NpcMovementHandler();
+        private event NpcMovementHandler StepNpcs;
 
         public static World Instance { get; } = new World();
 
@@ -61,10 +63,16 @@
             this.controlledCars.Add(controlledCar);
             this.AddObject(controlledCar);
         }
-        public void AddNpcCar(NonPlayerCar npcCar)
+
+        public void AddNpc(AbstractNPC npc)
         {
-            this.NpcCars.Add(npcCar);
-            this.AddObject(npcCar);
+            this.StepNpcs += new NpcMovementHandler(npc.StepObject);
+            this.AddObject(npc);
+        }
+
+        public void StepNonPlayerCharacters()
+        {
+            this.StepNpcs?.Invoke();
         }
 
         public void NextControlledCar()

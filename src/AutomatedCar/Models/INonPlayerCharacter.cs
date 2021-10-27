@@ -41,10 +41,16 @@
         /// </summary>
         /// <returns>return the normalized direction containing vector.</returns>
         Vector GetDirection();
+
         /// <summary>
         /// Set the rotation in degrees based on the direction
         /// </summary>
         /// <returns>Returns the rotation in degrees</returns>
         void SetRotation();
+
+        /// <summary>
+        /// Responsible to calculate and set the object's position derived from the elapsed time.
+        /// </summary>
+        public void StepObject();
     }
 }

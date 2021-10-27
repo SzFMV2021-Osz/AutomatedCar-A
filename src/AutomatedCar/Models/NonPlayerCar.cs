@@ -12,10 +12,6 @@
 
     public class NonPlayerCar : AbstractNPC
     {
-        private VirtualFunctionBus virtualFunctionBus;
-
-        public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
-
         public NonPlayerCar(int x, int y, string filename) : base(x, y, filename, WorldObjectType.Car)
         {
             var nonPlayerCarJsonName = "NPCCarCoordinatesPathTestWorld.json";
@@ -24,9 +20,6 @@
 
             this.PathCoordinates = JsonConvert.DeserializeObject<List<Vector>>(reader.ReadToEnd());
             this.Speed = 60;
-
-            //this.ZIndex = 10;
-            this.virtualFunctionBus = new VirtualFunctionBus();
         }
     }
 }
