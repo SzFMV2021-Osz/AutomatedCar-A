@@ -12,7 +12,7 @@
 
     public class Pedestrian : AbstractNPC
     {
-        public Pedestrian(int x, int y, string filename, string pedJsonName) : base(x, y, filename, WorldObjectType.Pedestrian)
+        public Pedestrian(int x, int y, string filename, string pedJsonName, bool isRepeatingPath) : base(x, y, filename, WorldObjectType.Pedestrian, isRepeatingPath)
         {
             StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly()
                     .GetManifestResourceStream($"AutomatedCar.Assets.{pedJsonName}"));

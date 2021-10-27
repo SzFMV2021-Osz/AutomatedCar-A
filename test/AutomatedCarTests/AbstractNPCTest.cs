@@ -57,11 +57,12 @@
                     new List<Vector>()
                     {
                         new Vector(0, 0),
-                        new Vector(10, 10),
+                        new Vector(10, 0),
                         new Vector(10, 20)
                     },
                     new Vector(10, 20),
                     1,
+                    30
                 };
             }
 
@@ -72,10 +73,15 @@
 
         [Theory]
         [ClassData(typeof(MovementTestDataProvider))]
-        public void MovementTest(List<Vector> path, Vector expectedDestination, int speed)
+        public void MovementTest(List<Vector> path, Vector expectedDestination, int speed, int expectedAmountOfMoves)
         {
             var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = speed };
-
+            foreach (var item in Enumerable.Range(0, expectedAmountOfMoves))
+            {
+                npc.MoveForward(speed);
+            }
+            Assert.Equal(npc.X, expectedDestination.X);
+            Assert.Equal(npc.Y, expectedDestination.Y);
         }
 
     }

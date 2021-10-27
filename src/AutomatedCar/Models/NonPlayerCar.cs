@@ -12,11 +12,11 @@
 
     public class NonPlayerCar : AbstractNPC
     {
-        public NonPlayerCar(int x, int y, string filename) : base(x, y, filename, WorldObjectType.Car)
+        public NonPlayerCar(int x, int y, string filename) : base(x, y, filename, WorldObjectType.Car, false)
         {
 
         }
-        public NonPlayerCar(int x, int y, string filename, string nonPlayerCarJsonName) : base(x, y, filename, WorldObjectType.Car)
+        public NonPlayerCar(int x, int y, string filename, string nonPlayerCarJsonName, bool isRepeatingPath) : base(x, y, filename, WorldObjectType.Car, isRepeatingPath)
         {
             StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly()
                     .GetManifestResourceStream($"AutomatedCar.Assets.{nonPlayerCarJsonName}"));
