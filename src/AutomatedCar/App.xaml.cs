@@ -40,7 +40,6 @@ namespace AutomatedCar
                 var world = World.Instance;
 
                 var game = new Game(world);
-                game.Start();
 
                 world.PopulateFromJSON($"AutomatedCar.Assets.test_world.json");
 
@@ -67,6 +66,7 @@ namespace AutomatedCar
 
                 desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(game) };
                 game.setCarFocusHandler(((MainWindow)desktop.MainWindow).FocusCar);
+                game.Start();
             }
 
             base.OnFrameworkInitializationCompleted();

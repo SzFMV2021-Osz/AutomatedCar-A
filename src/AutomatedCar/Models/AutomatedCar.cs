@@ -8,6 +8,7 @@ namespace AutomatedCar.Models
     using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
+    using System.Drawing;
 
     public class AutomatedCar : Car
     {
@@ -21,10 +22,14 @@ namespace AutomatedCar.Models
         private const int NEUTRAL_RPM_MULTIPLIER = 80;
         private const int RPM_DOWNSHIFT_POINT = 1300;
         private const int RPM_UPSHIFT_POINT = 2500;
+        private const int WHEELBASE = 200;
+        private const int TURNING_OFFSET = 5;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
         private int revolution;
+        private double carHeading;
+        private double turningAngle;
 
         private VirtualFunctionBus virtualFunctionBus;
         private CollisionDetection collisionDetection;
@@ -43,6 +48,8 @@ namespace AutomatedCar.Models
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
+            carHeading = -1.5;
+            turningAngle = 0;
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -143,8 +150,8 @@ namespace AutomatedCar.Models
 
             Velocity.Y = GetVelocityAccordingToGear(slowingForce);
 
-            Y += (int)Velocity.Y;
             CalculateSpeed();
+            Turn(turningAngle);
             CalculateRevolutions();
             if (Gearbox.InnerShiftingStatus != Shifting.None)
             {
@@ -152,6 +159,49 @@ namespace AutomatedCar.Models
             }
         }
 
+        public void StraightenWheel()
+        {
+            if (turningAngle < 0)
+            {
+                turningAngle += TURNING_OFFSET;
+            }
+            else if (turningAngle > 0)
+            {
+                turningAngle -= TURNING_OFFSET;
+            }
+        }
+        
+        public void TurnLeft()
+        {
+            turningAngle = TURNING_OFFSET;
+        }
+        
+        public void TurnRight()
+        { 
+            turningAngle = -TURNING_OFFSET;
+        }
+        
+        private void Turn(double steerAngle)
+        {
+            double frontX = X + (WHEELBASE / 2 * Math.Cos(carHeading));
+            double frontY = Y + (WHEELBASE / 2 * Math.Sin(carHeading));
+            double rearX = X - (WHEELBASE / 2 * Math.Cos(carHeading));
+            double rearY = Y - (WHEELBASE / 2 * Math.Sin(carHeading));
+
+            double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -3 : 3;
+            
+            frontX += Speed * 0.25 * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
+            frontY += Speed * 0.25 * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
+            rearX += Speed * 0.25 * Math.Cos(carHeading) * reverseMultiplier;
+            rearY += Speed * 0.25 * Math.Sin(carHeading) * reverseMultiplier;
+            
+            X = (int)(frontX + rearX) / 2;
+            Y = (int)(frontY + rearY) / 2;
+            
+            carHeading = Math.Atan2(frontY - rearY, frontX - rearX);
+            Rotation = ((carHeading * 180) / Math.PI) + 87;
+        }
+        
         private double GetVelocityAccordingToGear(double slowingForce)
         {
             double velocity = Velocity.Y;
@@ -178,7 +228,7 @@ namespace AutomatedCar.Models
 
             return velocity;
         }
-
+        
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;
