@@ -37,7 +37,7 @@
             else
             {
                 this.angleOfView = angleOfView;
-                this.distance = distance * 50;  // 1 meter is counted as approx 50 pixel
+                this.distance = distance * 50 / 50;  // 1 meter is counted as approx 50 pixel
             }
         }
 
@@ -48,11 +48,6 @@
 
         /// <summary>Gets or sets the sensor's location on car.</summary>
         public Point RelativeLocation { get; set; }
-
-        protected static double DistanceBetween(Point from, Point to)
-        {
-            return Math.Sqrt(Math.Pow(from.X - to.X, 2) + Math.Pow(from.Y - to.Y, 2));
-        }
 
         protected static WorldObject FindClosestObject(IList<WorldObject> worldObjects, AutomatedCar car)
         {
@@ -76,6 +71,11 @@
             return closestObject;
         }
 
+        protected static double DistanceBetween(Point from, Point to)
+        {
+            return Math.Sqrt(Math.Pow(from.X - to.X, 2) + Math.Pow(from.Y - to.Y, 2));
+        }
+
         protected void CalculateSensorData(AutomatedCar car, ObservableCollection<WorldObject> worldObjects)
         {
             this.SetSensor(car);
@@ -85,6 +85,40 @@
         }
 
         protected abstract bool IsRelevant(WorldObject worldObject);
+
+        private static PolylineGeometry RotateRawGeometry(PolylineGeometry geometry, System.Drawing.Point rotationPoint, double rotation)
+        {
+            List<Point> rotatedPoints = new ();
+            foreach (Point point in geometry.Points)
+            {
+                rotatedPoints.Add(RotatePoint(point, rotationPoint, rotation));
+            }
+
+            return new PolylineGeometry(rotatedPoints, true);
+        }
+
+        private static Point RotatePoint(Point point, System.Drawing.Point rotationPoint, double rotation)
+        {
+            Point transformedPoint = new (point.X - rotationPoint.X, point.Y - rotationPoint.Y);
+
+            double sin = Math.Sin(ConvertToRadians(rotation));
+            double cos = Math.Cos(ConvertToRadians(rotation));
+            Point rotatedPoint = new ((transformedPoint.X * cos) - (transformedPoint.Y * sin), (transformedPoint.X * sin) + (transformedPoint.Y * cos));
+
+            return rotatedPoint;
+        }
+
+        private static PolylineGeometry ShiftGeometryWithWorldCoordinates(PolylineGeometry geometry, int x, int y)
+        {
+            Points shiftedPoints = new ();
+
+            foreach (Point point in geometry.Points)
+            {
+                shiftedPoints.Add(new Point((int)(point.X + x), (int)(point.Y + y)));
+            }
+
+            return new PolylineGeometry(shiftedPoints, true);
+        }
 
         private static PolylineGeometry GetRawGeometry(int triangleBase, int distance)
         {
@@ -133,6 +167,13 @@
             return angle * (Math.PI / 180);
         }
 
+        private PolylineGeometry GetGeometry()
+        {
+            PolylineGeometry geometry = RotateRawGeometry(this.sensorObject.RawGeometries[0], this.sensorObject.RotationPoint, this.sensorObject.Rotation);
+
+            return ShiftGeometryWithWorldCoordinates(geometry, this.sensorObject.X, this.sensorObject.Y);
+        }
+
         private IList<Avalonia.Point> DrawTriangle()
         {
             int triangleBase = (int)(this.distance * Math.Tan(ConvertToRadians(this.angleOfView / 2)));
@@ -156,13 +197,13 @@
                 this.sensorObject = new WorldObject(car.X + car.RotationPoint.X, car.Y + car.RotationPoint.Y, "sensor.png");
                 this.sensorObject.RawGeometries.Add(GetRawGeometry(triangleBase, this.distance));
                 this.sensorObject.Collideable = false;
-                this.sensorObject.Geometries.Add(this.GetGeometry(car));
+                this.sensorObject.Geometries.Add(this.GetGeometry());
             }
             else
             {
                 this.sensorObject.X = car.X + car.RotationPoint.X;
                 this.sensorObject.Y = car.Y + car.RotationPoint.Y;
-                this.sensorObject.Geometries[0] = this.GetGeometry(car);
+                this.sensorObject.Geometries[0] = this.GetGeometry();
             }
 
             this.sensorObject.RotationPoint = new (triangleBase, this.distance + car.RotationPoint.Y - (int)this.RelativeLocation.Y);
@@ -190,31 +231,6 @@
         private void FilterRelevantObjects()
         {
             this.sensorPacket.RelevantObjects = this.sensorPacket.DetectedObjects.Where(wo => this.IsRelevant(wo)).ToList();
-        }
-
-        private PolylineGeometry GetGeometry(AutomatedCar car)
-        {
-            double sin = Math.Sin(ConvertToRadians(car.Rotation));
-            double cos = Math.Cos(ConvertToRadians(car.Rotation));
-
-            Point pointToConvert0 = new (this.sensorObject.RawGeometries[0].Points[0].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[0].Y - this.sensorObject.RotationPoint.Y);
-            Point pointToConvert1 = new (this.sensorObject.RawGeometries[0].Points[1].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[1].Y - this.sensorObject.RotationPoint.Y);
-            Point pointToConvert2 = new (this.sensorObject.RawGeometries[0].Points[2].X - this.sensorObject.RotationPoint.X, this.sensorObject.RawGeometries[0].Points[2].Y - this.sensorObject.RotationPoint.Y);
-
-            Point convertedPoint0 = new ((pointToConvert0.X * cos) - (pointToConvert0.Y * sin), (pointToConvert0.X * sin) + (pointToConvert0.Y * cos));
-            Point convertedPoint1 = new ((pointToConvert1.X * cos) - (pointToConvert1.Y * sin), (pointToConvert1.X * sin) + (pointToConvert1.Y * cos));
-            Point convertedPoint2 = new ((pointToConvert2.X * cos) - (pointToConvert2.Y * sin), (pointToConvert2.X * sin) + (pointToConvert2.Y * cos));
-
-            Point finalPoint = new (this.sensorObject.RotationPoint.X + this.sensorObject.X - this.sensorObject.RotationPoint.X, this.sensorObject.RotationPoint.Y + this.sensorObject.Y - this.sensorObject.RotationPoint.Y);
-            List<Point> points = new ()
-            {
-                new Point((int)(finalPoint.X + convertedPoint0.X), (int)(finalPoint.Y + convertedPoint0.Y)),
-                new Point((int)(finalPoint.X + convertedPoint1.X), (int)(finalPoint.Y + convertedPoint1.Y)),
-                new Point((int)(finalPoint.X + convertedPoint2.X), (int)(finalPoint.Y + convertedPoint2.Y)),
-                new Point((int)(finalPoint.X + convertedPoint0.X), (int)(finalPoint.Y + convertedPoint0.Y)),
-            };
-
-            return new PolylineGeometry(points, true);
         }
     }
 }
