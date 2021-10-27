@@ -52,6 +52,7 @@
         {
             IEnumerator<object[]> GetEnumerator()
             {
+                //linear test
                 yield return new object[]
                 {
                     new List<Vector>()
@@ -64,6 +65,7 @@
                     1,
                     30
                 };
+                //diagonal test
                 yield return new object[]
                 {
                     new List<Vector>()
@@ -90,7 +92,10 @@
             var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = speed };
             foreach (var item in Enumerable.Range(0, expectedAmountOfMoves))
             {
+                var before = new Vector(npc.X, npc.Y);
                 npc.MoveForward(speed);
+                var after = new Vector(npc.X, npc.Y);
+                Assert.NotEqual(before, after);
             }
             Assert.Equal(npc.X, expectedDestination.X);
             Assert.Equal(npc.Y, expectedDestination.Y);
