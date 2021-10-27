@@ -104,10 +104,10 @@
         /// </summary>
         public void StepObject()
         {
-            SetRotation();
             var timeOfMovement = DateTime.Now;
 
             MoveForward(PixelsToMove(timeOfMovement));
+            SetRotation();
 
             this.TimeOfLastMove = timeOfMovement;
         }
