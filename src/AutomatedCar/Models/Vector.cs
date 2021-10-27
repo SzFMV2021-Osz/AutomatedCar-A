@@ -7,6 +7,11 @@ namespace AutomatedCar.Models
         public double X { get; set; }
         public double Y { get; set; }
 
+        public Vector(double x, double y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
         public bool Equals(Vector other)
         {
             if (other.X == this.X && other.Y == this.Y)
