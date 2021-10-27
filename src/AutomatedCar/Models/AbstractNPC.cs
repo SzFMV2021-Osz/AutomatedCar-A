@@ -15,6 +15,8 @@
             : base(x, y, filename, 1, true, worldObjectType)
         {
             IsRepeatingPath = isRepeatingPath;
+            PreciseX = x;
+            PreciseY = y;
             if (PathCoordinates.Any())
             {
                 this.NextTurn = this.PathCoordinates[0]; 
@@ -63,7 +65,7 @@
 
         private double GetDistance(Vector destination)
         {
-            var dir = new Vector() { X = destination.X - this.X, Y = destination.Y - this.Y };
+            var dir = new Vector() { X = destination.X - this.PreciseX, Y = destination.Y - this.PreciseY };
             return Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y));
         }
 
