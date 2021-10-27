@@ -3,6 +3,8 @@ namespace AutomatedCar.Models
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
+    using System.Numerics;
     using Avalonia.Media;
     using global::AutomatedCar.Helpers;
     using global::AutomatedCar.SystemComponents;
@@ -16,12 +18,17 @@ namespace AutomatedCar.Models
         private const int MAX_PEDAL_POSITION = 100;
         private const double PEDAL_INPUT_MULTIPLIER = 0.01;
         private const double DRAG = 0.006; // This limits the top speed to 166 km/h
+        private const double WHEELBASE = 106.6;
 
         private const int MIN_SW_POSITION = -100;
         private const int MAX_SW_POSITION = 100;
-        private const int SW_OFFSET = 16;
+        private const int SW_OFFSET = 8;
+        private const double dt = 0.1;
+
+        private float carOrientation;
 
         private int steeringWheelPosition;
+        private double steeringAngle;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -42,6 +49,7 @@ namespace AutomatedCar.Models
             this.sensors = new List<ISensor>();
             this.ZIndex = 10;
             this.ExternalGearbox = new ExternalGearbox(this);
+            this.carOrientation = Conversions.MapRotationDegreeToOrientationValue(Rotation);
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -82,6 +90,19 @@ namespace AutomatedCar.Models
             set
             {
                 this.RaiseAndSetIfChanged(ref this.steeringWheelPosition, value);
+            }
+        }
+
+        public double SteeringAngle
+        {
+            get
+            {
+                return this.steeringAngle;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.steeringAngle, value);
             }
         }
 
@@ -135,7 +156,7 @@ namespace AutomatedCar.Models
             this.Speed = (int)Math.Sqrt(Math.Pow(this.Velocity.X, 2) + Math.Pow(this.Velocity.Y, 2));
         }
 
-        public void CalculateNextPosition()
+        public void MoveCarToNextPosition()
         {
             double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
@@ -145,40 +166,44 @@ namespace AutomatedCar.Models
 
             Velocity.Y = GetVelocityAccordingToGear(slowingForce);
 
-            Y += (int)Velocity.Y;
+            Vector nextCarPosition = CalculateNextCarPosition();
+
             CalculateSpeed();
-        }
 
-        private double GetVelocityAccordingToGear(double slowingForce)
-        {
-            double velocity = Velocity.Y;
-
-            if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.D)
+            if (!(ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R))
             {
-                velocity += -(Acceleration.Y - slowingForce);
-            }
-            else if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R)
-            {
-                velocity += Acceleration.Y - slowingForce;
+                this.Rotation = Conversions.MapOrientationToRotationDegree(carOrientation);
             }
             else
             {
-                if (velocity < 0) //In neutral gear, the car can stop whether it goes forward or backward
-                {
-                    velocity += slowingForce;
-                }
-                else
-                {
-                    velocity -= slowingForce;
-                }
+                this.Speed *= -1;
             }
 
-            return velocity;
+            X = Convert.ToInt32(nextCarPosition.X);
+            Y = Convert.ToInt32(nextCarPosition.Y);
         }
 
-        public Vector CalculateOrientaton()
+        public Vector CalculateNextCarPosition()
         {
-            return new Vector() { X = 0, Y = 1 };
+            double frontWheelX = X + (WHEELBASE / 2) * Math.Cos(carOrientation);
+            double frontWheelY = Y + (WHEELBASE / 2) * Math.Sin(carOrientation);
+
+            double rearWheelX = X - (WHEELBASE / 2) * Math.Cos(carOrientation);
+            double rearWheelY = Y - (WHEELBASE / 2) * Math.Sin(carOrientation);
+
+            rearWheelX += Speed * dt * Math.Cos(carOrientation);
+            rearWheelY += Speed * dt * Math.Sin(carOrientation);
+
+            double steerAngle = SteeringAngle;
+            frontWheelX += Speed * dt * Math.Cos(carOrientation + steerAngle);
+            frontWheelY += Speed * dt * Math.Sin(carOrientation + steerAngle);
+
+            double tempX = (frontWheelX + rearWheelX) / 2;
+            double tempY = (frontWheelY + rearWheelY) / 2;
+
+            carOrientation = (float)Math.Atan2(frontWheelY - rearWheelY, frontWheelX - rearWheelX);
+
+            return new Vector(tempX, tempY);
         }
 
         public void IncreaseGasPedalPosition()
@@ -209,12 +234,63 @@ namespace AutomatedCar.Models
         {
             int newPosition = (int)this.SteeringWheelPosition + SW_OFFSET;
             this.SteeringWheelPosition = this.BoundSteeringWheelPosition(newPosition);
+            AdjustWheels();
+        }
+
+        public void ReturnSteeringWheelToNaturalPosition()
+        {
+            int newPosition = 0;
+            if (this.SteeringWheelPosition > 0)
+            {
+                newPosition = (int)this.SteeringWheelPosition - SW_OFFSET;
+                this.SteeringWheelPosition = this.BoundPositiveSteeringWheelPosition(newPosition);
+            }
+            else if (this.SteeringWheelPosition < 0)
+            {
+                newPosition = (int)this.SteeringWheelPosition + SW_OFFSET;
+                this.SteeringWheelPosition = -this.BoundNegativSteeringWheelPosition(newPosition);
+            }
+
+            AdjustWheels();
         }
 
         public void TurnSteeringWheelToLeft()
         {
             int newPosition = (int)this.SteeringWheelPosition - SW_OFFSET;
             this.SteeringWheelPosition = this.BoundSteeringWheelPosition(newPosition);
+            AdjustWheels();
+        }
+
+        public void AdjustWheels()
+        {
+            this.SteeringAngle = Conversions.MapSWRotationToAngle(this.steeringWheelPosition);
+        }
+
+        private double GetVelocityAccordingToGear(double slowingForce)
+        {
+            double velocity = Velocity.Y;
+
+            if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.D)
+            {
+                velocity += -(Acceleration.Y - slowingForce);
+            }
+            else if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R)
+            {
+                velocity += Acceleration.Y - slowingForce;
+            }
+            else
+            {
+                if (velocity < 0) //In neutral gear, the car can stop whether it goes forward or backward
+                {
+                    velocity += slowingForce;
+                }
+                else
+                {
+                    velocity -= slowingForce;
+                }
+            }
+
+            return velocity;
         }
 
         private int BoundPedalPosition(int number)
@@ -225,6 +301,16 @@ namespace AutomatedCar.Models
         private int BoundSteeringWheelPosition(int number)
         {
             return Math.Max(MIN_SW_POSITION, Math.Min(number, MAX_SW_POSITION));
+        }
+
+        private int BoundPositiveSteeringWheelPosition(int number)
+        {
+            return Math.Max(0, Math.Min(number, MAX_SW_POSITION));
+        }
+
+        private int BoundNegativSteeringWheelPosition(int number)
+        {
+            return Math.Min(0, Math.Max(number, MIN_SW_POSITION));
         }
     }
 }

@@ -58,7 +58,7 @@
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Y}"/>
                                 <TextBlock Grid.Row="2" Grid.Column="0">Filename:</TextBlock>
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Filename}"/>
-                                <TextBlock Grid.Row="3" Grid.Column="0">Rotation:</TextBlock>
+                                <TextBlock Grid.Row="3" Grid.Column="0">(Model) Rotation:</TextBlock>
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Rotation}"/>
                             </Grid>
                         </StackPanel>

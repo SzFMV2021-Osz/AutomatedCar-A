@@ -35,8 +35,18 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
-            
-            World.Instance.ControlledCar.CalculateNextPosition();
+
+            if (!Keyboard.IsKeyDown(Key.Right) && World.Instance.ControlledCar.SteeringWheelPosition > 0)
+            {
+                World.Instance.ControlledCar.ReturnSteeringWheelToNaturalPosition();
+            }
+
+            if (!Keyboard.IsKeyDown(Key.Left) && World.Instance.ControlledCar.SteeringWheelPosition < 0)
+            {
+                World.Instance.ControlledCar.ReturnSteeringWheelToNaturalPosition();
+            }
+
+            World.Instance.ControlledCar.MoveCarToNextPosition();
             carFocusHandler.Invoke();
         }
     }
