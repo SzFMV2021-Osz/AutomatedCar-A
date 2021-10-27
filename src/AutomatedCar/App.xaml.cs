@@ -76,6 +76,7 @@ namespace AutomatedCar
                 npcpedestrian.Geometries = new ObservableCollection<PolylineGeometry>();
                 npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(42, 220), new Point(42, 200) }, false));
                 npcpedestrian.Geometries.Add(new PolylineGeometry(new List<Point> { new Point(66, 220), new Point(66, 200) }, false));
+                npcpedestrian.SetRotation();
                 world.AddNpc(npcpedestrian);
 
                 desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(game) };
