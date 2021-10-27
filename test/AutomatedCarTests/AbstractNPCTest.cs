@@ -11,7 +11,7 @@
 
     public class AbstractNPCTest
     {
-        private class NPCPathDataProvider : IEnumerable<object[]>
+        private class GetDirectionDataProvider : IEnumerable<object[]>
         {
             IEnumerator<object[]> GetEnumerator()
             {
@@ -19,19 +19,41 @@
                 {
                     new List<Vector>()
                     {
-                        new Vector(0, 0),
-                        new Vector(1, 1)
+                        new Vector(1, 0),
+                        new Vector(2, 0),
+                        new Vector(2, 1),
+                        new Vector(2, 2),
+                        new Vector(3, 2),
+                        new Vector(4, 2),
+                        new Vector(5, 2),
                     },
-                    new Vector(5, 5)
+                    new List<Vector>()
+                    {
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                        new Vector(0, 1),
+                        new Vector(0, 1),
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                    }
                 };
                 yield return new object[]
                 {
                     new List<Vector>()
                     {
                         new Vector(100, 100),
-                        new Vector(110, 110)
+                        new Vector(110, 100),
+                        new Vector(130, 100),
+                        new Vector(130, 124)
                     },
-                    new Vector(5, 5)
+                    new List<Vector>()
+                    {
+                        new Vector(100/Math.Sqrt(20000), 100/Math.Sqrt(20000)),
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                        new Vector(0, 1)
+                    }
                 };
             }
 
@@ -42,10 +64,18 @@
 
         private AbstractNPC npc;
         [Theory]
-        [ClassData(typeof(NPCPathDataProvider))]
-        public void GetDirectionTest(Vector[] path, Vector expectedDirection)
+        [ClassData(typeof(GetDirectionDataProvider))]
+        public void GetDirectionTest(Vector[] path, List<Vector> expectedDirections)
         {
-            var yeppe = path;
+            var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = 1 };
+            int i = 0;
+            foreach (var item in path)
+            {
+                npc.NextTurn = item;
+                Assert.Equal(npc.GetDirection(), expectedDirections[npc.PathCoordinates.IndexOf(item)]);
+                npc.X = (int)item.X;
+                npc.Y = (int)item.Y;
+            }
         }
 
         private class MovementTestDataProvider : IEnumerable<object[]>
