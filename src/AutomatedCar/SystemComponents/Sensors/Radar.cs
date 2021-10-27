@@ -5,10 +5,12 @@
     using AutomatedCar.Models;
     using AutomatedCar.SystemComponents.Packets;
     using Avalonia;
+    using Avalonia.Media;
 
     public sealed class Radar : Sensor
     {
         private readonly Dictionary<int, double> previousObjects;
+        private PolylineGeometry laneGeometry;
 
         public Radar(VirtualFunctionBus virtualFunctionBus)
             : base(virtualFunctionBus, 60, 200)
@@ -33,10 +35,13 @@
 
         private void CalculateRadarData(AutomatedCar car)
         {
-            Dictionary<int, Point> permanentObjectsInRadar = this.GetPermanentObjectsInRadar();
-            Dictionary<int, double> closingObjects = this.GetClosingObjects(permanentObjectsInRadar, car);
+            this.CreateLaneGeometry();
 
-            this.SaveToPacket(closingObjects);
+            Dictionary<int, Point> permanentObjectsInRadar = this.GetPermanentObjectsInRadar();
+            IList<WorldObject> closingObjects = this.GetClosingObjects(permanentObjectsInRadar, car);
+
+            ((IRadarPacket)this.sensorPacket).ClosingObjects = closingObjects;
+            ((IRadarPacket)this.sensorPacket).ClosestObjectInLane = this.GetClosestObjectInLane(closingObjects, car);
             this.SavePreviousObjectDistances(car);
         }
 
@@ -64,38 +69,63 @@
             return permanentObjects;
         }
 
-        private Dictionary<int, double> GetClosingObjects(Dictionary<int, Point> objectsInRadar, AutomatedCar car)
+        private IList<WorldObject> GetClosingObjects(Dictionary<int, Point> objectsInRadar, AutomatedCar car)
         {
-            Dictionary<int, double> closingElements = new ();
+            IList<WorldObject> closingObjects = new List<WorldObject>();
             foreach (var currPoint in objectsInRadar)
             {
                 double currDst = DistanceBetween(currPoint.Value, new Point(car.X, car.Y));
                 if (currDst < this.previousObjects[currPoint.Key])
                 {
-                    closingElements.Add(currPoint.Key, this.previousObjects[currPoint.Key]);
+                    closingObjects.Add(this.sensorPacket.RelevantObjects.Where(d => d.Id == currPoint.Key).FirstOrDefault());
                 }
             }
 
-            return closingElements;
+            return closingObjects;
         }
 
-        private void SaveToPacket(Dictionary<int, double> id)
+        private void CreateLaneGeometry()
         {
-            int closestObjectID = id.OrderBy(w => w.Value).FirstOrDefault().Key;
-
-            ((IRadarPacket)this.sensorPacket).ClosingObjects.Clear();
-            foreach (var currentID in id)
+            if (this.laneGeometry == null)
             {
-                WorldObject currObj = this.sensorPacket.RelevantObjects
-                    .Where(d => d.Id == currentID.Key)
-                    .FirstOrDefault();
-                ((IRadarPacket)this.sensorPacket).ClosingObjects.Add(currObj);
+                this.laneGeometry = this.GetSelfLaneGeometry();
+            }
+        }
 
-                if (currentID.Key == closestObjectID)
+        private PolylineGeometry GetSelfLaneGeometry()
+        {
+            IList<Point> points = new List<Point>()
+            {
+                new Point(0, this.sensorObject.RotationPoint.Y),
+                new Point(2 * this.sensorObject.RotationPoint.X, this.sensorObject.RotationPoint.Y),
+                new Point(2 * this.sensorObject.RotationPoint.X, this.sensorObject.RotationPoint.Y - this.distance),
+                new Point(0, this.sensorObject.RotationPoint.Y - this.distance),
+                new Point(0, this.sensorObject.RotationPoint.Y),
+            };
+
+            return new PolylineGeometry(points, true);
+        }
+
+        private bool IsObjectInLane(WorldObject currObject)
+        {
+            PolylineGeometry geometry = RotateRawGeometry(this.laneGeometry, this.sensorObject.RotationPoint, this.sensorObject.Rotation);
+            geometry = ShiftGeometryWithWorldCoordinates(geometry, this.sensorObject.X, this.sensorObject.Y);
+
+            foreach (var point in GetPoints(currObject))
+            {
+                if (geometry.FillContains(point))
                 {
-                    ((IRadarPacket)this.sensorPacket).ClosestObjectInLane = currObj;
+                    return true;
                 }
             }
+
+            return false;
+        }
+
+        private WorldObject GetClosestObjectInLane(IList<WorldObject> worldObjects, AutomatedCar car)
+        {
+            IList<WorldObject> incomingObjectsInLane = worldObjects.Where(c => this.IsObjectInLane(c)).ToList();
+            return FindClosestObject(incomingObjectsInLane, car);
         }
     }
 }
