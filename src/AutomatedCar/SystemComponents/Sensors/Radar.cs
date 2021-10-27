@@ -93,7 +93,7 @@
 
                 if (currentID.Key == closestObjectID)
                 {
-                    ((IRadarPacket)this.sensorPacket).ClosestObject = currObj;
+                    ((IRadarPacket)this.sensorPacket).ClosestObjectInLane = currObj;
                 }
             }
         }
