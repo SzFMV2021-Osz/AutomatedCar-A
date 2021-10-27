@@ -25,7 +25,7 @@
         private DebugStatus debugStatus = new DebugStatus();
         private ObservableCollection<AutomatedCar> controlledCars = new ();
 
-        private delegate void NpcMovementHandler();
+        private delegate void NpcMovementHandler(DateTime timeOfMovement);
         private event NpcMovementHandler StepNpcs;
 
         public static World Instance { get; } = new World();
@@ -72,7 +72,7 @@
 
         public void StepNonPlayerCharacters()
         {
-            this.StepNpcs?.Invoke();
+            this.StepNpcs?.Invoke(DateTime.Now);
         }
 
         public void NextControlledCar()

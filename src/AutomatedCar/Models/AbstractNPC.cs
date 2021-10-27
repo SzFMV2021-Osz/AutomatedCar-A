@@ -11,9 +11,10 @@
     /// </summary>
     public abstract class AbstractNPC : WorldObject, INonPlayerCharacter
     {
-        public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType) : base(x, y, filename, 1, true, worldObjectType)
-
+        public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType, bool isRepeatingPath) 
+            : base(x, y, filename, 1, true, worldObjectType)
         {
+            IsRepeatingPath = isRepeatingPath;
             if (PathCoordinates.Any())
             {
                 this.NextTurn = this.PathCoordinates[0]; 
@@ -52,7 +53,7 @@
         public DateTime TimeOfLastMove { get; set; } = DateTime.Now;
 
         // inheritdoc..
-        public bool IsRepeatingPath { get; set; }
+        public bool IsRepeatingPath { get; set; } = false;
 
         private double PixelsToMove(DateTime timeOfMovement)
         {
@@ -67,7 +68,7 @@
         }
 
         /// Recursive function only modify with extreme caution.
-        public void MoveForward(double distanceToMove)
+        private void MoveForward(double distanceToMove)
         {
             var distanceFromNextTurn = GetDistance(NextTurn);
 
@@ -80,7 +81,7 @@
                 var remainingDistanceToTravel = distanceToMove - distanceFromNextTurn;
                 UpdateNpcPosition(distanceFromNextTurn);
                 var currentTurnIdx = PathCoordinates.IndexOf(NextTurn);
-                if(PathCoordinates.Count > currentTurnIdx)
+                if(PathCoordinates.Count > currentTurnIdx + 1)
                 {
                     NextTurn = PathCoordinates[currentTurnIdx + 1];
                     MoveForward(remainingDistanceToTravel);
@@ -110,10 +111,8 @@
         /// <summary>
         /// Responsible to calculate and set the object's next position.
         /// </summary>
-        public void StepObject()
+        public void StepObject(DateTime timeOfMovement)
         {
-            var timeOfMovement = DateTime.Now;
-
             MoveForward(PixelsToMove(timeOfMovement));
             SetRotation();
 

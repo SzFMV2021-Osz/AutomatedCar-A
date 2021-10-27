@@ -51,6 +51,6 @@
         /// <summary>
         /// Responsible to calculate and set the object's position derived from the elapsed time.
         /// </summary>
-        public void StepObject();
+        public void StepObject(DateTime timeOfMovement);
     }
 }
