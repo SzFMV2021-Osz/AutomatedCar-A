@@ -36,5 +36,10 @@
         /// </summary>
         /// <returns>return the non normalized direction containing vector.</returns>
         Vector GetDirection();
+        /// <summary>
+        /// Set the rotation in degrees based on the direction
+        /// </summary>
+        /// <returns>Returns the rotation in degrees</returns>
+        void SetRotation();
     }
 }

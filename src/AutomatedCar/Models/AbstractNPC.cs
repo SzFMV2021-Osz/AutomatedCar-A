@@ -45,12 +45,22 @@
         /// </summary>
         public void StepObject()
         {
+            SetRotation();
             var timeOfMovement = DateTime.Now;
             var pixelsToMove = this.PixelsToMove(timeOfMovement);
 
             //TODO: algo
 
             this.TimeOfLastMove = timeOfMovement;
+        }
+
+        /// <summary>
+        /// Set the rotation in degrees based on the direction
+        /// </summary>
+        /// <returns>Returns the rotation in degrees</returns>
+        public void SetRotation(){
+            var direction = GetDirection();
+            this.Rotation = Math.Atan2(direction.Y, direction.X) * (180/Math.PI) + 90;
         }
     }
 }
