@@ -11,13 +11,80 @@
 
     public class AbstractNPCTest
     {
-        private class MovementTestDataProvider : IEnumerable<object[]>
+        private class GetDirectionDataProvider : IEnumerable<object[]>
         {
             IEnumerator<object[]> GetEnumerator()
             {
                 //linear test
                 yield return new object[]
                 {
+                    new List<Vector>()
+                    {
+                        new Vector(1, 0),
+                        new Vector(2, 0),
+                        new Vector(2, 1),
+                        new Vector(2, 2),
+                        new Vector(3, 2),
+                        new Vector(4, 2),
+                        new Vector(5, 2),
+                    },
+                    new List<Vector>()
+                    {
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                        new Vector(0, 1),
+                        new Vector(0, 1),
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                    }
+                };
+                yield return new object[]
+                {
+                    new List<Vector>()
+                    {
+                        new Vector(100, 100),
+                        new Vector(110, 100),
+                        new Vector(130, 100),
+                        new Vector(130, 124)
+                    },
+                    new List<Vector>()
+                    {
+                        new Vector(100/Math.Sqrt(20000), 100/Math.Sqrt(20000)),
+                        new Vector(1, 0),
+                        new Vector(1, 0),
+                        new Vector(0, 1)
+                    }
+                };
+            }
+
+            IEnumerator<object[]> IEnumerable<object[]>.GetEnumerator() => GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        private AbstractNPC npc;
+        [Theory]
+        [ClassData(typeof(GetDirectionDataProvider))]
+        public void GetDirectionTest(Vector[] path, List<Vector> expectedDirections)
+        {
+            var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = 1 };
+            int i = 0;
+            foreach (var item in path)
+            {
+                npc.NextTurn = item;
+                Assert.Equal(npc.GetDirection(), expectedDirections[npc.PathCoordinates.IndexOf(item)]);
+                npc.X = (int)item.X;
+                npc.Y = (int)item.Y;
+            }
+        }
+
+        private class MovementTestDataProvider : IEnumerable<object[]>
+        {
+            IEnumerator<object[]> GetEnumerator()
+            {
+                yield return new object[]
+                   {
                     new List<Vector>()
                     {
                         new Vector(0, 0),
@@ -28,7 +95,6 @@
                     1,
                     30
                 };
-                //diagonal test
                 yield return new object[]
                 {
                     new List<Vector>()
