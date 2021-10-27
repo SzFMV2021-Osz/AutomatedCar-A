@@ -18,6 +18,8 @@ namespace AutomatedCar.Models
 
         public WorldObject(int x, int y, string filename, int zindex = 1, bool collideable = false, WorldObjectType worldObjectType = WorldObjectType.Other)
         {
+            this.PreciseX = x;
+            this.PreciseY = y;
             this.X = x;
             this.Y = y;
             this.Filename = filename;

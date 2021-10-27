@@ -15,8 +15,6 @@
             : base(x, y, filename, 1, true, worldObjectType)
         {
             IsRepeatingPath = isRepeatingPath;
-            PreciseX = x;
-            PreciseY = y;
             if (PathCoordinates.Any())
             {
                 this.NextTurn = this.PathCoordinates[0]; 
