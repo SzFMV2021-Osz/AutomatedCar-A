@@ -28,16 +28,74 @@
         // inhetritdoc..
         public Vector GetDirection()
         {
-            return new Vector() { X = this.NextTurn.X - this.X, Y = this.NextTurn.Y - this.Y };
+            var dir = new Vector() { X = this.NextTurn.X - this.X, Y = this.NextTurn.Y - this.Y };
+            var len = Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y));
+            if (len > 0)
+            {
+                return new Vector() { X = dir.X / len, Y = dir.Y / len };
+            }
+            else
+            {
+                return new Vector() { X = 0, Y = 0 };
+            }
         }
 
         // inheritdoc..
         public DateTime TimeOfLastMove { get; set; }
 
-        private int PixelsToMove(DateTime timeOfMovement)
+        // inheritdoc..
+        public bool IsRepeatingPath { get; set; }
+
+        private double PixelsToMove(DateTime timeOfMovement)
         {
             var timeElapsed = timeOfMovement - this.TimeOfLastMove;
-            return this.Speed * (Convert.ToInt32(timeElapsed.TotalMilliseconds) / 1000);
+            return this.Speed * timeElapsed.TotalMilliseconds / 1000;
+        }
+
+        private double GetDistance(Vector destination)
+        {
+            var dir = new Vector() { X = destination.X - this.X, Y = destination.Y - this.Y };
+            return Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y));
+        }
+
+        private void MoveForward(double distanceToMove)
+        {
+            var distanceFromNextTurn = GetDistance(NextTurn);
+
+            if(distanceFromNextTurn > distanceToMove)
+            {
+                UpdateNpcPosition(distanceToMove);
+            }
+            else
+            {
+                var remainingDistanceToTravel = distanceToMove - distanceFromNextTurn;
+                UpdateNpcPosition(distanceFromNextTurn);
+                var currentTurnIdx = PathCoordinates.IndexOf(NextTurn);
+                if(PathCoordinates.Count > currentTurnIdx)
+                {
+                    NextTurn = PathCoordinates[currentTurnIdx + 1];
+                    MoveForward(remainingDistanceToTravel);
+                }
+                else
+                {
+                    if(IsRepeatingPath)
+                    {
+                        NextTurn = PathCoordinates[0];
+                        MoveForward(remainingDistanceToTravel);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void UpdateNpcPosition(double distanceToMove)
+        {
+            var dir = GetDirection();
+            this.PreciseX += dir.X * distanceToMove;
+            this.PreciseY += dir.Y * distanceToMove;
         }
 
         /// <summary>
@@ -46,9 +104,8 @@
         public void StepObject()
         {
             var timeOfMovement = DateTime.Now;
-            var pixelsToMove = this.PixelsToMove(timeOfMovement);
 
-            //TODO: algo
+            MoveForward(PixelsToMove(timeOfMovement));
 
             this.TimeOfLastMove = timeOfMovement;
         }

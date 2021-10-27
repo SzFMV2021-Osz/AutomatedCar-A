@@ -1,13 +1,22 @@
+using System;
+
 namespace AutomatedCar.Models
 {
-    public class Vector : System.IComparable
+    public class Vector : IEquatable<Vector>
     {
         public double X { get; set; }
         public double Y { get; set; }
 
-        public int CompareTo(object obj)
+        public bool Equals(Vector other)
         {
-            //TODO
+            if (other.X == this.X && other.Y == this.Y)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

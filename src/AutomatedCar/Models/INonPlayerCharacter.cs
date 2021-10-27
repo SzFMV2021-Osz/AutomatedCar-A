@@ -22,6 +22,11 @@
         Vector NextTurn { get; set; }
 
         /// <summary>
+        /// Gets or sets the value determining the path should be done indefinately in a loop.
+        /// </summary>
+        bool IsRepeatingPath { get; set; }
+
+        /// <summary>
         /// Gets or sets the speed of the npc in pixel per sec.
         /// </summary>
         int Speed { get; set; }
@@ -34,7 +39,7 @@
         /// <summary>
         /// Facing direction of the object.
         /// </summary>
-        /// <returns>return the non normalized direction containing vector.</returns>
+        /// <returns>return the normalized direction containing vector.</returns>
         Vector GetDirection();
     }
 }
