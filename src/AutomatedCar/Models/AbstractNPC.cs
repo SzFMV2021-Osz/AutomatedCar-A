@@ -14,11 +14,18 @@
         public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType) : base(x, y, filename, 1, true, worldObjectType)
 
         {
-            this.NextTurn = this.PathCoordinates[2];
+            if (PathCoordinates.Any())
+            {
+                this.NextTurn = this.PathCoordinates[0]; 
+            }
+            else
+            {
+                NextTurn = new Vector() { X = x, Y = y };
+            }
         }
 
         // inhetritdoc..
-        public IList<Vector> PathCoordinates { get; set; }
+        public IList<Vector> PathCoordinates { get; set; } = new List<Vector>();
 
         // inhetritdoc..
         public Vector NextTurn { get; set; }
