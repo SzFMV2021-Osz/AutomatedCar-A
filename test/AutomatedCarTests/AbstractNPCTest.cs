@@ -47,5 +47,36 @@
         {
             var yeppe = path;
         }
+
+        private class MovementTestDataProvider : IEnumerable<object[]>
+        {
+            IEnumerator<object[]> GetEnumerator()
+            {
+                yield return new object[]
+                {
+                    new List<Vector>()
+                    {
+                        new Vector(0, 0),
+                        new Vector(10, 10),
+                        new Vector(10, 20)
+                    },
+                    new Vector(10, 20),
+                    1,
+                };
+            }
+
+            IEnumerator<object[]> IEnumerable<object[]>.GetEnumerator() => GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        [Theory]
+        [ClassData(typeof(MovementTestDataProvider))]
+        public void MovementTest(List<Vector> path, Vector expectedDestination, int speed)
+        {
+            var npc = new NonPlayerCar(0, 0, "") { PathCoordinates = path, Speed = speed };
+
+        }
+
     }
 }

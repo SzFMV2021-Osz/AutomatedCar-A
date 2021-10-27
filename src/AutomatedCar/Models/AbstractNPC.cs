@@ -66,8 +66,8 @@
             return Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y));
         }
 
-        // Recursive function only modify with extreme caution.
-        private void MoveForward(double distanceToMove)
+        /// Recursive function only modify with extreme caution.
+        public void MoveForward(double distanceToMove)
         {
             var distanceFromNextTurn = GetDistance(NextTurn);
 
