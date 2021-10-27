@@ -12,14 +12,13 @@
 
     public class NonPlayerCar : AbstractNPC
     {
-        public NonPlayerCar(int x, int y, string filename) : base(x, y, filename, WorldObjectType.Car)
+        public NonPlayerCar(int x, int y, string filename, string nonPlayerCarJsonName) : base(x, y, filename, WorldObjectType.Car)
         {
-            var nonPlayerCarJsonName = "NPCCarCoordinatesPathTestWorld.json";
             StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly()
                     .GetManifestResourceStream($"AutomatedCar.Assets.{nonPlayerCarJsonName}"));
 
             this.PathCoordinates = JsonConvert.DeserializeObject<List<Vector>>(reader.ReadToEnd());
-            this.Speed = 60;
+            this.Speed = 20;
         }
     }
 }

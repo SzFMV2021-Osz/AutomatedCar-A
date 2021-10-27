@@ -37,10 +37,6 @@ namespace AutomatedCar
             }
 
             // Move forward all the NPCs.
-            //foreach (var item in World.Instance.GetAllNPCs())
-            //{
-            //    item.StepObject();
-            //}
             World.Instance.StepNonPlayerCharacters();
 
             World.Instance.ControlledCar.CalculateNextPosition();
