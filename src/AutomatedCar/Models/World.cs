@@ -13,6 +13,7 @@
     using Helpers;
     using Visualization;
     using Avalonia.Media;
+    using System.Linq;
 
     public class World : ReactiveObject
     {
@@ -24,6 +25,9 @@
         private DebugStatus debugStatus = new DebugStatus();
         private ObservableCollection<AutomatedCar> controlledCars = new ();
 
+        private delegate void NpcMovementHandler(DateTime timeOfMovement);
+        private event NpcMovementHandler StepNpcs;
+
         public static World Instance { get; } = new World();
 
         public ObservableCollection<WorldObject> WorldObjects { get; } = new ObservableCollection<WorldObject>();
@@ -33,6 +37,12 @@
             get => this.controlledCars[this.controlledCarPointer];
 
         }
+
+        public IEnumerable<AbstractNPC> GetAllNPCs()
+        {
+            return WorldObjects.OfType<AbstractNPC>();
+        }
+
         public int ControlledCarPointer
         {
             get => this.controlledCarPointer;
@@ -53,6 +63,18 @@
             this.controlledCars.Add(controlledCar);
             this.AddObject(controlledCar);
         }
+
+        public void AddNpc(AbstractNPC npc)
+        {
+            this.StepNpcs += new NpcMovementHandler(npc.StepObject);
+            this.AddObject(npc);
+        }
+
+        public void StepNonPlayerCharacters()
+        {
+            this.StepNpcs?.Invoke(DateTime.Now);
+        }
+
         public void NextControlledCar()
         {
             controlledCars[controlledCarPointer].InFocus = false;

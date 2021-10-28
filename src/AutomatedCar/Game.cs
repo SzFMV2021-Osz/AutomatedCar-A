@@ -41,9 +41,13 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.StraightenWheel();
             }
+          
+            // Move forward all the NPCs.
+            World.Instance.StepNonPlayerCharacters();
 
             World.Instance.ControlledCar.CalculateNextPosition();
             this.carFocusHandler.Invoke();
         }
     }
+
 }
