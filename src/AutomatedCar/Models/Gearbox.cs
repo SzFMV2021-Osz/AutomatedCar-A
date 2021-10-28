@@ -53,7 +53,7 @@
 
         public void ExternalDownshift()
         {
-            if (currentExternalGearPosition != 0)
+            if (currentExternalGearPosition != Gear.P)
             {
                 if ((automatedCar.Velocity.Y >= 0 && currentExternalGearPosition == Gear.N) || automatedCar.Speed == 0 || currentExternalGearPosition == Gear.D)
                 {
