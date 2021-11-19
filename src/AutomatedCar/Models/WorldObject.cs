@@ -1,5 +1,6 @@
 namespace AutomatedCar.Models
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.Drawing;
     using Avalonia.Media;
@@ -10,11 +11,15 @@ namespace AutomatedCar.Models
         private int id;
         private int x;
         private int y;
+        private double preciseX;
+        private double preciseY;
 
         private double rotation;
 
         public WorldObject(int x, int y, string filename, int zindex = 1, bool collideable = false, WorldObjectType worldObjectType = WorldObjectType.Other)
         {
+            this.PreciseX = x;
+            this.PreciseY = y;
             this.X = x;
             this.Y = y;
             this.Filename = filename;
@@ -38,12 +43,28 @@ namespace AutomatedCar.Models
             set => this.RaiseAndSetIfChanged(ref this.x, value);
         }
 
-        public int Id { get; private set; }
-
         public int Y
         {
             get => this.y;
             set => this.RaiseAndSetIfChanged(ref this.y, value);
+        }
+        public int Id { get; private set; }
+
+        public double PreciseX { 
+            get => this.preciseX;
+            set {
+                this.preciseX = value;
+                X = Convert.ToInt32(value);
+            }
+        }
+        public double PreciseY 
+        { 
+            get => this.preciseY;
+            set
+            {
+                this.preciseY = value;
+                Y = Convert.ToInt32(value);
+            }
         }
 
         public Point RotationPoint { get; set; }

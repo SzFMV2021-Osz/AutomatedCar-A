@@ -16,26 +16,27 @@ namespace AutomatedCar.Views
         {
             Keyboard.Keys.Add(e.Key);
             base.OnKeyDown(e);
+
             if (Keyboard.IsKeyDown(Key.Up))
             {
                 World.Instance.ControlledCar.IncreaseGasPedalPosition();
             }
-
+            
             if (Keyboard.IsKeyDown(Key.Down))
             {
                 World.Instance.ControlledCar.IncreaseBrakePedalPosition();
             }
-
+            
             if (Keyboard.IsKeyDown(Key.Left))
             {
-                World.Instance.ControlledCar.X -= 5;
+                World.Instance.ControlledCar.TurnLeft();
             }
-
+            
             if (Keyboard.IsKeyDown(Key.Right))
             {
-                World.Instance.ControlledCar.X += 5;
+                World.Instance.ControlledCar.TurnRight();
             }
-
+            
             if (Keyboard.IsKeyDown(Key.PageUp))
             {
                 World.Instance.ControlledCar.Rotation += 5;
@@ -91,12 +92,12 @@ namespace AutomatedCar.Views
 
             if (Keyboard.IsKeyDown(Key.A))
             {
-                World.Instance.ControlledCar.ExternalGearbox.Downshift();
+                World.Instance.ControlledCar.Gearbox.ExternalDownshift();
             }
 
             if (Keyboard.IsKeyDown(Key.Q))
             {
-                World.Instance.ControlledCar.ExternalGearbox.Upshift();
+                World.Instance.ControlledCar.Gearbox.ExternalUpshift();
             }
 
             if (Keyboard.IsKeyDown(Key.L))

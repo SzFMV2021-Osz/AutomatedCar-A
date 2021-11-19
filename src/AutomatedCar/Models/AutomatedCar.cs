@@ -9,8 +9,9 @@ namespace AutomatedCar.Models
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
     using global::AutomatedCar.SystemComponents.Helpers;
+    using System.Drawing;
 
-    public class AutomatedCar : Car, IAutomatedCar
+    public class AutomatedCar : Car
     {
         private const int PEDAL_OFFSET = 16;
         private const int MIN_PEDAL_POSITION = 0;
@@ -18,12 +19,18 @@ namespace AutomatedCar.Models
         private const double PEDAL_INPUT_MULTIPLIER = 0.01;
         private const double DRAG = 0.006; // This limits the top speed to 166 km/h
         private const int IDLE_RPM = 800;
-        private const int NEUTRAL_RPM_MULTIPLIER = 100;
+        private const int MAX_RPM = 6000;
+        private const int NEUTRAL_RPM_MULTIPLIER = 80;
+        private const int RPM_DOWNSHIFT_POINT = 1300;
+        private const int RPM_UPSHIFT_POINT = 2500;
+        private const int WHEELBASE = 200;
+        private const int TURNING_OFFSET = 5;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
         private int revolution;
-        private int innerGear = 1; //manually set until inner gearbox is implemented
+        private double carHeading;
+        private double turningAngle;
 
         private VirtualFunctionBus virtualFunctionBus;
         private CollisionDetection collisionDetection;
@@ -43,7 +50,9 @@ namespace AutomatedCar.Models
             this.Camera = new (this.virtualFunctionBus);
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
-            this.ExternalGearbox = new ExternalGearbox(this);
+            this.Gearbox = new Gearbox(this);
+            carHeading = -1.5;
+            turningAngle = 0;
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -86,13 +95,14 @@ namespace AutomatedCar.Models
             {
                 return this.revolution;
             }
+
             set
             {
                 this.RaiseAndSetIfChanged(ref this.revolution, value);
             }
         }
 
-        public IGearbox ExternalGearbox { get; set; }
+        public IGearbox Gearbox { get; set; }
 
         public Vector Velocity { get; set; }
 
@@ -161,20 +171,67 @@ namespace AutomatedCar.Models
 
             Velocity.Y = GetVelocityAccordingToGear(slowingForce);
 
-            Y += (int)Velocity.Y;
             CalculateSpeed();
+            Turn(turningAngle);
             CalculateRevolutions();
+            if (Gearbox.InnerShiftingStatus != Shifting.None)
+            {
+                this.HandleRpmTransitionWhenShifting();
+            }
         }
 
+        public void StraightenWheel()
+        {
+            if (turningAngle < 0)
+            {
+                turningAngle += TURNING_OFFSET;
+            }
+            else if (turningAngle > 0)
+            {
+                turningAngle -= TURNING_OFFSET;
+            }
+        }
+        
+        public void TurnLeft()
+        {
+            turningAngle = TURNING_OFFSET;
+        }
+        
+        public void TurnRight()
+        { 
+            turningAngle = -TURNING_OFFSET;
+        }
+        
+        private void Turn(double steerAngle)
+        {
+            double frontX = X + (WHEELBASE / 2 * Math.Cos(carHeading));
+            double frontY = Y + (WHEELBASE / 2 * Math.Sin(carHeading));
+            double rearX = X - (WHEELBASE / 2 * Math.Cos(carHeading));
+            double rearY = Y - (WHEELBASE / 2 * Math.Sin(carHeading));
+
+            double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -3 : 3;
+            
+            frontX += Speed * 0.25 * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
+            frontY += Speed * 0.25 * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
+            rearX += Speed * 0.25 * Math.Cos(carHeading) * reverseMultiplier;
+            rearY += Speed * 0.25 * Math.Sin(carHeading) * reverseMultiplier;
+            
+            X = (int)(frontX + rearX) / 2;
+            Y = (int)(frontY + rearY) / 2;
+            
+            carHeading = Math.Atan2(frontY - rearY, frontX - rearX);
+            Rotation = ((carHeading * 180) / Math.PI) + 87;
+        }
+        
         private double GetVelocityAccordingToGear(double slowingForce)
         {
             double velocity = Velocity.Y;
 
-            if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.D)
+            if (Gearbox.CurrentExternalGearPosition == Gear.D)
             {
                 velocity += -(Acceleration.Y - slowingForce);
             }
-            else if (ExternalGearbox.currentGearPosition == Models.ExternalGearbox.Gear.R)
+            else if (Gearbox.CurrentExternalGearPosition == Gear.R)
             {
                 velocity += Acceleration.Y - slowingForce;
             }
@@ -192,7 +249,7 @@ namespace AutomatedCar.Models
 
             return velocity;
         }
-
+        
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;
@@ -232,26 +289,58 @@ namespace AutomatedCar.Models
         private void IncreaseRevolutions()
         {
             double revolutionsIncreaseRate =
-                RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.innerGear).Item2;
-            if (this.innerGear > 0)
+                RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.Gearbox.CurrentInternalGear).Item2;
+
+            if (this.Gearbox.CurrentInternalGear > 0 && this.Revolution < MAX_RPM)
             {
                 this.Revolution += (int)Math.Round(this.Speed * revolutionsIncreaseRate);
             }
-            else
+            else if (this.Gearbox.CurrentInternalGear == 0 && this.Revolution < MAX_RPM)
             {
                 this.Revolution += (int)Math.Round(revolutionsIncreaseRate * NEUTRAL_RPM_MULTIPLIER);
+            }
+
+            if (this.revolution > RPM_UPSHIFT_POINT && this.Gearbox.CurrentInternalGear != 0)
+            {
+                this.Gearbox.InternalUpshift();
             }
         }
 
         private void DecreaseRevolutions()
         {
             double revolutionsDecreaseRate =
-                RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.innerGear).Item2 / 5;
+               0.15 / RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.Gearbox.CurrentInternalGear).Item2;
             var revolutionChange = this.brakePedalPosition > 0
                 ? this.brakePedalPosition * revolutionsDecreaseRate
                 : Math.Pow(Math.Log(this.Speed + 1) / 20, -1.38) * revolutionsDecreaseRate;
             int newRPM = this.revolution - (int)Math.Round(revolutionChange);
             this.Revolution = Math.Max(newRPM, IDLE_RPM);
+
+            if (this.revolution < RPM_DOWNSHIFT_POINT && Gearbox.CurrentInternalGear > 1)
+            {
+                Gearbox.InternalDownshift();
+            }
+        }
+
+        private void HandleRpmTransitionWhenShifting()
+        {
+            if (Gearbox.InnerShiftingStatus == Shifting.Up)
+            {
+                this.revolution -= 100;
+                if (this.revolution < 1400)
+                {
+                    Gearbox.InnerShiftingStatus = Shifting.None;
+                }
+            }
+
+            if (Gearbox.InnerShiftingStatus == Shifting.Down)
+            {
+                this.revolution += 100;
+                if (this.revolution > 2000)
+                {
+                    Gearbox.InnerShiftingStatus = Shifting.None;
+                }
+            }
         }
 
         private int BoundPedalPosition(int number)

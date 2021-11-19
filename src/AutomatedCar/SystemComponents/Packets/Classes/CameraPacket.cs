@@ -15,15 +15,8 @@
 
         public IList<WorldObject> Roads
         {
-            get
-            {
-                return this.roads;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.roads, value);
-            }
+            get => this.roads;
+            set => this.RaiseAndSetIfChanged(ref this.roads, value);
         }
     }
 }

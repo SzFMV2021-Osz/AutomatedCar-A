@@ -2,10 +2,18 @@
 {
     public interface IGearbox
     {
-        ExternalGearbox.Gear currentGearPosition { get; set; }
+        Gear CurrentExternalGearPosition { get; set; }
 
-        void Downshift();
+        int CurrentInternalGear { get; set; }
 
-        void Upshift();
+        Shifting InnerShiftingStatus { get; set; }
+
+        void ExternalDownshift();
+
+        void ExternalUpshift();
+
+        void InternalDownshift();
+
+        void InternalUpshift();
     }
 }

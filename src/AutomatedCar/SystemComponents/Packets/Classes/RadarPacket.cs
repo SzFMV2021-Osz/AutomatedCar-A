@@ -16,28 +16,14 @@
 
         public IList<WorldObject> ClosingObjects
         {
-            get
-            {
-                return this.incomingObjects;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.incomingObjects, value);
-            }
+            get => this.incomingObjects;
+            set => this.RaiseAndSetIfChanged(ref this.incomingObjects, value);
         }
 
         public WorldObject ClosestObjectInLane
         {
-            get
-            {
-                return this.closestObjectInLane;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.closestObjectInLane, value);
-            }
+            get => this.closestObjectInLane;
+            set => this.RaiseAndSetIfChanged(ref this.closestObjectInLane, value);
         }
     }
 }

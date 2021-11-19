@@ -10,6 +10,7 @@ namespace AutomatedCar
     {
         private readonly World world;
         private CarFocusHandler carFocusHandler;
+        
         public Game(World world)
         {
             this.world = world;
@@ -35,9 +36,18 @@ namespace AutomatedCar
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }
+            
+            if (!Keyboard.IsKeyDown(Key.Left) && !Keyboard.IsKeyDown(Key.Right))
+            {
+                World.Instance.ControlledCar.StraightenWheel();
+            }
+          
+            // Move forward all the NPCs.
+            World.Instance.StepNonPlayerCharacters();
 
             World.Instance.ControlledCar.CalculateNextPosition();
             this.carFocusHandler.Invoke();
         }
     }
+
 }

@@ -1,8 +1,8 @@
-namespace AutomatedCar.Models
+﻿namespace AutomatedCar.Models
 {
-    using Avalonia.Media;
     using System.Collections.ObjectModel;
     using System.Drawing;
+    using Avalonia.Media;
 
     public interface IWorldObject
     {
@@ -25,6 +25,10 @@ namespace AutomatedCar.Models
         int X { get; set; }
 
         int Y { get; set; }
+
+        double PreciseX { get; set; }
+
+        double PreciseY { get; set; }
 
         int ZIndex { get; set; }
     }

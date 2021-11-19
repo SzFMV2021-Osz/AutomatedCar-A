@@ -37,7 +37,7 @@
                             <Grid ColumnDefinitions="2*,6*,2*" RowDefinitions="30,15">
                                 <TextBlock Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Text="L" FontSize="20" TextAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Text="R" FontSize="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ExternalGearbox.currentGearPosition}" FontSize="20" TextAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Gearbox.CurrentExternalGearPosition}" FontSize="20" TextAlignment="Center"/>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="Gear" TextAlignment="Center"/>
                             </Grid>
                             <Separator Height="15"></Separator>
@@ -62,6 +62,8 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Rotation}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="0">Lane keeping status:</TextBlock>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Rotation}"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0">Inner Gear:</TextBlock>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Gearbox.CurrentInternalGear}"/>
                             </Grid>
                         </StackPanel>
                     </DataTemplate>

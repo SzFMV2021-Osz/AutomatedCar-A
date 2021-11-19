@@ -18,41 +18,20 @@
 
         public IList<WorldObject> DetectedObjects
         {
-            get
-            {
-                return this.detectedObjects;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.detectedObjects, value);
-            }
+            get => this.detectedObjects;
+            set => this.RaiseAndSetIfChanged(ref this.detectedObjects, value);
         }
 
         public IList<WorldObject> RelevantObjects
         {
-            get
-            {
-                return this.relevantObjects;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.relevantObjects, value);
-            }
+            get => this.relevantObjects;
+            set => this.RaiseAndSetIfChanged(ref this.relevantObjects, value);
         }
 
         public WorldObject ClosestObject
         {
-            get
-            {
-                return this.closestObject;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.closestObject, value);
-            }
+            get => this.closestObject;
+            set => this.RaiseAndSetIfChanged(ref this.closestObject, value);
         }
     }
 }
