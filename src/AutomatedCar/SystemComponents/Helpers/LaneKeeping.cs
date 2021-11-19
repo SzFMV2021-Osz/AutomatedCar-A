@@ -26,40 +26,103 @@
 
         public override void Process()
         {
-            if (this.laneKeepingPacket.LaneKeepingStatus == LaneKeepingStatus.Active
-                && !this.laneKeepingPacket.CarCentered)
+            AutomatedCar car = World.Instance.ControlledCar;
+            if (car.LaneKeepingMod.CurrentLaneKeepingStatus == LaneKeepingStatus.Active)
             {
-                this.CenterCar();
+                this.CenterCar(this.cameraPacket.RelevantObjects, car);
+
+                IEnumerable<WorldObject> roads = this.cameraPacket.RelevantObjects;
+                ;
                 //TODO
-                this.ChangeLaneKeepingStatus(this.cameraPacket.RelevantObjects);
+                //this.ChangeLaneKeepingStatus(this.cameraPacket.RelevantObjects);
             }
         }
 
-        public void CenterCar()
+        public void CenterCar(IEnumerable<WorldObject> roads, AutomatedCar car)
         {
+            WorldObject closest = Closest(roads, car);
+            ;
+            if (car.Speed != 0 && car.Gearbox.CurrentExternalGearPosition == Gear.D && closest != null)
+            {
+               
+                if (car.Rotation > closest.Rotation + 2)
+                {
+                    car.TurnLeft();
+                    car.CalculateNextPosition();
+                }
+                else if (car.Rotation < closest.Rotation - 2)
+                {
+                    car.TurnRight();
+                    car.CalculateNextPosition();
+                }
+                
+                if (closest.Rotation == 90)
+                {
+                    if (car.Rotation < 105 && car.Rotation > 75 && car.Y > closest.Geometries[2].Bounds.Y - 50)
+                    {
+                        car.Y -= 1;
+                    }
+                    else if (car.Rotation < 105 && car.Rotation > 75 && car.Y < closest.Geometries[2].Bounds.Y - 50)
+                    {
+                        car.Y += 1;
+                    }
+                    else if (car.Rotation > 255 && car.Rotation < -75 && car.Y > closest.Geometries[1].Bounds.Y)
+                    {
+                        car.Y -= 1;
+                    }
+                    else if (car.Rotation > 255 && car.Rotation < -75 && car.Y < closest.Geometries[1].Bounds.Y)
+                    {
+                        car.Y += 1;
+                    }
+                }
+                else if (closest.Rotation == 0) 
+                {
+                    if (car.Rotation < 15 && car.Rotation > -15 && car.X > closest.Geometries[2].Bounds.X)
+                    {
+                        car.X -= 1;
+                    }
+                    else if (car.Rotation < 15 && car.Rotation > -15 && car.X < closest.Geometries[2].Bounds.X)
+                    {
+                        car.X += 1;
+                    }
+                    else if (car.Rotation > 165 && car.Rotation < 195 && car.X > closest.Geometries[1].Bounds.X)
+                    {
+                        car.X -= 1;
+                    }
+                    else if (car.Rotation > 165 && car.Rotation < 195 && car.X < closest.Geometries[1].Bounds.X)
+                    {
+                        car.X += 1;
+                    }
+                }
+            }
+        }
 
+        public WorldObject Closest(IEnumerable<WorldObject> roads, AutomatedCar car)
+        {
+            List<int> distances = new List<int>();
+
+            foreach (WorldObject wo in roads)
+            {
+                distances.Add((int) Math.Sqrt(Math.Pow(car.X - wo.X, 2) + Math.Pow(car.Y - wo.Y, 2)));
+            }
+
+            if (distances.Count() == 0) 
+            {
+                return null;
+            }
+
+            return roads.ToList()[distances.IndexOf(distances.Min())];
         }
 
         public void ChangeLaneKeepingStatus(IEnumerable<WorldObject> roads)
         {
-            if (roads.ToList()[0].Filename != "road_2lane_straight.png"
-                && roads.ToList()[0].Filename != "road_2lane_6left.png"
-                && roads.ToList()[0].Filename != "road_2lane_6right.png")
-            {
-                this.laneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Inactive;
-                return;
-            }
+            /*
+             "road_2lane_straight.png"
+             "road_2lane_6left.png"
+            "road_2lane_6right.png"
 
-            for (int i = 1; i < roads.Count() && i < this.MAX_DISENGAGE_DISTANCE; i++)
-            {
-                if (roads.ToList()[i].Filename != "road_2lane_straight.png"
-                    && roads.ToList()[i].Filename != "road_2lane_6left.png"
-                    && roads.ToList()[i].Filename != "road_2lane_6right.png")
-                {
-                    this.laneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Disengaging;
-                    break;
-                }
-            }
+            World.Instance.ControlledCar.LaneKeepingMod.CurrentLaneKeepingStatus
+             */
         }
     }
 }
