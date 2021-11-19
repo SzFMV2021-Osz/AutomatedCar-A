@@ -30,21 +30,25 @@ namespace AutomatedCar.Views
             if (Keyboard.IsKeyDown(Key.Left))
             {
                 World.Instance.ControlledCar.TurnLeft();
+                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
             }
             
             if (Keyboard.IsKeyDown(Key.Right))
             {
                 World.Instance.ControlledCar.TurnRight();
+                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
             }
             
             if (Keyboard.IsKeyDown(Key.PageUp))
             {
                 World.Instance.ControlledCar.Rotation += 5;
+                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
             }
 
             if (Keyboard.IsKeyDown(Key.PageDown))
             {
                 World.Instance.ControlledCar.Rotation -= 5;
+                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
             }
 
             if (Keyboard.IsKeyDown(Key.D1))
@@ -102,8 +106,7 @@ namespace AutomatedCar.Views
 
             if (Keyboard.IsKeyDown(Key.L))
             {
-                World.Instance.ControlledCar.LaneKeeping();
-
+                World.Instance.ControlledCar.LaneKeepingMod.ToggleLaneKeeping();
             }
         }
 

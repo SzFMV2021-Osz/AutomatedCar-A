@@ -51,7 +51,7 @@
                                 Source="resm:AutomatedCar.Assets.steering-wheel.png?assembly=AutomatedCar"
                                 RenderTransformOrigin="{Binding RotationPoint, Converter={x:Static visualization:RenderTransformOriginTransformer.Instance}}">
                             </Image>
-                            <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                            <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                                 <TextBlock Grid.Row="0" Grid.Column="0">X:</TextBlock>
                                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding X}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="0">Y:</TextBlock>
@@ -60,10 +60,12 @@
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Filename}"/>
                                 <TextBlock Grid.Row="3" Grid.Column="0">Rotation:</TextBlock>
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Rotation}"/>
-                                <TextBlock Grid.Row="4" Grid.Column="0">Lane keeping status:</TextBlock>
-                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Rotation}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="0">Inner Gear:</TextBlock>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Gearbox.CurrentInternalGear}"/>
+                                <TextBlock Grid.Row="5" Grid.Column="0">Lane keeping status:</TextBlock>
+                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LaneKeepingMod.CurrentLaneKeepingStatus}"/>
+                                <TextBlock Grid.Row="6" Grid.Column="0">Lane keeping available:</TextBlock>
+                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LaneKeepingMod.LaneKeepingAvailibility}"/>
                             </Grid>
                         </StackPanel>
                     </DataTemplate>

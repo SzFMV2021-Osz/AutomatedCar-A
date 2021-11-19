@@ -26,12 +26,12 @@
 
         public override void Process()
         {
-            if (this.laneKeepingPacket.LaneKeepingStatus == LaneKeepingStatus.Active 
+            if (this.laneKeepingPacket.LaneKeepingStatus == LaneKeepingStatus.Active
                 && !this.laneKeepingPacket.CarCentered)
             {
                 this.CenterCar();
                 //TODO
-                this.ChangeLaneKeepingStatus(this.cameraPacket.DetectedObjects);
+                this.ChangeLaneKeepingStatus(this.cameraPacket.RelevantObjects);
             }
         }
 
@@ -40,7 +40,7 @@
 
         }
 
-        public void ChangeLaneKeepingStatus(IEnumerable<IWorldObject> roads)
+        public void ChangeLaneKeepingStatus(IEnumerable<WorldObject> roads)
         {
             if (roads.ToList()[0].Filename != "road_2lane_straight.png"
                 && roads.ToList()[0].Filename != "road_2lane_6left.png"
