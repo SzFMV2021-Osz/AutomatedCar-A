@@ -51,7 +51,7 @@ namespace AutomatedCar.Models
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
-            this.LaneKeepingMod = new LaneKeepingModel();
+            this.LaneKeepingMod = new LaneKeepingModel(this);
             carHeading = -1.5;
             turningAngle = 0;
         }

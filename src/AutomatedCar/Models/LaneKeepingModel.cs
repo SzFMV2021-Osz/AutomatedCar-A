@@ -7,10 +7,43 @@
     {
         private LaneKeepingStatus currentLaneKeepingStatus = LaneKeepingStatus.Inactive;
         private bool available;
+        private AutomatedCar car;
 
-        public LaneKeepingModel(bool laneKeepingAvailable = true)
+        public LaneKeepingModel(AutomatedCar car, bool laneKeepingAvailable = true)
         {
+            this.car = car;
             this.LaneKeepingAvailibility = laneKeepingAvailable;
+        }
+
+        public void SteerCarLeft()
+        {
+            this.car.TurnLeft();
+            this.car.CalculateNextPosition();
+        }
+
+        public void SteerCarRight()
+        {
+            this.car.TurnRight();
+            this.car.CalculateNextPosition();
+        }
+
+        public void MoveCar(int direction)
+        {
+            switch (direction)
+            {
+                case 0:
+                    this.car.X += 1;
+                    break;
+                case 1:
+                    this.car.X -= 1;
+                    break;
+                case 2:
+                    this.car.Y += 1;
+                    break;
+                case 3:
+                    this.car.Y -= 1;
+                    break;
+            }
         }
 
         public void DisengagingLaneKeeping()
