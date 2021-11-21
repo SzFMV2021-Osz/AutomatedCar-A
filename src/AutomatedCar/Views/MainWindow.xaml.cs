@@ -42,13 +42,11 @@ namespace AutomatedCar.Views
             if (Keyboard.IsKeyDown(Key.PageUp))
             {
                 World.Instance.ControlledCar.Rotation += 5;
-                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
             }
 
             if (Keyboard.IsKeyDown(Key.PageDown))
             {
                 World.Instance.ControlledCar.Rotation -= 5;
-                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
             }
 
             if (Keyboard.IsKeyDown(Key.D1))

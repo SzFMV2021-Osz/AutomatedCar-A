@@ -25,7 +25,10 @@
 
         public void EngageLaneKeeping()
         {
-            this.CurrentLaneKeepingStatus = LaneKeepingStatus.Active;
+            if (this.available)
+            {
+                this.CurrentLaneKeepingStatus = LaneKeepingStatus.Active;
+            }
         }
 
         public void ToggleLaneKeeping()
