@@ -8,6 +8,7 @@ namespace AutomatedCar.Models
     using global::AutomatedCar.SystemComponents;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
+    using global::AutomatedCar.SystemComponents.Helpers;
     using System.Drawing;
 
     public class AutomatedCar : Car
@@ -34,6 +35,7 @@ namespace AutomatedCar.Models
 
         private VirtualFunctionBus virtualFunctionBus;
         private CollisionDetection collisionDetection;
+        private LaneKeeping laneKeeping;
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -41,6 +43,7 @@ namespace AutomatedCar.Models
             this.Velocity = new Vector();
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
+
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
@@ -49,6 +52,7 @@ namespace AutomatedCar.Models
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
+            this.LaneKeepingMod = new LaneKeepingModel(this);
             carHeading = -1.5;
             turningAngle = 0;
         }
@@ -102,6 +106,8 @@ namespace AutomatedCar.Models
 
         public IGearbox Gearbox { get; set; }
 
+        public LaneKeepingModel LaneKeepingMod { get; set; }
+
         public Vector Velocity { get; set; }
 
         public Vector Acceleration { get; set; }
@@ -134,6 +140,24 @@ namespace AutomatedCar.Models
         {
             this.Radar.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.TopRight.X / 2, this.Geometry.Bounds.TopRight.Y);
             this.Camera.RelativeLocation = new Avalonia.Point(this.Geometry.Bounds.Center.X, this.Geometry.Bounds.Center.Y / 2);
+        }
+
+        public void SetLaneKeepingAssistant()
+        {
+            this.laneKeeping = new LaneKeeping(this.virtualFunctionBus);
+        }
+
+        public void LaneKeeping()
+        {
+            //Set status of Lanekeeping
+            if (this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus == LaneKeepingStatus.Active)
+            {
+                this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Inactive;
+            }
+            else
+            {
+                this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Active;
+            }
         }
 
         public void CalculateSpeed()
