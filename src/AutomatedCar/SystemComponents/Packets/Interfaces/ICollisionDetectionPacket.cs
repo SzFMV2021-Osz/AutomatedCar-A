@@ -1,8 +1,5 @@
 ﻿namespace AutomatedCar.SystemComponents.Helpers
 {
-    using System;
-    using Avalonia;
-
     /// <summary>
     /// Interface for the collision detection events.
     /// </summary>
