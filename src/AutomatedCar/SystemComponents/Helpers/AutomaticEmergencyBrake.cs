@@ -27,11 +27,21 @@
             AutomatedCar car = World.Instance.ControlledCar;
             IList<WorldObject> relevantObjects = this.virtualFunctionBus.RadarPacket.RelevantObjects;
 
+            if (car.Speed >= 70)
+            {
+                this.aebPacket.MightNotWorkProperlyWarning = true;
+            }
+            else
+            {
+                this.aebPacket.MightNotWorkProperlyWarning = false;
+            }
+
             foreach (var relevantObject in relevantObjects)
             {
                 if (this.IsObjectInBrakeDistance(relevantObject, car))
                 {
                     this.aebPacket.NeedEmergencyBrakeWarning = true;
+                    car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
                 }
                 else
                 {
@@ -105,15 +115,15 @@
         }
 
         /// <summary>
-        /// Reaches max deceleration at 100 km/h. Normalizes the deceleration between 0 and 9.
+        /// Reaches max deceleration at 70 km/h. Normalizes the deceleration between 0 and 9.
         /// </summary>
         /// <param name="speed">Velocity of the car.</param>
         /// <returns>A real number between 0 and 9.</returns>
         private double NormalizeDeceleration(int speed)
         {
-            if (speed < 100)
+            if (speed < 70)
             {
-                return MAX_DECELERATION * (speed / 100);
+                return MAX_DECELERATION * (speed / 70);
             }
             else
             {

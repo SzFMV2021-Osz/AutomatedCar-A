@@ -247,6 +247,7 @@ namespace AutomatedCar.Models
 
         public void EmergencyBrake(double normalizedDeceleration)
         {
+            this.gasPedalPosition = MIN_PEDAL_POSITION;
             this.brakePedalPosition = MAX_PEDAL_POSITION;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
