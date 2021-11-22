@@ -2,22 +2,16 @@
 {
     using AutomatedCar.SystemComponents.Helpers;
     using ReactiveUI;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    public class LaneKeepingPacket : ReactiveObject, ILaneKeepingPacket
+    public class LKAPacket : ReactiveObject, ILKAPacket
     {
         private LaneKeepingStatus laneKeepingEngaged = LaneKeepingStatus.Inactive;
-        private bool carCentered = false;
 
         public LaneKeepingStatus LaneKeepingStatus {
-            get => this.laneKeepingEngaged; 
+            get => this.laneKeepingEngaged;
             set => this.RaiseAndSetIfChanged(ref this.laneKeepingEngaged, value);
         }
 
-        public bool CarCentered => this.carCentered;
+        public bool CarCentered { get; }
     }
 }

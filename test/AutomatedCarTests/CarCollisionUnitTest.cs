@@ -43,7 +43,7 @@
             automatedCar.Geometry = MockCarPoints();
 
             // Expected 151, because car point X is 51 + word position 100
-            Assert.Equal(151, collisionDetection.GetCarPoints(automatedCar).Points[0].X);
+            Assert.Equal(151, CollisionDetection.GetCarPoints(automatedCar).Points[0].X);
         }
 
         [Fact]
@@ -52,7 +52,7 @@
             automatedCar.Geometry = MockCarPoints();
 
             // Expected 339, because car point Y is 239 + word position 100
-            Assert.Equal(339, collisionDetection.GetCarPoints(automatedCar).Points[0].Y);
+            Assert.Equal(339, CollisionDetection.GetCarPoints(automatedCar).Points[0].Y);
         }
 
         private PolylineGeometry MockCarPoints()
