@@ -17,7 +17,7 @@ namespace AutomatedCar.Models
         private const int MIN_PEDAL_POSITION = 0;
         private const int MAX_PEDAL_POSITION = 100;
         private const double PEDAL_INPUT_MULTIPLIER = 0.01;
-        private const double DRAG = 0.006; // This limits the top speed to 166 km/h
+        private const double DRAG = 0.01;
         private const int IDLE_RPM = 800;
         private const int MAX_RPM = 6000;
         private const int NEUTRAL_RPM_MULTIPLIER = 80;
@@ -25,6 +25,7 @@ namespace AutomatedCar.Models
         private const int RPM_UPSHIFT_POINT = 2500;
         private const int WHEELBASE = 200;
         private const int TURNING_OFFSET = 5;
+        private const double TURNING_MULTIPLIER = 0.1;
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -214,10 +215,10 @@ namespace AutomatedCar.Models
 
             double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -3 : 3;
             
-            frontX += Speed * 0.25 * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
-            frontY += Speed * 0.25 * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
-            rearX += Speed * 0.25 * Math.Cos(carHeading) * reverseMultiplier;
-            rearY += Speed * 0.25 * Math.Sin(carHeading) * reverseMultiplier;
+            frontX += Speed * TURNING_MULTIPLIER * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
+            frontY += Speed * TURNING_MULTIPLIER * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
+            rearX += Speed * TURNING_MULTIPLIER * Math.Cos(carHeading) * reverseMultiplier;
+            rearY += Speed * TURNING_MULTIPLIER * Math.Sin(carHeading) * reverseMultiplier;
             
             X = (int)(frontX + rearX) / 2;
             Y = (int)(frontY + rearY) / 2;
@@ -234,13 +235,13 @@ namespace AutomatedCar.Models
             {
                 velocity += -(Acceleration.Y - slowingForce);
             }
-            else if (Gearbox.CurrentExternalGearPosition == Gear.R)
+            else if (Gearbox.CurrentExternalGearPosition == Gear.R && Speed < 20) // Should not reverse with unlimited speed
             {
                 velocity += Acceleration.Y - slowingForce;
             }
             else
             {
-                if (velocity < 0) //In neutral gear, the car can stop whether it goes forward or backward
+                if (velocity < 0) // In neutral gear, the car can stop whether it goes forward or backward
                 {
                     velocity += slowingForce;
                 }
