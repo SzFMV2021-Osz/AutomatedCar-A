@@ -167,6 +167,16 @@
 
         public override void Process()
         {
+            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+            if(objInLine != null)
+            {
+                mode = AccMode.CarFollowing;
+            }
+            else
+            {
+                mode = AccMode.SpeedKeeping;
+            }
+
             AccFunctionalityToExecute();
         }
 
