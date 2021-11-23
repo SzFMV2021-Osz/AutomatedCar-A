@@ -26,9 +26,14 @@
         {
             this.car = World.Instance.ControlledCar;
             this.roads = this.virtualFunctionBus.CameraPacket.Roads;
+            this.LKAAvailibility();
             if (this.car.LKAModel.CurrentLaneKeepingStatus != LaneKeepingStatus.Inactive)
             {
-                this.CenterCar();
+                if (this.car.LKAModel.CurrentLaneKeepingStatus != LaneKeepingStatus.Disengaging)
+                {
+                    this.CenterCar();
+                }
+
                 this.ChangeLKAStatus();
             }
         }
@@ -162,6 +167,11 @@
             Point carPoint = new (this.car.X + this.car.RotationPoint.X, this.car.Y + this.car.RotationPoint.Y);
 
             return roadGeometry.FillContains(carPoint);
+        }
+
+        private void LKAAvailibility()
+        {
+            this.car.LKAModel.LaneKeepingAvailibility = this.CarUnderRoad() != null;
         }
     }
 }
