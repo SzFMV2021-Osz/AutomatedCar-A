@@ -107,11 +107,11 @@ namespace AutomatedCar.Views
             {
                 World.Instance.ControlledCar.DummyAcc.SwitchDistance();
             }
-            if (Keyboard.IsKeyDown(Key.K))
+            if (Keyboard.IsKeyDown(Key.Add))
             {
                 World.Instance.ControlledCar.DummyAcc.IncreaseSpeed();
             }
-            if (Keyboard.IsKeyDown(Key.L))
+            if (Keyboard.IsKeyDown(Key.Subtract))
             {
                 World.Instance.ControlledCar.DummyAcc.DecreaseSpeed();
             }
