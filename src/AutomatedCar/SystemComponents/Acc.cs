@@ -3,10 +3,12 @@
     using ReactiveUI;
     using Models;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public class Acc : SystemComponent, IDummyAcc
     {
-        enum AccMOde
+        enum AccMode
         {
             SpeedKeeping,
             CarFollowing
@@ -21,6 +23,7 @@
         private const int speedTick = 10;
 
         private readonly AutomatedCar Car;
+        private AccMode mode;
 
         private Vector objectPositionInLaneT0 = null;
 
@@ -41,6 +44,7 @@
             if (!IsAccOn && Car.Speed > minSpeed)
             {
                 AccSpeed = Car.Speed;
+                mode = AccMode.SpeedKeeping;
                 IsAccOn = true;
             }
             else if (IsAccOn)
@@ -91,18 +95,32 @@
 
         public override void Process()
         {
-            if (IsAccOn)
+            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+
+            Action sup = (IsAccOn, mode) switch
             {
-                var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+                (true, AccMode.CarFollowing) => DoSpeedKeeping,
+                (true, AccMode.SpeedKeeping) => DoFollowOperation,
+                (false, _) => new Action(() => { }),
+                _ => throw new ArgumentException("The AccMode state was invalid!"),
+            };
+            sup();
 
-                if (objInLine != null && objectPositionInLaneT0 != null)
-                {
-                    var deltaPosition = objectPositionInLaneT0 - objInLine;
-                    var deltaDistance = deltaPosition.GetLength();
-                }
-                this.objectPositionInLaneT0 = objInLine.GetLocation();
+            if (objInLine != null && objectPositionInLaneT0 != null)
+            {
+                var deltaPosition = objectPositionInLaneT0 - objInLine;
+                var deltaDistance = deltaPosition.GetLength();
             }
+            this.objectPositionInLaneT0 = objInLine.GetLocation();
+        }
 
+        public void DoFollowOperation()
+        {
+            
+        }
+
+        public void DoSpeedKeeping()
+        {
 
         }
     }
