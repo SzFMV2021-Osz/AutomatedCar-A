@@ -26,8 +26,10 @@
         {
             AutomatedCar car = World.Instance.ControlledCar;
             IList<WorldObject> relevantObjects = this.virtualFunctionBus.RadarPacket.RelevantObjects;
+            IList<WorldObject> closingObjects = this.virtualFunctionBus.RadarPacket.ClosingObjects;
+            WorldObject closestObject = this.virtualFunctionBus.RadarPacket.ClosestObject;
 
-            if (car.Speed >= 70)
+            if (car.Speed >= MIN_WARNING_SPEED)
             {
                 this.aebPacket.MightNotWorkProperlyWarning = true;
             }
@@ -36,9 +38,40 @@
                 this.aebPacket.MightNotWorkProperlyWarning = false;
             }
 
-            foreach (var relevantObject in relevantObjects)
+            /*foreach (var closingObject in closingObjects)
             {
-                if (this.IsObjectInBrakeDistance(relevantObject, car))
+                if (relevantObjects.Contains(closingObject) && (closestObject.X == closingObject.X && closestObject.Y == closingObject.X))
+                {
+                    if (this.IsObjectDynamic(closingObject))
+                    {
+                        if (this.IsDynamicObjectWillInBrakeDistance(closingObject, car))
+                        {
+                            this.aebPacket.NeedEmergencyBrakeWarning = true;
+                            car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
+                        }
+                        else
+                        {
+                            this.aebPacket.NeedEmergencyBrakeWarning = false;
+                        }
+                    }
+                    else
+                    {
+                        if (this.IsObjectInBrakeDistance(closingObject, car))
+                        {
+                            this.aebPacket.NeedEmergencyBrakeWarning = true;
+                            car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
+                        }
+                        else
+                        {
+                            this.aebPacket.NeedEmergencyBrakeWarning = false;
+                        }
+                    }
+                }
+            }*/
+
+            foreach (var closingObject in relevantObjects)
+            {
+                if (this.IsObjectInBrakeDistance(closingObject, car))
                 {
                     this.aebPacket.NeedEmergencyBrakeWarning = true;
                     car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
@@ -47,6 +80,7 @@
                 {
                     this.aebPacket.NeedEmergencyBrakeWarning = false;
                 }
+
             }
         }
 
@@ -62,9 +96,42 @@
         /// <returns>True or False.</returns>
         private bool IsObjectInBrakeDistance(WorldObject worldObject, AutomatedCar car)
         {
-            double error = 1;
+            double error = 2;
 
             if (this.ObjectDistanceFromCarInTime(worldObject, car) + error <= this.BrakeDistanceInTime(car))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsObjectDynamic(WorldObject worldObject)
+        {
+            if (worldObject is Pedestrian)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsDynamicObjectWillInBrakeDistance(WorldObject worldObject, AutomatedCar car)
+        {
+            int objectSpeed = (worldObject as Pedestrian).Speed;
+            double x1 = Math.Abs(car.X - worldObject.X) + worldObject.X;
+            double y1 = worldObject.Y;
+
+            double x2 = worldObject.X;
+            double y2 = Math.Abs(car.Y - worldObject.Y) + worldObject.Y;
+
+            double distanceFromIntersection1 = this.DistanceFromPoint(worldObject, x1, y1);
+            double distanceFromIntersectionInTime1 = distanceFromIntersection1 / objectSpeed;
+
+            double distanceFromIntersection2 = this.DistanceFromPoint(worldObject, x1, y1);
+            double distanceFromIntersectionInTime2 = distanceFromIntersection1 / objectSpeed;
+
+            if ((distanceFromIntersectionInTime1 <= this.BrakeDistanceInTime(car)) || (distanceFromIntersection2 <= this.BrakeDistanceInTime(car)))
             {
                 return true;
             }
@@ -81,6 +148,11 @@
         private double DistanceFromCar(WorldObject worldObject, AutomatedCar car)
         {
             return Math.Sqrt(Math.Pow(worldObject.X - car.X, 2) + Math.Pow(worldObject.Y - car.Y, 2));
+        }
+
+        private double DistanceFromPoint(WorldObject worldObject, double x, double y)
+        {
+            return Math.Sqrt(Math.Pow(worldObject.X - x, 2) + Math.Pow(worldObject.Y - y, 2));
         }
 
         /// <summary>
