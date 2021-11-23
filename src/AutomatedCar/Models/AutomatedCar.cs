@@ -108,7 +108,7 @@ namespace AutomatedCar.Models
 
         public Geometry Geometry { get; set; }
 
-        public IDummyAcc Acc { get; set; }
+        public IAcc Acc { get; set; }
 
         /// <summary>Starts the automated car by starting the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
         public void Start()
