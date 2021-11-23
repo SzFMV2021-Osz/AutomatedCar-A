@@ -1,6 +1,7 @@
 ﻿namespace AutomatedCar.Models
 {
     using ReactiveUI;
+    using System;
 
     public class DummyAcc : ReactiveObject, IDummyAcc
     {
@@ -32,12 +33,15 @@
 
         public void ToggleAcc()
         {
-            if (!IsAccOn)
+            if (!IsAccOn && automatedCar.Speed > minSpeed)
             {
-                AccSpeed = automatedCar.Speed > minSpeed ? automatedCar.Speed : minSpeed;
+                AccSpeed = automatedCar.Speed;
+                IsAccOn = true;
             }
-
-            IsAccOn = !IsAccOn;
+            else if (IsAccOn)
+            {
+                IsAccOn = false;
+            }
         }
 
         public void SwitchDistance()
@@ -47,17 +51,37 @@
 
         public void IncreaseSpeed()
         {
-            if (AccSpeed < maxSpeed)
+            var nextSpeed = RoundUpByTick(AccSpeed);
+            if (nextSpeed <= maxSpeed)
             {
-                AccSpeed += speedTick;
+                AccSpeed = nextSpeed;
+            }
+            else
+            {
+                AccSpeed = maxSpeed;
             }
         }
         public void DecreaseSpeed()
         {
+            var nextSpeed = RoundDownByTick(AccSpeed);
             if (AccSpeed > minSpeed)
             {
-                AccSpeed -= speedTick;
+                AccSpeed = nextSpeed;
             }
+            else
+            {
+                AccSpeed = minSpeed;
+            }
+        }
+
+        private int RoundUpByTick(int speed)
+        {
+            return (int)Math.Floor((speed + speedTick) / 10.0) * 10;
+        }
+
+        private int RoundDownByTick(int speed)
+        {
+            return (int)Math.Ceiling((speed - speedTick) / 10.0) * 10;
         }
     }
 }
