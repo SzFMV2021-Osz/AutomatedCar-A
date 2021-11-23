@@ -35,6 +35,7 @@ namespace AutomatedCar.Models
         private VirtualFunctionBus virtualFunctionBus;
         private CollisionDetection collisionDetection;
         private LaneKeepingAssistant laneKeepingAssistant;
+        private AutomaticEmergencyBrake automaticEmergencyBrake;
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -42,12 +43,12 @@ namespace AutomatedCar.Models
             this.Velocity = new Vector();
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
-
+            this.automaticEmergencyBrake = new AutomaticEmergencyBrake(this.virtualFunctionBus);
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
-            this.Radar = new (this.virtualFunctionBus);
-            this.Camera = new (this.virtualFunctionBus);
+            this.Radar = new(this.virtualFunctionBus);
+            this.Camera = new(this.virtualFunctionBus);
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
@@ -336,6 +337,18 @@ namespace AutomatedCar.Models
         private int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
+        }
+
+        public void EmergencyBrake(double normalizedDeceleration)
+        {
+            this.gasPedalPosition = MIN_PEDAL_POSITION;
+            this.brakePedalPosition = MAX_PEDAL_POSITION;
+            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
+
+            this.Velocity.Y -= normalizedDeceleration + slowingForce;
+            this.Y += (int)this.Velocity.Y;
+            this.CalculateSpeed();
         }
     }
 }

@@ -1,6 +1,7 @@
 namespace AutomatedCar.Views
 {
     using AutomatedCar.Models;
+    using AutomatedCar.SystemComponents;
     using Avalonia.Controls;
     using Avalonia.Input;
     using Avalonia.Markup.Xaml;
@@ -16,29 +17,27 @@ namespace AutomatedCar.Views
         {
             Keyboard.Keys.Add(e.Key);
             base.OnKeyDown(e);
-
-            if (Keyboard.IsKeyDown(Key.Up))
+            VirtualFunctionBus virtualFunctionBus = World.Instance.ControlledCar.VirtualFunctionBus;
+            if (Keyboard.IsKeyDown(Key.Up) && !virtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.IncreaseGasPedalPosition();
             }
-            
-            if (Keyboard.IsKeyDown(Key.Down))
+
+            if (Keyboard.IsKeyDown(Key.Down) && !virtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.IncreaseBrakePedalPosition();
             }
-            
+
             if (Keyboard.IsKeyDown(Key.Left))
             {
-                World.Instance.ControlledCar.TurnLeft();
-                World.Instance.ControlledCar.LKAModel.DisengageLaneKeeping();
+                World.Instance.ControlledCar.X -= 5;
             }
-            
+
             if (Keyboard.IsKeyDown(Key.Right))
             {
-                World.Instance.ControlledCar.TurnRight();
-                World.Instance.ControlledCar.LKAModel.DisengageLaneKeeping();
+                World.Instance.ControlledCar.X += 5;
             }
-            
+
             if (Keyboard.IsKeyDown(Key.PageUp))
             {
                 World.Instance.ControlledCar.Rotation += 5;
@@ -91,20 +90,13 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
-
             if (Keyboard.IsKeyDown(Key.A))
             {
-                World.Instance.ControlledCar.Gearbox.ExternalDownshift();
+                World.Instance.ControlledCar.ExternalGearbox.Downshift();
             }
-
             if (Keyboard.IsKeyDown(Key.Q))
             {
-                World.Instance.ControlledCar.Gearbox.ExternalUpshift();
-            }
-
-            if (Keyboard.IsKeyDown(Key.L))
-            {
-                World.Instance.ControlledCar.LKAModel.ToggleLaneKeeping();
+                World.Instance.ControlledCar.ExternalGearbox.Upshift();
             }
         }
 
