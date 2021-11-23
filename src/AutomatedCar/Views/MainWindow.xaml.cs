@@ -97,6 +97,24 @@ namespace AutomatedCar.Views
             {
                 World.Instance.ControlledCar.Gearbox.ExternalUpshift();
             }
+
+            // ACC
+            if (Keyboard.IsKeyDown(Key.C))
+            {
+                World.Instance.ControlledCar.DummyAcc.ToggleAcc();
+            }
+            if (Keyboard.IsKeyDown(Key.T))
+            {
+                World.Instance.ControlledCar.DummyAcc.SwitchDistance();
+            }
+            if (Keyboard.IsKeyDown(Key.K))
+            {
+                World.Instance.ControlledCar.DummyAcc.IncreaseSpeed();
+            }
+            if (Keyboard.IsKeyDown(Key.L))
+            {
+                World.Instance.ControlledCar.DummyAcc.DecreaseSpeed();
+            }
         }
 
         protected override void OnKeyUp(KeyEventArgs e)

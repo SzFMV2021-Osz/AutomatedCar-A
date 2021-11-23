@@ -48,6 +48,7 @@ namespace AutomatedCar.Models
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
+            this.DummyAcc = new DummyAcc(this);
             carHeading = -1.5;
             turningAngle = 0;
         }
@@ -106,6 +107,8 @@ namespace AutomatedCar.Models
         public Vector Acceleration { get; set; }
 
         public Geometry Geometry { get; set; }
+
+        public IDummyAcc DummyAcc { get; set; }
 
         /// <summary>Starts the automated car by starting the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
         public void Start()
@@ -245,6 +248,7 @@ namespace AutomatedCar.Models
         {
             int newPosition = this.brakePedalPosition + PEDAL_OFFSET;
             this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
+            this.DummyAcc.IsAccOn = false;
         }
 
         public void DecreaseBrakePedalPosition()
