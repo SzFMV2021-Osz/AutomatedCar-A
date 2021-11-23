@@ -1,9 +1,10 @@
-﻿namespace AutomatedCar.Models
+﻿namespace AutomatedCar.SystemComponents
 {
     using ReactiveUI;
+    using Models;
     using System;
 
-    public class DummyAcc : ReactiveObject, IDummyAcc
+    public class Acc : SystemComponent, IDummyAcc
     {
         private const double minDistance = 0.8;
         private const double maxDistance = 1.4;
@@ -13,29 +14,25 @@
         private const int maxSpeed = 160;
         private const int speedTick = 10;
 
+        private readonly AutomatedCar Car;
 
-        private AutomatedCar automatedCar;
-        private bool isAccOn;
-        private double accDistance;
-        private int accSpeed;
-
-        public DummyAcc(AutomatedCar automatedCar)
+        public Acc(AutomatedCar car, VirtualFunctionBus virtualFunctionBus) : base(virtualFunctionBus)
         {
-            this.automatedCar = automatedCar;
-            this.isAccOn = false;
-            this.accDistance = minDistance;
-            this.accSpeed = minSpeed;
+            this.Car = car;
+            this.IsAccOn = false;
+            this.AccDistance = minDistance;
+            this.AccSpeed = minSpeed;
         }
 
-        public bool IsAccOn { get => this.isAccOn; set => this.RaiseAndSetIfChanged(ref this.isAccOn, value); }
-        public double AccDistance { get => this.accDistance; set => this.RaiseAndSetIfChanged(ref this.accDistance, value); }
-        public int AccSpeed { get => this.accSpeed; set => this.RaiseAndSetIfChanged(ref this.accSpeed, value); }
+        public bool IsAccOn { get; set; }
+        public double AccDistance { get; set; }
+        public int AccSpeed { get; set; }
 
         public void ToggleAcc()
         {
-            if (!IsAccOn && automatedCar.Speed > minSpeed)
+            if (!IsAccOn && Car.Speed > minSpeed)
             {
-                AccSpeed = automatedCar.Speed;
+                AccSpeed = Car.Speed;
                 IsAccOn = true;
             }
             else if (IsAccOn)
@@ -82,6 +79,12 @@
         private int RoundDownByTick(int speed)
         {
             return (int)Math.Ceiling((speed - speedTick) / 10.0) * 10;
+        }
+
+        public override void Process()
+        {
+            //TODO
+            throw new NotImplementedException();
         }
     }
 }

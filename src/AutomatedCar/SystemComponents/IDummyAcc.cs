@@ -1,4 +1,4 @@
-﻿namespace AutomatedCar.Models
+﻿namespace AutomatedCar.SystemComponents
 {
     public interface IDummyAcc
     {

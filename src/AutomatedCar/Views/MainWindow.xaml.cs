@@ -101,22 +101,22 @@ namespace AutomatedCar.Views
             // ACC
             if (Keyboard.IsKeyDown(Key.C))
             {
-                World.Instance.ControlledCar.DummyAcc.ToggleAcc();
+                World.Instance.ControlledCar.Acc.ToggleAcc();
                 Keyboard.Keys.Remove(Key.C);
             }
             if (Keyboard.IsKeyDown(Key.T))
             {
-                World.Instance.ControlledCar.DummyAcc.SwitchDistance();
+                World.Instance.ControlledCar.Acc.SwitchDistance();
                 Keyboard.Keys.Remove(Key.T);
             }
             if (Keyboard.IsKeyDown(Key.Add))
             {
-                World.Instance.ControlledCar.DummyAcc.IncreaseSpeed();
+                World.Instance.ControlledCar.Acc.IncreaseSpeed();
                 Keyboard.Keys.Remove(Key.Add);
             }
             if (Keyboard.IsKeyDown(Key.Subtract))
             {
-                World.Instance.ControlledCar.DummyAcc.DecreaseSpeed();
+                World.Instance.ControlledCar.Acc.DecreaseSpeed();
                 Keyboard.Keys.Remove(Key.Subtract);
             }
         }
