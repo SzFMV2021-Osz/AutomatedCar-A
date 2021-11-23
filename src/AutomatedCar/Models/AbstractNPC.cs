@@ -64,7 +64,7 @@
         private double GetDistance(Vector destination)
         {
             var dir = new Vector() { X = destination.X - this.PreciseX, Y = destination.Y - this.PreciseY };
-            return Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y));
+            return dir.GetLength();
         }
 
         /// Recursive function only modify with extreme caution.

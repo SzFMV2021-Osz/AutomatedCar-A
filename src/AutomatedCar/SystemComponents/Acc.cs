@@ -6,6 +6,12 @@
 
     public class Acc : SystemComponent, IDummyAcc
     {
+        enum AccMOde
+        {
+            SpeedKeeping,
+            CarFollowing
+        }
+
         private const double minDistance = 0.8;
         private const double maxDistance = 1.4;
         private const double distanceTick = 0.2;
@@ -15,6 +21,8 @@
         private const int speedTick = 10;
 
         private readonly AutomatedCar Car;
+
+        private Vector objectPositionInLaneT0 = null;
 
         public Acc(AutomatedCar car, VirtualFunctionBus virtualFunctionBus) : base(virtualFunctionBus)
         {
@@ -83,8 +91,19 @@
 
         public override void Process()
         {
-            //TODO
-            throw new NotImplementedException();
+            if (IsAccOn)
+            {
+                var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+
+                if (objInLine != null && objectPositionInLaneT0 != null)
+                {
+                    var deltaPosition = objectPositionInLaneT0 - objInLine;
+                    var deltaDistance = deltaPosition.GetLength();
+                }
+                this.objectPositionInLaneT0 = objInLine.GetLocation();
+            }
+
+
         }
     }
 }
