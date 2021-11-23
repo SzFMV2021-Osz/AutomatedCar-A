@@ -17,6 +17,21 @@ namespace AutomatedCar.Models
             this.X = x;
             this.Y = y;
         }
+
+        public static Vector operator -(Vector a, Vector b)
+        {
+            return new Vector(a.X - b.X, a.Y - b.Y);
+        }
+
+        public static Vector operator -(Vector a, WorldObject b)
+        {
+            return new Vector(a.X - b.X, a.Y - b.Y);
+        }
+
+        public double GetLength()
+        {
+            return Math.Sqrt((X * X) + (Y * Y));
+        }
         public bool Equals(Vector other)
         {
             if (other.X == this.X && other.Y == this.Y)
