@@ -66,7 +66,7 @@ namespace AutomatedCar.Models
                 return this.gasPedalPosition;
             }
 
-            private set
+            set
             {
                 this.RaiseAndSetIfChanged(ref this.gasPedalPosition, value);
             }
@@ -79,7 +79,7 @@ namespace AutomatedCar.Models
                 return this.brakePedalPosition;
             }
 
-            private set
+            set
             {
                 this.RaiseAndSetIfChanged(ref this.brakePedalPosition, value);
             }

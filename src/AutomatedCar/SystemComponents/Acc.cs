@@ -19,19 +19,20 @@
         private const double minDistance = 0.8;
         private const double maxDistance = 1.4;
         private const double distanceTick = 0.2;
+        private double accDistance;
 
         private const int minSpeed = 30;
         private const int maxSpeed = 160;
         private const int speedTick = 10;
+        private int accSpeed;
 
         private bool isAccOn;
-        private int accSpeed;
-        private double accDistance;
 
         private readonly AutomatedCar Car;
         private AccMode mode;
 
-        private Vector objectPositionInLaneT0 = null;
+        //private Vector objectPositionInLaneT0 = null;
+        //private DateTime TimeOfSample { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -156,35 +157,55 @@
             }
         }
 
+        public Action AccFunctionalityToExecute => (IsAccOn, mode) switch
+        {
+            (true, AccMode.CarFollowing) => DoFollowOperation,
+            (true, AccMode.SpeedKeeping) => DoSpeedKeeping,
+            (false, _) => new Action(() => { }),
+            _ => throw new ArgumentException("The AccMode state was invalid!"),
+        };
+
         public override void Process()
         {
-            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
-
-            Action sup = (IsAccOn, mode) switch
-            {
-                (true, AccMode.CarFollowing) => DoSpeedKeeping,
-                (true, AccMode.SpeedKeeping) => DoFollowOperation,
-                (false, _) => new Action(() => { }),
-                _ => throw new ArgumentException("The AccMode state was invalid!"),
-            };
-            sup();
-
-            if (objInLine != null && objectPositionInLaneT0 != null)
-            {
-                var deltaPosition = objectPositionInLaneT0 - objInLine;
-                var deltaDistance = deltaPosition.GetLength();
-            }
-            this.objectPositionInLaneT0 = objInLine.GetLocation();
+            AccFunctionalityToExecute();
         }
 
         public void DoFollowOperation()
         {
-            
+            var newTime = DateTime.Now;
+            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+
+            if (objInLine != null)
+            {
+                var deltaPosition = objInLine.GetLocation() - Car.GetLocation();
+                var deltaDistance = deltaPosition.GetLength();
+                var distanceInTime = deltaDistance / Car.Speed; //TODO: pix/s or m/s ?? huh
+
+                double deltaTime = accDistance - distanceInTime;
+                (var gasPosition, var breakPosition) = deltaTime switch
+                {
+                    > 0 => AccBreakCar(deltaTime),
+                    < 0 => AccAccelerateCar(deltaTime),
+                    _ => (Car.GasPedalPosition, Car.BrakePedalPosition),
+                };
+                Car.GasPedalPosition = gasPosition;
+                Car.BrakePedalPosition = breakPosition;
+            }
+        }
+
+        private (int gasPosition, int breakPosition) AccAccelerateCar(double deltaTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        private (int gasPosition, int breakPosition) AccBreakCar(double deltaTime)
+        {
+            throw new NotImplementedException();
         }
 
         public void DoSpeedKeeping()
         {
-
+            
         }
     }
 }
