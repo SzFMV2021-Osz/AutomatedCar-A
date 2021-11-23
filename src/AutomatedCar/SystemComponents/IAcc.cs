@@ -1,6 +1,6 @@
 ﻿namespace AutomatedCar.SystemComponents
 {
-    public interface IDummyAcc
+    public interface IAcc
     {
         public bool IsAccOn { get; set; }
         public int AccSpeed { get; set; }
