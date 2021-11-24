@@ -44,10 +44,9 @@
                 {
                     if (this.IsObjectDynamic(closingObject))
                     {
-                        if (this.IsDynamicObjectWillInBrakeDistance(closingObject, car))
+                        if (this.IsObjectInBrakeDistance(closingObject, car))
                         {
                             this.aebPacket.NeedEmergencyBrakeWarning = true;
-                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed);
                         }
                         else
                         {
@@ -59,7 +58,6 @@
                         if (this.IsObjectInBrakeDistance(closingObject, car))
                         {
                             this.aebPacket.NeedEmergencyBrakeWarning = true;
-                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed) * 50;
                         }
                         else
                         {
@@ -69,7 +67,7 @@
                 }
             }
 
-            if (closingObjects.Count == 0)
+            if (car.Speed == 0 || this.virtualFunctionBus.RadarPacket.ClosestObject == null)
             {
                 this.aebPacket.NeedEmergencyBrakeWarning = false;
             }
@@ -87,14 +85,18 @@
         /// <returns>True or False.</returns>
         private bool IsObjectInBrakeDistance(WorldObject worldObject, AutomatedCar car)
         {
-            double error = 10;
+            double error = 200;
+            double d = this.DistanceFromCar(worldObject, car);
+            double r = this.BrakeDistance(car);
 
-            if (this.ObjectDistanceFromCarInTime(worldObject, car) <= this.BrakeDistanceInTime(car) + error)
+            if (d <= r + error)
             {
                 return true;
             }
-
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         private bool IsObjectDynamic(WorldObject worldObject)
