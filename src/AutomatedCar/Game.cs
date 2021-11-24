@@ -35,6 +35,7 @@ namespace AutomatedCar
             if (!Keyboard.IsKeyDown(Key.Down))
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
+                World.Instance.ControlledCar.Acc.AutoAccOff();
             }
             
             if (!Keyboard.IsKeyDown(Key.Left) && !Keyboard.IsKeyDown(Key.Right))

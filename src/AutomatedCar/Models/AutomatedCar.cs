@@ -331,5 +331,18 @@ namespace AutomatedCar.Models
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
         }
+
+        public void EmergencyBrake(double normalizedDeceleration)
+        {
+            this.Acc.AutoAccOff();
+            this.gasPedalPosition = MIN_PEDAL_POSITION;
+            this.brakePedalPosition = MAX_PEDAL_POSITION;
+            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
+
+            this.Velocity.Y -= normalizedDeceleration + slowingForce;
+            this.Y += (int)this.Velocity.Y;
+            this.CalculateSpeed();
+        }
     }
 }

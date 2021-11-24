@@ -226,5 +226,13 @@
         {
             
         }
+
+        public void AutoAccOff()
+        {
+            if (isAccOn)
+            {
+                isAccOn = false;
+            }
+        }
     }
 }
