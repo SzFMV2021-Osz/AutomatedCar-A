@@ -31,6 +31,9 @@
         private readonly AutomatedCar Car;
         private AccMode mode;
 
+        public int AccBreak { get; set; } = 0;
+        public int AccGas { get; set; } = 0;
+
         //private Vector objectPositionInLaneT0 = null;
         //private DateTime TimeOfSample { get; set; }
 
@@ -97,14 +100,21 @@
 
         public void ToggleAcc()
         {
-            if (!IsAccOn && Car.Speed > minSpeed)
+            if (!IsAccOn)// && Car.Speed > minSpeed)
             {
                 AccSpeed = Car.Speed;
                 mode = AccMode.SpeedKeeping;
+                AccGas = Car.GasPedalPosition;
+                AccBreak = Car.BrakePedalPosition;
+                Car.GasPedalPosition = 0;
+                Car.BrakePedalPosition = 0;
+
                 IsAccOn = true;
             }
             else if (IsAccOn)
             {
+                AccGas = 0;
+                AccBreak = 0;
                 IsAccOn = false;
             }
         }
@@ -182,35 +192,34 @@
 
         public void DoFollowOperation()
         {
-            var newTime = DateTime.Now;
             var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
 
             if (objInLine != null)
             {
                 var deltaPosition = objInLine.GetLocation() - Car.GetLocation();
                 var deltaDistance = deltaPosition.GetLength();
-                var distanceInTime = deltaDistance / Car.Speed; //TODO: pix/s or m/s ?? huh
+                var distanceInTime = deltaDistance / (Car.Speed * 100); //TODO: pix/s or m/s ?? huh
 
                 double deltaTime = accDistance - distanceInTime;
                 (var gasPosition, var breakPosition) = deltaTime switch
                 {
                     > 0 => AccBreakCar(deltaTime),
                     < 0 => AccAccelerateCar(deltaTime),
-                    _ => (Car.GasPedalPosition, Car.BrakePedalPosition),
+                    _ => (AccGas, AccBreak),
                 };
-                Car.GasPedalPosition = gasPosition;
-                Car.BrakePedalPosition = breakPosition;
+                AccGas = gasPosition;
+                AccBreak = breakPosition;
             }
         }
 
         private (int gasPosition, int breakPosition) AccAccelerateCar(double deltaTime)
         {
-            throw new NotImplementedException();
+            return (AutomatedCar.BoundPedalPosition(AccGas + 10), 0);
         }
 
         private (int gasPosition, int breakPosition) AccBreakCar(double deltaTime)
         {
-            throw new NotImplementedException();
+            return (0, AutomatedCar.BoundPedalPosition(AccBreak + 10));
         }
 
         public void DoSpeedKeeping()

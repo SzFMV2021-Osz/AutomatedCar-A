@@ -67,9 +67,13 @@ namespace AutomatedCar.Models
             }
         }
 
-        public Vector GetLocation()
+        public Vector GetPreciseLocation()
         {
             return new Vector(preciseX, preciseY);
+        }
+        public Vector GetLocation()
+        {
+            return new Vector(X, Y);
         }
 
         public Point RotationPoint { get; set; }
