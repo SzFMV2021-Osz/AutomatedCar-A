@@ -8,5 +8,7 @@
         public bool NeedEmergencyBrakeWarning { get; set; }
 
         public bool MightNotWorkProperlyWarning { get; set; }
+
+        public double DecelerationRate { get; set; }
     }
 }

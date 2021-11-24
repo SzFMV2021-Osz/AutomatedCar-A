@@ -154,6 +154,13 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
+            var AEB = this.virtualFunctionBus.AutomaticEmergencyBrakePacket;
+            if (AEB.NeedEmergencyBrakeWarning)
+            {
+                this.gasPedalPosition = MIN_PEDAL_POSITION;
+                this.brakePedalPosition = this.BoundPedalPosition((int)Math.Round((AEB.DecelerationRate / 9) * MAX_PEDAL_POSITION, 0));
+            }
+
             double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
@@ -337,18 +344,6 @@ namespace AutomatedCar.Models
         private int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
-        }
-
-        public void EmergencyBrake(double normalizedDeceleration)
-        {
-            this.gasPedalPosition = MIN_PEDAL_POSITION;
-            this.brakePedalPosition = MAX_PEDAL_POSITION;
-            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
-            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
-
-            this.Velocity.Y -= normalizedDeceleration + slowingForce;
-            this.Y += (int)this.Velocity.Y;
-            this.CalculateSpeed();
         }
     }
 }

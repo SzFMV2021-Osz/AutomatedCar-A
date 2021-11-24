@@ -47,7 +47,7 @@
                         if (this.IsDynamicObjectWillInBrakeDistance(closingObject, car))
                         {
                             this.aebPacket.NeedEmergencyBrakeWarning = true;
-                            car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
+                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed);
                         }
                         else
                         {
@@ -59,7 +59,7 @@
                         if (this.IsObjectInBrakeDistance(closingObject, car))
                         {
                             this.aebPacket.NeedEmergencyBrakeWarning = true;
-                            car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
+                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed) * 50;
                         }
                         else
                         {
@@ -67,6 +67,11 @@
                         }
                     }
                 }
+            }
+
+            if (closingObjects.Count == 0)
+            {
+                this.aebPacket.NeedEmergencyBrakeWarning = false;
             }
         }
 
@@ -82,9 +87,9 @@
         /// <returns>True or False.</returns>
         private bool IsObjectInBrakeDistance(WorldObject worldObject, AutomatedCar car)
         {
-            double error = 2;
+            double error = 10;
 
-            if (this.ObjectDistanceFromCarInTime(worldObject, car) + error <= this.BrakeDistanceInTime(car))
+            if (this.ObjectDistanceFromCarInTime(worldObject, car) <= this.BrakeDistanceInTime(car) + error)
             {
                 return true;
             }
@@ -94,7 +99,7 @@
 
         private bool IsObjectDynamic(WorldObject worldObject)
         {
-            if (worldObject is Pedestrian)
+            if (worldObject is Pedestrian || worldObject is NonPlayerCar)
             {
                 return true;
             }
@@ -104,7 +109,7 @@
 
         private bool IsDynamicObjectWillInBrakeDistance(WorldObject worldObject, AutomatedCar car)
         {
-            int objectSpeed = (worldObject as Pedestrian).Speed;
+            int objectSpeed = (worldObject as AbstractNPC).Speed;
             double x1 = Math.Abs(car.X - worldObject.X) + worldObject.X;
             double y1 = worldObject.Y;
 
@@ -159,7 +164,7 @@
         /// <returns>Distance required for braking.</returns>
         private double BrakeDistance(AutomatedCar car)
         {
-            return Math.Pow(car.Speed, 2) / (2 * this.NormalizeDeceleration(car.Speed));
+            return Math.Pow(car.Speed, 2) / (double)(2 * this.NormalizeDeceleration(car.Speed));
         }
 
         /// <summary>
@@ -181,7 +186,7 @@
         {
             if (speed < 70)
             {
-                return MAX_DECELERATION * (speed / 70);
+                return MAX_DECELERATION * ((double)speed / 70);
             }
             else
             {
