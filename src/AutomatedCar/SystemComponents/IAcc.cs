@@ -9,5 +9,6 @@
         public void SwitchDistance();
         public void IncreaseSpeed();
         public void DecreaseSpeed();
+        public void AutoAccOff();
     }
 }
