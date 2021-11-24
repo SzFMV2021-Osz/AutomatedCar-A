@@ -40,7 +40,7 @@
 
             foreach (var closingObject in closingObjects)
             {
-                if (relevantObjects.Contains(closingObject) && (closestObject.X == closingObject.X && closestObject.Y == closingObject.X))
+                if (relevantObjects.Contains(closingObject) && (closestObject.X == closingObject.X && closestObject.Y == closingObject.Y))
                 {
                     if (this.IsObjectDynamic(closingObject))
                     {
