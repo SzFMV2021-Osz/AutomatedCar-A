@@ -12,7 +12,7 @@
     public abstract class AbstractNPC : WorldObject, INonPlayerCharacter
     {
         public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType, bool isRepeatingPath) 
-            : base(x, y, filename, 1, true, worldObjectType)
+            : base(x, y, filename, 5, true, worldObjectType)
         {
             IsRepeatingPath = isRepeatingPath;
             if (PathCoordinates.Any())
