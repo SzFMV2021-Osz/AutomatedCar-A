@@ -62,12 +62,16 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Rotation}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="0">Inner Gear:</TextBlock>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Gearbox.CurrentInternalGear}"/>
-                                <TextBlock Grid.Row="5" Grid.Column="0">ACC status (on/off):</TextBlock>
-                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Acc.IsAccOn, Converter={x:Static visualization:BoolToStatusConverter.Instance}}"/>
-                                <TextBlock Grid.Row="6" Grid.Column="0">ACC adjustable distance (sec):</TextBlock>
-                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Acc.AccDistance}"/>
-                                <TextBlock Grid.Row="7" Grid.Column="0">ACC adjustable speed (km/h):</TextBlock>
-                                <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Acc.AccSpeed}"/>
+                                <TextBlock Grid.Row="5" Grid.Column="0">Lane keeping status:</TextBlock>
+                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LKAModel.CurrentLaneKeepingStatus}"/>
+                                <TextBlock Grid.Row="6" Grid.Column="0">Lane keeping available:</TextBlock>
+                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LKAModel.LaneKeepingAvailibility}"/>
+                                <TextBlock Grid.Row="7" Grid.Column="0">ACC status (on/off):</TextBlock>
+                                <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Acc.IsAccOn, Converter={x:Static visualization:BoolToStatusConverter.Instance}}"/>
+                                <TextBlock Grid.Row="8" Grid.Column="0">ACC adjustable distance (sec):</TextBlock>
+                                <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding Acc.AccDistance}"/>
+                                <TextBlock Grid.Row="9" Grid.Column="0">ACC adjustable speed (km/h):</TextBlock>
+                                <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Acc.AccSpeed}"/>
 
 
                             </Grid>

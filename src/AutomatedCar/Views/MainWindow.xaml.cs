@@ -30,11 +30,13 @@ namespace AutomatedCar.Views
             if (Keyboard.IsKeyDown(Key.Left))
             {
                 World.Instance.ControlledCar.TurnLeft();
+                World.Instance.ControlledCar.LKAModel.DisengageLaneKeeping();
             }
             
             if (Keyboard.IsKeyDown(Key.Right))
             {
                 World.Instance.ControlledCar.TurnRight();
+                World.Instance.ControlledCar.LKAModel.DisengageLaneKeeping();
             }
             
             if (Keyboard.IsKeyDown(Key.PageUp))
@@ -89,10 +91,12 @@ namespace AutomatedCar.Views
                 World.Instance.PrevControlledCar();
                 Keyboard.Keys.Remove(Key.F5);
             }
+
             if (Keyboard.IsKeyDown(Key.A))
             {
                 World.Instance.ControlledCar.Gearbox.ExternalDownshift();
             }
+
             if (Keyboard.IsKeyDown(Key.Q))
             {
                 World.Instance.ControlledCar.Gearbox.ExternalUpshift();
@@ -118,6 +122,11 @@ namespace AutomatedCar.Views
             {
                 World.Instance.ControlledCar.Acc.DecreaseSpeed();
                 Keyboard.Keys.Remove(Key.Subtract);
+            }
+
+            if (Keyboard.IsKeyDown(Key.L))
+            {
+                World.Instance.ControlledCar.LKAModel.ToggleLaneKeeping();
             }
         }
 

@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using AutomatedCar.Models;
+    using AutomatedCar.SystemComponents.Helpers;
     using AutomatedCar.SystemComponents.Packets;
     using Avalonia;
     using Avalonia.Media;
@@ -51,7 +52,7 @@
 
             foreach (WorldObject currObj in this.sensorPacket.RelevantObjects)
             {
-                this.previousObjects.Add(currObj.Id, DistanceBetween(new Point(currObj.X, currObj.Y), new Point(car.X, car.Y)));
+                this.previousObjects.Add(currObj.Id, Utils.DistanceBetween(new Point(currObj.X, currObj.Y), new Point(car.X, car.Y)));
             }
         }
 
@@ -74,7 +75,7 @@
             IList<WorldObject> closingObjects = new List<WorldObject>();
             foreach (var currPoint in objectsInRadar)
             {
-                double currDst = DistanceBetween(currPoint.Value, new Point(car.X, car.Y));
+                double currDst = Utils.DistanceBetween(currPoint.Value, new Point(car.X, car.Y));
                 if (currDst < this.previousObjects[currPoint.Key])
                 {
                     closingObjects.Add(this.sensorPacket.RelevantObjects.Where(d => d.Id == currPoint.Key).FirstOrDefault());
@@ -108,10 +109,10 @@
 
         private bool IsObjectInLane(WorldObject currObject)
         {
-            PolylineGeometry geometry = RotateRawGeometry(this.laneGeometry, this.sensorObject.RotationPoint, this.sensorObject.Rotation);
-            geometry = ShiftGeometryWithWorldCoordinates(geometry, this.sensorObject.X, this.sensorObject.Y);
+            PolylineGeometry geometry = Utils.RotateRawGeometry(this.laneGeometry, this.sensorObject.RotationPoint, this.sensorObject.Rotation);
+            geometry = Utils.ShiftGeometryWithWorldCoordinates(geometry, this.sensorObject.X, this.sensorObject.Y);
 
-            foreach (var point in GetPoints(currObject))
+            foreach (var point in Utils.GetPoints(currObject))
             {
                 if (geometry.FillContains(point))
                 {
@@ -125,7 +126,7 @@
         private WorldObject GetClosestObjectInLane(IList<WorldObject> worldObjects, AutomatedCar car)
         {
             IList<WorldObject> incomingObjectsInLane = worldObjects.Where(c => this.IsObjectInLane(c)).ToList();
-            return FindClosestObject(incomingObjectsInLane, car);
+            return Utils.FindClosestObject(incomingObjectsInLane, car);
         }
     }
 }
