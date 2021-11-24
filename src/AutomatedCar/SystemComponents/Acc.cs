@@ -205,12 +205,12 @@
 
         private (int gasPosition, int breakPosition) AccAccelerateCar(double deltaTime)
         {
-            throw new NotImplementedException();
+            return (0, AutomatedCar.BoundPedalPosition(Car.GasPedalPosition + 1));
         }
 
         private (int gasPosition, int breakPosition) AccBreakCar(double deltaTime)
         {
-            throw new NotImplementedException();
+            return (AutomatedCar.BoundPedalPosition(Car.BrakePedalPosition + 1), 0);
         }
 
         public void DoSpeedKeeping()

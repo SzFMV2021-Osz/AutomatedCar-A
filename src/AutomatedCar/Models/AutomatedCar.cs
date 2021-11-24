@@ -235,26 +235,26 @@ namespace AutomatedCar.Models
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;
-            this.GasPedalPosition = this.BoundPedalPosition(newPosition);
+            this.GasPedalPosition = BoundPedalPosition(newPosition);
         }
 
         public void DecreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition - PEDAL_OFFSET;
-            this.GasPedalPosition = this.BoundPedalPosition(newPosition);
+            this.GasPedalPosition = BoundPedalPosition(newPosition);
         }
 
         public void IncreaseBrakePedalPosition()
         {
             int newPosition = this.brakePedalPosition + PEDAL_OFFSET;
-            this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
+            this.BrakePedalPosition = BoundPedalPosition(newPosition);
             this.Acc.IsAccOn = false;
         }
 
         public void DecreaseBrakePedalPosition()
         {
             int newPosition = this.brakePedalPosition - PEDAL_OFFSET;
-            this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
+            this.BrakePedalPosition = BoundPedalPosition(newPosition);
         }
 
         private void CalculateRevolutions()
@@ -326,7 +326,7 @@ namespace AutomatedCar.Models
             }
         }
 
-        private int BoundPedalPosition(int number)
+        public static int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
         }
