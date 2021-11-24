@@ -30,6 +30,8 @@
 
         public static World Instance { get; } = new World();
 
+        private DateTime yes = DateTime.Now;
+
         public ObservableCollection<WorldObject> WorldObjects { get; } = new ObservableCollection<WorldObject>();
 
         public AutomatedCar ControlledCar
@@ -72,7 +74,9 @@
 
         public void StepNonPlayerCharacters()
         {
-            this.StepNpcs?.Invoke(DateTime.Now);
+            //redo: this.StepNpcs?.Invoke(DateTime.Now);
+            yes = yes + TimeSpan.FromMilliseconds(1000 / 60);
+            this.StepNpcs?.Invoke(yes);
         }
 
         public void NextControlledCar()

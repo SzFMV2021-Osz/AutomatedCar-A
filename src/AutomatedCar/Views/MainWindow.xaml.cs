@@ -106,12 +106,10 @@ namespace AutomatedCar.Views
             if (Keyboard.IsKeyDown(Key.C))
             {
                 World.Instance.ControlledCar.Acc.ToggleAcc();
-                Keyboard.Keys.Remove(Key.C);
             }
             if (Keyboard.IsKeyDown(Key.T))
             {
                 World.Instance.ControlledCar.Acc.SwitchDistance();
-                Keyboard.Keys.Remove(Key.T);
             }
             if (Keyboard.IsKeyDown(Key.Add))
             {

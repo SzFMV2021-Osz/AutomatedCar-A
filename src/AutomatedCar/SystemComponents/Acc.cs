@@ -97,9 +97,15 @@
 
         public void ToggleAcc()
         {
-            if (!IsAccOn)// && Car.Speed > minSpeed)
+            if (IsAccOn)
             {
-                AccSpeed = Car.Speed;
+                AccGas = 0;
+                AccBreak = 0;
+                IsAccOn = false;
+            }
+            else
+            {
+                AccSpeed = Car.Speed < minSpeed ? minSpeed : Car.Speed;
                 mode = AccMode.SpeedKeeping;
                 AccGas = Car.GasPedalPosition;
                 AccBreak = Car.BrakePedalPosition;
@@ -107,12 +113,6 @@
                 Car.BrakePedalPosition = 0;
 
                 IsAccOn = true;
-            }
-            else if (IsAccOn)
-            {
-                AccGas = 0;
-                AccBreak = 0;
-                IsAccOn = false;
             }
         }
 
@@ -174,16 +174,19 @@
 
         public override void Process()
         {
-            var objInLine = GetCarInFront();
-            if (objInLine != null)
+            if (IsAccOn)
             {
-                mode = AccMode.CarFollowing;
+                var objInLine = GetCarInFront();
+                if (objInLine != null)
+                {
+                    mode = AccMode.CarFollowing;
+                }
+                else
+                {
+                    mode = AccMode.SpeedKeeping;
+                }
+                AccFunctionalityToExecute(); 
             }
-            else
-            {
-                mode = AccMode.SpeedKeeping;
-            }
-            AccFunctionalityToExecute();
         }
 
         public void DoFollowOperation()

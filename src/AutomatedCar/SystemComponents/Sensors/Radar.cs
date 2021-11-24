@@ -14,7 +14,7 @@
         private PolylineGeometry laneGeometry;
 
         public Radar(VirtualFunctionBus virtualFunctionBus)
-            : base(virtualFunctionBus, 40, 20)
+            : base(virtualFunctionBus, 60, 120)
         {
             this.previousObjects = new Dictionary<int, double>();
             this.sensorPacket = new RadarPacket();
@@ -123,19 +123,10 @@
             return false;
         }
 
-        private WorldObject GetClosestObjectInLane(IEnumerable<WorldObject> worldObjects, AutomatedCar car)
+        private WorldObject GetClosestObjectInLane(IList<WorldObject> worldObjects, AutomatedCar car)
         {
-            IEnumerable<WorldObject> incomingObjectsInLane = worldObjects.Where(worldObject => this.IsObjectInLane(worldObject) && IsRelevantObject(worldObject.WorldObjectType));
+            IList<WorldObject> incomingObjectsInLane = worldObjects.Where(c => this.IsObjectInLane(c)).ToList();
             return Utils.FindClosestObject(incomingObjectsInLane, car);
         }
-
-        private static bool IsRelevantObject(WorldObjectType type) => type switch
-        {
-            WorldObjectType.Car => true,
-            WorldObjectType.Pedestrian => true,
-            WorldObjectType.Tree => true,
-            WorldObjectType.Building => true,
-            _ => false,
-        };
     }
 }
