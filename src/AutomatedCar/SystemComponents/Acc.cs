@@ -248,5 +248,13 @@
             AccGas = gasPosition;
             AccBreak = breakPosition;
         }
+
+        public void AutoAccOff()
+        {
+            if (isAccOn)
+            {
+                isAccOn = false;
+            }
+        }
     }
 }

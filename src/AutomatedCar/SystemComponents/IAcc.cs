@@ -9,6 +9,7 @@
         public void SwitchDistance();
         public void IncreaseSpeed();
         public void DecreaseSpeed();
+        public void AutoAccOff();
         public int AccBreak { get; set; }
         public int AccGas { get; set; }
     }
