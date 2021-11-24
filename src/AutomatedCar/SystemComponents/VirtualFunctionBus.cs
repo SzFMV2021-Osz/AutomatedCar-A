@@ -12,6 +12,8 @@ namespace AutomatedCar.SystemComponents
 
         public IAutomaticEmergencyBrakePacket AutomaticEmergencyBrakePacket { get; set; }
 
+        public ILKAPacket LaneKeepingPacket { get; set; }
+
         public ICameraPacket CameraPacket { get; set; }
 
         public IRadarPacket RadarPacket { get; set; }

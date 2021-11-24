@@ -38,7 +38,7 @@
                 this.aebPacket.MightNotWorkProperlyWarning = false;
             }
 
-            /*foreach (var closingObject in closingObjects)
+            foreach (var closingObject in closingObjects)
             {
                 if (relevantObjects.Contains(closingObject) && (closestObject.X == closingObject.X && closestObject.Y == closingObject.X))
                 {
@@ -67,20 +67,6 @@
                         }
                     }
                 }
-            }*/
-
-            foreach (var closingObject in relevantObjects)
-            {
-                if (this.IsObjectInBrakeDistance(closingObject, car))
-                {
-                    this.aebPacket.NeedEmergencyBrakeWarning = true;
-                    car.EmergencyBrake(this.NormalizeDeceleration(car.Speed));
-                }
-                else
-                {
-                    this.aebPacket.NeedEmergencyBrakeWarning = false;
-                }
-
             }
         }
 
@@ -128,10 +114,10 @@
             double distanceFromIntersection1 = this.DistanceFromPoint(worldObject, x1, y1);
             double distanceFromIntersectionInTime1 = distanceFromIntersection1 / objectSpeed;
 
-            double distanceFromIntersection2 = this.DistanceFromPoint(worldObject, x1, y1);
-            double distanceFromIntersectionInTime2 = distanceFromIntersection1 / objectSpeed;
+            double distanceFromIntersection2 = this.DistanceFromPoint(worldObject, x2, y2);
+            double distanceFromIntersectionInTime2 = distanceFromIntersection2 / objectSpeed;
 
-            if ((distanceFromIntersectionInTime1 <= this.BrakeDistanceInTime(car)) || (distanceFromIntersection2 <= this.BrakeDistanceInTime(car)))
+            if ((distanceFromIntersectionInTime1 <= this.BrakeDistanceInTime(car)) || (distanceFromIntersectionInTime2 <= this.BrakeDistanceInTime(car)))
             {
                 return true;
             }
