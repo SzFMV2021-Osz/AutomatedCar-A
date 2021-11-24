@@ -13,7 +13,7 @@
         private PolylineGeometry laneGeometry;
 
         public Radar(VirtualFunctionBus virtualFunctionBus)
-            : base(virtualFunctionBus, 60, 30)
+            : base(virtualFunctionBus, 120, 80)
         {
             this.previousObjects = new Dictionary<int, double>();
             this.sensorPacket = new RadarPacket();

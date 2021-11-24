@@ -177,7 +177,7 @@
 
         public override void Process()
         {
-            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane as NonPlayerCar;
             if(objInLine != null)
             {
                 mode = AccMode.CarFollowing;
