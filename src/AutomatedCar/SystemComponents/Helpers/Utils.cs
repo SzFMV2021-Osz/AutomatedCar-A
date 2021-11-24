@@ -14,7 +14,7 @@
     {
         public static readonly IList<ReferencePoint> ReferencePoints = LoadReferencePoints();
 
-        public static WorldObject FindClosestObject(IList<WorldObject> worldObjects, AutomatedCar car)
+        public static WorldObject FindClosestObject(IEnumerable<WorldObject> worldObjects, AutomatedCar car)
         {
             Point carPoint = new (car.X, car.Y);
             WorldObject closestObject = null;

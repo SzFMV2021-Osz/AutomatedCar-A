@@ -34,9 +34,6 @@
         public int AccBreak { get; set; } = 0;
         public int AccGas { get; set; } = 0;
 
-        //private Vector objectPositionInLaneT0 = null;
-        //private DateTime TimeOfSample { get; set; }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Acc(AutomatedCar car, VirtualFunctionBus virtualFunctionBus) : base(virtualFunctionBus)
@@ -177,8 +174,8 @@
 
         public override void Process()
         {
-            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane as NonPlayerCar;
-            if(objInLine != null)
+            var objInLine = GetCarInFront();
+            if (objInLine != null)
             {
                 mode = AccMode.CarFollowing;
             }
@@ -186,13 +183,12 @@
             {
                 mode = AccMode.SpeedKeeping;
             }
-
             AccFunctionalityToExecute();
         }
 
         public void DoFollowOperation()
         {
-            var objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane;
+            var objInLine = GetCarInFront();
 
             if (objInLine != null)
             {
@@ -203,28 +199,54 @@
                 double deltaTime = accDistance - distanceInTime;
                 (var gasPosition, var breakPosition) = deltaTime switch
                 {
-                    > 0 => AccBreakCar(deltaTime),
-                    < 0 => AccAccelerateCar(deltaTime),
+                    > 0 => AccBreakCar(),
+                    < 0 => AccAccelerateCar(),
                     _ => (AccGas, AccBreak),
                 };
                 AccGas = gasPosition;
                 AccBreak = breakPosition;
             }
+            else
+            {
+                return;
+            }
         }
 
-        private (int gasPosition, int breakPosition) AccAccelerateCar(double deltaTime)
+        private WorldObject GetCarInFront()
         {
-            return (AutomatedCar.BoundPedalPosition(AccGas + 10), 0);
+            WorldObject objInLine = virtualFunctionBus.RadarPacket.ClosestObjectInLane as NonPlayerCar;
+
+            if (!(virtualFunctionBus.RadarPacket.ClosestObjectInLane is NonPlayerCar))
+            {
+                var probableObj = virtualFunctionBus.RadarPacket.DetectedObjects.FirstOrDefault(obj => obj is NonPlayerCar);
+                objInLine = probableObj;
+            }
+
+            return objInLine;
         }
 
-        private (int gasPosition, int breakPosition) AccBreakCar(double deltaTime)
+        private (int gasPosition, int breakPosition) AccAccelerateCar()
+        {
+            return (AutomatedCar.BoundPedalPosition(AccGas + 20), 0);
+        }
+
+        private (int gasPosition, int breakPosition) AccBreakCar()
         {
             return (0, AutomatedCar.BoundPedalPosition(AccBreak + 10));
         }
 
         public void DoSpeedKeeping()
         {
-            
+            double deltaSpeed = AccSpeed - Car.Speed;
+
+            (var gasPosition, var breakPosition) = deltaSpeed switch
+            {
+                > 0 => AccAccelerateCar(),
+                < 0 => AccBreakCar(),
+                _ => (AccGas, AccBreak),
+            };
+            AccGas = gasPosition;
+            AccBreak = breakPosition;
         }
     }
 }

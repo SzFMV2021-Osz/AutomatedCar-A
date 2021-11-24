@@ -22,7 +22,7 @@
                     .GetManifestResourceStream($"AutomatedCar.Assets.{nonPlayerCarJsonName}"));
 
             this.PathCoordinates = JsonConvert.DeserializeObject<List<Vector>>(reader.ReadToEnd());
-            this.Speed = 180;
+            this.Speed = 80;
         }
     }
 }
