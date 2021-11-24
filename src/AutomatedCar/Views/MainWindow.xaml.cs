@@ -102,6 +102,26 @@ namespace AutomatedCar.Views
                 World.Instance.ControlledCar.Gearbox.ExternalUpshift();
             }
 
+            // ACC
+            if (Keyboard.IsKeyDown(Key.C))
+            {
+                World.Instance.ControlledCar.Acc.ToggleAcc();
+            }
+            if (Keyboard.IsKeyDown(Key.T))
+            {
+                World.Instance.ControlledCar.Acc.SwitchDistance();
+            }
+            if (Keyboard.IsKeyDown(Key.Add))
+            {
+                World.Instance.ControlledCar.Acc.IncreaseSpeed();
+                Keyboard.Keys.Remove(Key.Add);
+            }
+            if (Keyboard.IsKeyDown(Key.Subtract))
+            {
+                World.Instance.ControlledCar.Acc.DecreaseSpeed();
+                Keyboard.Keys.Remove(Key.Subtract);
+            }
+
             if (Keyboard.IsKeyDown(Key.L))
             {
                 World.Instance.ControlledCar.LKAModel.ToggleLaneKeeping();

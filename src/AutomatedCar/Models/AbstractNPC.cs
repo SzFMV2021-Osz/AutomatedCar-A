@@ -12,7 +12,7 @@
     public abstract class AbstractNPC : WorldObject, INonPlayerCharacter
     {
         public AbstractNPC(int x, int y, string filename, WorldObjectType worldObjectType, bool isRepeatingPath) 
-            : base(x, y, filename, 1, true, worldObjectType)
+            : base(x, y, filename, 5, true, worldObjectType)
         {
             IsRepeatingPath = isRepeatingPath;
             if (PathCoordinates.Any())
@@ -64,7 +64,7 @@
         private double GetDistance(Vector destination)
         {
             var dir = new Vector() { X = destination.X - this.PreciseX, Y = destination.Y - this.PreciseY };
-            return Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y));
+            return dir.GetLength();
         }
 
         /// Recursive function only modify with extreme caution.

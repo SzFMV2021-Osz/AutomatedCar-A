@@ -65,6 +65,9 @@ namespace AutomatedCar.Models
             this.LKAModel = new LKAModel(this);
             this.carHeading = -1.5;
             this.turningAngle = 0;
+            this.Acc = new Acc(this, this.virtualFunctionBus);
+            carHeading = -1.5;
+            turningAngle = 0;
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -80,11 +83,12 @@ namespace AutomatedCar.Models
                 return this.gasPedalPosition;
             }
 
-            private set
+            set
             {
                 this.RaiseAndSetIfChanged(ref this.gasPedalPosition, value);
             }
         }
+        public int AccGas { get; set; }
 
         public int BrakePedalPosition
         {
@@ -93,7 +97,7 @@ namespace AutomatedCar.Models
                 return this.brakePedalPosition;
             }
 
-            private set
+            set
             {
                 this.RaiseAndSetIfChanged(ref this.brakePedalPosition, value);
             }
@@ -123,6 +127,8 @@ namespace AutomatedCar.Models
         public Vector Acceleration { get; set; }
 
         public Geometry Geometry { get; set; }
+
+        public IAcc Acc { get; set; }
 
         /// <summary>Starts the automated car by starting the ticker in the Virtual Function Bus, that cyclically calls the system components.</summary>
         public void Start()
@@ -164,8 +170,8 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
-            double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
-            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double gasInputForce = (this.gasPedalPosition + Acc.AccGas) * PEDAL_INPUT_MULTIPLIER;
+            double brakeInputForce = (this.brakePedalPosition + Acc.AccBreak) * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
 
             Acceleration.Y = gasInputForce;
@@ -263,30 +269,31 @@ namespace AutomatedCar.Models
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;
-            this.GasPedalPosition = this.BoundPedalPosition(newPosition);
+            this.GasPedalPosition = BoundPedalPosition(newPosition);
         }
 
         public void DecreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition - PEDAL_OFFSET;
-            this.GasPedalPosition = this.BoundPedalPosition(newPosition);
+            this.GasPedalPosition = BoundPedalPosition(newPosition);
         }
 
         public void IncreaseBrakePedalPosition()
         {
             int newPosition = this.brakePedalPosition + PEDAL_OFFSET;
-            this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
+            this.BrakePedalPosition = BoundPedalPosition(newPosition);
+            this.Acc.IsAccOn = false;
         }
 
         public void DecreaseBrakePedalPosition()
         {
             int newPosition = this.brakePedalPosition - PEDAL_OFFSET;
-            this.BrakePedalPosition = this.BoundPedalPosition(newPosition);
+            this.BrakePedalPosition = BoundPedalPosition(newPosition);
         }
 
         private void CalculateRevolutions()
         {
-            if (this.gasPedalPosition > 0)
+            if ((this.gasPedalPosition + Acc.AccGas)> 0)
             {
                 this.IncreaseRevolutions();
             }
@@ -320,8 +327,8 @@ namespace AutomatedCar.Models
         {
             double revolutionsDecreaseRate =
                0.15 / RevolutionsHelper.GearCoefficients.FirstOrDefault(x => x.Item1 == this.Gearbox.CurrentInternalGear).Item2;
-            var revolutionChange = this.brakePedalPosition > 0
-                ? this.brakePedalPosition * revolutionsDecreaseRate
+            var revolutionChange = (this.brakePedalPosition + Acc.AccBreak) > 0
+                ? (this.brakePedalPosition + Acc.AccBreak) * revolutionsDecreaseRate
                 : Math.Pow(Math.Log(this.Speed + 1) / 20, -1.38) * revolutionsDecreaseRate;
             int newRPM = this.revolution - (int)Math.Round(revolutionChange);
             this.Revolution = Math.Max(newRPM, IDLE_RPM);
@@ -353,9 +360,22 @@ namespace AutomatedCar.Models
             }
         }
 
-        private int BoundPedalPosition(int number)
+        public static int BoundPedalPosition(int number)
         {
             return Math.Max(MIN_PEDAL_POSITION, Math.Min(number, MAX_PEDAL_POSITION));
+        }
+
+        public void EmergencyBrake(double normalizedDeceleration)
+        {
+            this.Acc.AutoAccOff();
+            this.gasPedalPosition = MIN_PEDAL_POSITION;
+            this.brakePedalPosition = MAX_PEDAL_POSITION;
+            double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
+            double slowingForce = (this.Speed * DRAG) + (this.Speed > 0 ? brakeInputForce : 0);
+
+            this.Velocity.Y -= normalizedDeceleration + slowingForce;
+            this.Y += (int)this.Velocity.Y;
+            this.CalculateSpeed();
         }
     }
 }
