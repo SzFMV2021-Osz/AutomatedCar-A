@@ -15,6 +15,8 @@
 
         private AutomaticEmergencyBrakePacket aebPacket;
 
+        private WorldObject wo;
+
         public AutomaticEmergencyBrake(VirtualFunctionBus virtualFunction)
             : base(virtualFunction)
         {
@@ -38,32 +40,36 @@
                 this.aebPacket.MightNotWorkProperlyWarning = false;
             }
 
+
             foreach (var closingObject in closingObjects)
             {
                 if (relevantObjects.Contains(closingObject) && (closestObject.X == closingObject.X && closestObject.Y == closingObject.Y))
                 {
-                    if (this.IsObjectDynamic(closingObject))
+                    IList<Point> points = new List<Point>()
                     {
-                        if (this.IsDynamicObjectWillInBrakeDistance(closingObject, car))
+                        new Point(0, car.RotationPoint.Y),
+                        new Point(car.RotationPoint.X + 70, car.RotationPoint.Y),
+                        new Point(car.RotationPoint.X + 70, car.RotationPoint.Y - 180),
+                        new Point(0, car.RotationPoint.Y - 180),
+                        new Point(0, car.RotationPoint.Y),
+                    };
+
+                    PolylineGeometry carGeometry = new PolylineGeometry(points, true);
+
+                    PolylineGeometry geometry = Utils.RotateRawGeometry(carGeometry, car.RotationPoint, car.Rotation);
+                    geometry = Utils.ShiftGeometryWithWorldCoordinates(geometry, car.X, car.Y);
+
+                    //wo = new WorldObject(car.X, car.Y, "sensor.png");
+                    //wo.RawGeometries.Add(carGeometry);
+                    //wo.Geometries.Add(geometry);
+                    //World.Instance.WorldObjects.Add(wo);
+
+                    foreach (var point in Utils.GetPoints(closingObject))
+                    {
+                        if (geometry.FillContains(point))
                         {
                             this.aebPacket.NeedEmergencyBrakeWarning = true;
-                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed);
-                        }
-                        else
-                        {
-                            this.aebPacket.NeedEmergencyBrakeWarning = false;
-                        }
-                    }
-                    else
-                    {
-                        if (this.IsObjectInBrakeDistance(closingObject, car))
-                        {
-                            this.aebPacket.NeedEmergencyBrakeWarning = true;
-                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed) * 50;
-                        }
-                        else
-                        {
-                            this.aebPacket.NeedEmergencyBrakeWarning = false;
+                            this.aebPacket.DecelerationRate = this.NormalizeDeceleration(car.Speed) * 80;
                         }
                     }
                 }
@@ -74,6 +80,7 @@
                 this.aebPacket.NeedEmergencyBrakeWarning = false;
             }
         }
+
 
         /// <summary>
         /// Decides that whether the object is in brake distance or not.
@@ -97,7 +104,7 @@
             return false;
         }
 
-        private bool IsObjectDynamic(WorldObject worldObject)
+        private bool IsDynamicObject(WorldObject worldObject)
         {
             if (worldObject is Pedestrian || worldObject is NonPlayerCar)
             {

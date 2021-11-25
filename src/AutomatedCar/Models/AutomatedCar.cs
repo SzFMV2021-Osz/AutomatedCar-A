@@ -1,6 +1,7 @@
 namespace AutomatedCar.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using Avalonia.Media;
@@ -22,9 +23,19 @@ namespace AutomatedCar.Models
         private const int NEUTRAL_RPM_MULTIPLIER = 80;
         private const int RPM_DOWNSHIFT_POINT = 1300;
         private const int RPM_UPSHIFT_POINT = 2500;
-        private const int WHEELBASE = 200;
+        private const int WHEELBASE = 300;
         private const int TURNING_OFFSET = 5;
-        private const double TURNING_MULTIPLIER = 0.1;
+        private const double TURNING_MULTIPLIER = 0.3;
+
+        private static Dictionary<int, double> scalingValueLookupTable = new Dictionary<int, double>()
+            {
+                { 20, 1.0 },
+                { 30, 0.9 },
+                { 40, 0.8 },
+                { 50, 0.7 },
+                { 60, 0.6 },
+                { 75, 0.5 },
+            };
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -155,10 +166,10 @@ namespace AutomatedCar.Models
         public void CalculateNextPosition()
         {
             var AEB = this.virtualFunctionBus.AutomaticEmergencyBrakePacket;
-            if (AEB.NeedEmergencyBrakeWarning)
+            if (AEB.NeedEmergencyBrakeWarning && this.Gearbox.CurrentExternalGearPosition == Gear.D)
             {
                 this.gasPedalPosition = MIN_PEDAL_POSITION;
-                this.brakePedalPosition = this.BoundPedalPosition((int)Math.Round((AEB.DecelerationRate / 9) * MAX_PEDAL_POSITION, 0));
+                this.brakePedalPosition = this.BoundPedalPosition((int)Math.Round((AEB.DecelerationRate / 4) * MAX_PEDAL_POSITION, 0));
             }
 
             double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
@@ -202,23 +213,31 @@ namespace AutomatedCar.Models
 
         private void Turn(double steerAngle)
         {
-            double frontX = X + (WHEELBASE / 2 * Math.Cos(carHeading));
-            double frontY = Y + (WHEELBASE / 2 * Math.Sin(carHeading));
-            double rearX = X - (WHEELBASE / 2 * Math.Cos(carHeading));
-            double rearY = Y - (WHEELBASE / 2 * Math.Sin(carHeading));
+            double frontWheelX = X + (WHEELBASE / 2 * Math.Cos(carHeading));
+            double frontWheelY = Y + (WHEELBASE / 2 * Math.Sin(carHeading));
+            double rearWheelX = X - (WHEELBASE / 2 * Math.Cos(carHeading));
+            double rearWheelY = Y - (WHEELBASE / 2 * Math.Sin(carHeading));
 
-            double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -3 : 3;
+            double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -1 : 1;
 
-            frontX += Speed * TURNING_MULTIPLIER * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
-            frontY += Speed * TURNING_MULTIPLIER * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
-            rearX += Speed * TURNING_MULTIPLIER * Math.Cos(carHeading) * reverseMultiplier;
-            rearY += Speed * TURNING_MULTIPLIER * Math.Sin(carHeading) * reverseMultiplier;
+            double scale = GetScaleDownValue(Speed);
 
-            X = (int)(frontX + rearX) / 2;
-            Y = (int)(frontY + rearY) / 2;
+            frontWheelX += Speed * scale * TURNING_MULTIPLIER * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
+            frontWheelY += Speed * scale * TURNING_MULTIPLIER * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
+            rearWheelX += Speed * scale * TURNING_MULTIPLIER * Math.Cos(carHeading) * reverseMultiplier;
+            rearWheelY += Speed * scale * TURNING_MULTIPLIER * Math.Sin(carHeading) * reverseMultiplier;
 
-            carHeading = Math.Atan2(frontY - rearY, frontX - rearX);
+            X = (int)(frontWheelX + rearWheelX) / 2;
+            Y = (int)(frontWheelY + rearWheelY) / 2;
+
+            carHeading = Math.Atan2(frontWheelY - rearWheelY, frontWheelX - rearWheelX);
             Rotation = ((carHeading * 180) / Math.PI) + 87;
+        }
+
+        private double GetScaleDownValue(int speed)
+        {
+            int rounded_speed = scalingValueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(speed - x)).First();
+            return scalingValueLookupTable[rounded_speed];
         }
 
         private double GetVelocityAccordingToGear(double slowingForce)
