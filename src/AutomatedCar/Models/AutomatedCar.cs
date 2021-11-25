@@ -34,7 +34,7 @@ namespace AutomatedCar.Models
                 { 40, 0.8 },
                 { 50, 0.7 },
                 { 60, 0.6 },
-                { 75, 0.55 },
+                { 75, 0.5 },
             };
 
         private int gasPedalPosition;
