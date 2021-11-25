@@ -63,9 +63,9 @@
                                 <TextBlock Grid.Row="4" Grid.Column="0">Inner Gear:</TextBlock>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Gearbox.CurrentInternalGear}"/>
                                 <TextBlock Grid.Row="5" Grid.Column="0">Lane keeping status:</TextBlock>
-                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LaneKeepingMod.CurrentLaneKeepingStatus}"/>
+                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LKAModel.CurrentLaneKeepingStatus}"/>
                                 <TextBlock Grid.Row="6" Grid.Column="0">Lane keeping available:</TextBlock>
-                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LaneKeepingMod.LaneKeepingAvailibility}"/>
+                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LKAModel.LaneKeepingAvailibility}"/>
                             </Grid>
                             <Canvas Width="90" Height="90">
                                 <Image

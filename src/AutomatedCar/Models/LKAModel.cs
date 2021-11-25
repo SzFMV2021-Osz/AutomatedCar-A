@@ -3,13 +3,13 @@
     using global::AutomatedCar.SystemComponents.Helpers;
     using ReactiveUI;
 
-    public class LaneKeepingModel : ReactiveObject
+    public class LKAModel : ReactiveObject
     {
         private LaneKeepingStatus currentLaneKeepingStatus = LaneKeepingStatus.Inactive;
         private bool available;
-        private AutomatedCar car;
+        private readonly AutomatedCar car;
 
-        public LaneKeepingModel(AutomatedCar car, bool laneKeepingAvailable = true)
+        public LKAModel(AutomatedCar car, bool laneKeepingAvailable = true)
         {
             this.car = car;
             this.LaneKeepingAvailibility = laneKeepingAvailable;
@@ -46,11 +46,6 @@
             }
         }
 
-        public void DisengagingLaneKeeping()
-        {
-            this.CurrentLaneKeepingStatus = LaneKeepingStatus.Disengaging;
-        }
-
         public void DisengageLaneKeeping()
         {
             this.CurrentLaneKeepingStatus = LaneKeepingStatus.Inactive;
@@ -66,7 +61,7 @@
 
         public void ToggleLaneKeeping()
         {
-            if (this.currentLaneKeepingStatus == LaneKeepingStatus.Active && this.available)
+            if (this.currentLaneKeepingStatus == LaneKeepingStatus.Active)
             {
                 this.DisengageLaneKeeping();
             }

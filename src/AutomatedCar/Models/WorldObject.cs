@@ -80,5 +80,10 @@ namespace AutomatedCar.Models
         public bool Collideable { get; set; }
 
         public WorldObjectType WorldObjectType { get; set; }
+
+        public override string ToString()
+        {
+            return Filename;
+        }
     }
 }

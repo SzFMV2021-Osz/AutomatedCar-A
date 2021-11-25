@@ -1,15 +1,15 @@
 namespace AutomatedCar.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using Avalonia.Media;
     using global::AutomatedCar.Helpers;
     using global::AutomatedCar.SystemComponents;
+    using global::AutomatedCar.SystemComponents.Helpers;
     using global::AutomatedCar.SystemComponents.Sensors;
     using ReactiveUI;
-    using global::AutomatedCar.SystemComponents.Helpers;
-    using System.Drawing;
 
     public class AutomatedCar : Car
     {
@@ -17,14 +17,25 @@ namespace AutomatedCar.Models
         private const int MIN_PEDAL_POSITION = 0;
         private const int MAX_PEDAL_POSITION = 100;
         private const double PEDAL_INPUT_MULTIPLIER = 0.01;
-        private const double DRAG = 0.006; // This limits the top speed to 166 km/h
+        private const double DRAG = 0.01;
         private const int IDLE_RPM = 800;
         private const int MAX_RPM = 6000;
         private const int NEUTRAL_RPM_MULTIPLIER = 80;
         private const int RPM_DOWNSHIFT_POINT = 1300;
         private const int RPM_UPSHIFT_POINT = 2500;
-        private const int WHEELBASE = 200;
+        private const int WHEELBASE = 300;
         private const int TURNING_OFFSET = 5;
+        private const double TURNING_MULTIPLIER = 0.3;
+
+        private static Dictionary<int, double> scalingValueLookupTable = new Dictionary<int, double>()
+            {
+                { 20, 1.0 },
+                { 30, 0.9 },
+                { 40, 0.8 },
+                { 50, 0.7 },
+                { 60, 0.6 },
+                { 75, 0.5 },
+            };
 
         private int gasPedalPosition;
         private int brakePedalPosition;
@@ -34,7 +45,8 @@ namespace AutomatedCar.Models
 
         private VirtualFunctionBus virtualFunctionBus;
         private CollisionDetection collisionDetection;
-        private LaneKeeping laneKeeping;
+        private LaneKeepingAssistant laneKeepingAssistant;
+        private AutomaticEmergencyBrake automaticEmergencyBrake;
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -42,18 +54,18 @@ namespace AutomatedCar.Models
             this.Velocity = new Vector();
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
-
+            this.automaticEmergencyBrake = new AutomaticEmergencyBrake(this.virtualFunctionBus);
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
-            this.Radar = new (this.virtualFunctionBus);
-            this.Camera = new (this.virtualFunctionBus);
+            this.Radar = new(this.virtualFunctionBus);
+            this.Camera = new(this.virtualFunctionBus);
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
-            this.LaneKeepingMod = new LaneKeepingModel(this);
-            carHeading = -1.5;
-            turningAngle = 0;
+            this.LKAModel = new LKAModel(this);
+            this.carHeading = -1.5;
+            this.turningAngle = 0;
         }
 
         public VirtualFunctionBus VirtualFunctionBus { get => this.virtualFunctionBus; }
@@ -105,7 +117,7 @@ namespace AutomatedCar.Models
 
         public IGearbox Gearbox { get; set; }
 
-        public LaneKeepingModel LaneKeepingMod { get; set; }
+        public LKAModel LKAModel { get; set; }
 
         public Vector Velocity { get; set; }
 
@@ -143,20 +155,7 @@ namespace AutomatedCar.Models
 
         public void SetLaneKeepingAssistant()
         {
-            this.laneKeeping = new LaneKeeping(this.virtualFunctionBus);
-        }
-
-        public void LaneKeeping()
-        {
-            //Set status of Lanekeeping
-            if (this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus == LaneKeepingStatus.Active)
-            {
-                this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Inactive;
-            }
-            else
-            {
-                this.virtualFunctionBus.LaneKeepingPacket.LaneKeepingStatus = LaneKeepingStatus.Active;
-            }
+            this.laneKeepingAssistant = new LaneKeepingAssistant(this.virtualFunctionBus);
         }
 
         public void CalculateSpeed()
@@ -166,6 +165,13 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
+            var AEB = this.virtualFunctionBus.AutomaticEmergencyBrakePacket;
+            if (AEB.NeedEmergencyBrakeWarning && this.Gearbox.CurrentExternalGearPosition == Gear.D)
+            {
+                this.gasPedalPosition = MIN_PEDAL_POSITION;
+                this.brakePedalPosition = this.BoundPedalPosition((int)Math.Round((AEB.DecelerationRate / 4) * MAX_PEDAL_POSITION, 0));
+            }
+
             double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
@@ -194,38 +200,47 @@ namespace AutomatedCar.Models
                 turningAngle -= TURNING_OFFSET;
             }
         }
-        
+
         public void TurnLeft()
         {
             turningAngle = TURNING_OFFSET;
         }
-        
+
         public void TurnRight()
-        { 
+        {
             turningAngle = -TURNING_OFFSET;
         }
-        
+
         private void Turn(double steerAngle)
         {
-            double frontX = X + (WHEELBASE / 2 * Math.Cos(carHeading));
-            double frontY = Y + (WHEELBASE / 2 * Math.Sin(carHeading));
-            double rearX = X - (WHEELBASE / 2 * Math.Cos(carHeading));
-            double rearY = Y - (WHEELBASE / 2 * Math.Sin(carHeading));
+            double frontWheelX = X + (WHEELBASE / 2 * Math.Cos(carHeading));
+            double frontWheelY = Y + (WHEELBASE / 2 * Math.Sin(carHeading));
+            double rearWheelX = X - (WHEELBASE / 2 * Math.Cos(carHeading));
+            double rearWheelY = Y - (WHEELBASE / 2 * Math.Sin(carHeading));
 
-            double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -3 : 3;
-            
-            frontX += Speed * 0.25 * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
-            frontY += Speed * 0.25 * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
-            rearX += Speed * 0.25 * Math.Cos(carHeading) * reverseMultiplier;
-            rearY += Speed * 0.25 * Math.Sin(carHeading) * reverseMultiplier;
-            
-            X = (int)(frontX + rearX) / 2;
-            Y = (int)(frontY + rearY) / 2;
-            
-            carHeading = Math.Atan2(frontY - rearY, frontX - rearX);
+            double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -1 : 1;
+
+            double scaling = GetScaleDownValue(Speed);
+
+            frontWheelX += Speed * scaling * TURNING_MULTIPLIER * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
+            frontWheelY += Speed * scaling * TURNING_MULTIPLIER * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
+            rearWheelX += Speed * scaling * TURNING_MULTIPLIER * Math.Cos(carHeading) * reverseMultiplier;
+            rearWheelY += Speed * scaling * TURNING_MULTIPLIER * Math.Sin(carHeading) * reverseMultiplier;
+
+            X = (int)(frontWheelX + rearWheelX) / 2;
+            Y = (int)(frontWheelY + rearWheelY) / 2;
+
+            carHeading = Math.Atan2(frontWheelY - rearWheelY, frontWheelX - rearWheelX);
+
             Rotation = ((carHeading * 180) / Math.PI) + 87;
         }
-        
+
+        private double GetScaleDownValue(int speed)
+        {
+            int rounded_speed = scalingValueLookupTable.Keys.ToList().OrderBy(x => Math.Abs(speed - x)).First();
+            return scalingValueLookupTable[rounded_speed];
+        }
+
         private double GetVelocityAccordingToGear(double slowingForce)
         {
             double velocity = Velocity.Y;
@@ -234,13 +249,13 @@ namespace AutomatedCar.Models
             {
                 velocity += -(Acceleration.Y - slowingForce);
             }
-            else if (Gearbox.CurrentExternalGearPosition == Gear.R)
+            else if (Gearbox.CurrentExternalGearPosition == Gear.R && Speed < 20) // Should not reverse with unlimited speed
             {
                 velocity += Acceleration.Y - slowingForce;
             }
             else
             {
-                if (velocity < 0) //In neutral gear, the car can stop whether it goes forward or backward
+                if (velocity < 0) // In neutral gear, the car can stop whether it goes forward or backward
                 {
                     velocity += slowingForce;
                 }
@@ -252,7 +267,7 @@ namespace AutomatedCar.Models
 
             return velocity;
         }
-        
+
         public void IncreaseGasPedalPosition()
         {
             int newPosition = this.gasPedalPosition + PEDAL_OFFSET;

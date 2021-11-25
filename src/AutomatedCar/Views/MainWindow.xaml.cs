@@ -1,6 +1,7 @@
 namespace AutomatedCar.Views
 {
     using AutomatedCar.Models;
+    using AutomatedCar.SystemComponents;
     using Avalonia.Controls;
     using Avalonia.Input;
     using Avalonia.Markup.Xaml;
@@ -16,29 +17,30 @@ namespace AutomatedCar.Views
         {
             Keyboard.Keys.Add(e.Key);
             base.OnKeyDown(e);
+            VirtualFunctionBus virtualFunctionBus = World.Instance.ControlledCar.VirtualFunctionBus;
 
-            if (Keyboard.IsKeyDown(Key.Up))
+            if (Keyboard.IsKeyDown(Key.Up) && !virtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.IncreaseGasPedalPosition();
             }
-            
-            if (Keyboard.IsKeyDown(Key.Down))
+
+            if (Keyboard.IsKeyDown(Key.Down) && !virtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.IncreaseBrakePedalPosition();
             }
-            
+
             if (Keyboard.IsKeyDown(Key.Left))
             {
                 World.Instance.ControlledCar.TurnLeft();
-                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
+                World.Instance.ControlledCar.LKAModel.DisengageLaneKeeping();
             }
-            
+
             if (Keyboard.IsKeyDown(Key.Right))
             {
                 World.Instance.ControlledCar.TurnRight();
-                World.Instance.ControlledCar.LaneKeepingMod.DisengageLaneKeeping();
+                World.Instance.ControlledCar.LKAModel.DisengageLaneKeeping();
             }
-            
+
             if (Keyboard.IsKeyDown(Key.PageUp))
             {
                 World.Instance.ControlledCar.Rotation += 5;
@@ -104,7 +106,7 @@ namespace AutomatedCar.Views
 
             if (Keyboard.IsKeyDown(Key.L))
             {
-                World.Instance.ControlledCar.LaneKeepingMod.ToggleLaneKeeping();
+                World.Instance.ControlledCar.LKAModel.ToggleLaneKeeping();
             }
         }
 

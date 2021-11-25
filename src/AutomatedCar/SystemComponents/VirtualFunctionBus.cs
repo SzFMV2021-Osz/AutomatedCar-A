@@ -10,7 +10,9 @@ namespace AutomatedCar.SystemComponents
 
         public ICollisionDetectionPacket CollisionDetectionPacket { get; set; }
 
-        public ILaneKeepingPacket LaneKeepingPacket { get; set; }
+        public IAutomaticEmergencyBrakePacket AutomaticEmergencyBrakePacket { get; set; }
+
+        public ILKAPacket LaneKeepingPacket { get; set; }
 
         public ICameraPacket CameraPacket { get; set; }
 
