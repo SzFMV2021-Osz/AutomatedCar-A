@@ -34,7 +34,7 @@ namespace AutomatedCar.Models
                 { 40, 0.8 },
                 { 50, 0.7 },
                 { 60, 0.6 },
-                { 75, 0.5 },
+                { 75, 0.55 },
             };
 
         private int gasPedalPosition;
@@ -220,17 +220,18 @@ namespace AutomatedCar.Models
 
             double reverseMultiplier = Gearbox.CurrentExternalGearPosition == Gear.R ? -1 : 1;
 
-            double scale = GetScaleDownValue(Speed);
+            double scaling = GetScaleDownValue(Speed);
 
-            frontWheelX += Speed * scale * TURNING_MULTIPLIER * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
-            frontWheelY += Speed * scale * TURNING_MULTIPLIER * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
-            rearWheelX += Speed * scale * TURNING_MULTIPLIER * Math.Cos(carHeading) * reverseMultiplier;
-            rearWheelY += Speed * scale * TURNING_MULTIPLIER * Math.Sin(carHeading) * reverseMultiplier;
+            frontWheelX += Speed * scaling * TURNING_MULTIPLIER * Math.Cos(carHeading + steerAngle) * reverseMultiplier;
+            frontWheelY += Speed * scaling * TURNING_MULTIPLIER * Math.Sin(carHeading + steerAngle) * reverseMultiplier;
+            rearWheelX += Speed * scaling * TURNING_MULTIPLIER * Math.Cos(carHeading) * reverseMultiplier;
+            rearWheelY += Speed * scaling * TURNING_MULTIPLIER * Math.Sin(carHeading) * reverseMultiplier;
 
             X = (int)(frontWheelX + rearWheelX) / 2;
             Y = (int)(frontWheelY + rearWheelY) / 2;
 
             carHeading = Math.Atan2(frontWheelY - rearWheelY, frontWheelX - rearWheelX);
+
             Rotation = ((carHeading * 180) / Math.PI) + 87;
         }
 
