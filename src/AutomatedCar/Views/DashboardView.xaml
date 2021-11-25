@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl  xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals" xmlns:shapes="clr-namespace:Avalonia.Controls.Shapes;assembly=Avalonia.Controls" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -67,6 +67,25 @@
                                 <TextBlock Grid.Row="6" Grid.Column="0">Lane keeping available:</TextBlock>
                                 <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LKAModel.LaneKeepingAvailibility}"/>
                             </Grid>
+                            <Canvas Width="90" Height="90">
+                                <Image
+                                Width="90" Height="90"
+                                RenderOptions.BitmapInterpolationMode="HighQuality"
+                                Source="resm:AutomatedCar.Assets.aeb.png?assembly=AutomatedCar"
+                                RenderTransformOrigin="{Binding RotationPoint, Converter={x:Static visualization:RenderTransformOriginTransformer.Instance}}">
+                                </Image>
+                                <Rectangle IsVisible="{Binding VirtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning}" Fill="Yellow"  Height="90" Width="90">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush RenderOptions.BitmapInterpolationMode="HighQuality" Source="resm:AutomatedCar.Assets.aeb.png?assembly=AutomatedCar" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <Rectangle IsVisible="{Binding VirtualFunctionBus.AutomaticEmergencyBrakePacket.MightNotWorkProperlyWarning}" Fill="Red"  Height="90" Width="90">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush RenderOptions.BitmapInterpolationMode="HighQuality" Source="resm:AutomatedCar.Assets.aeb.png?assembly=AutomatedCar" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                            </Canvas>
+                            <TextBlock IsVisible="{Binding VirtualFunctionBus.AutomaticEmergencyBrakePacket.MightNotWorkProperlyWarning}" HorizontalAlignment="Center" FontSize="20" >Warning! AEB might not work!</TextBlock>
                         </StackPanel>
                     </DataTemplate>
                 </ContentControl.ContentTemplate>
