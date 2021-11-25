@@ -17,7 +17,7 @@
             IsRepeatingPath = isRepeatingPath;
             if (PathCoordinates.Any())
             {
-                this.NextTurn = this.PathCoordinates[0]; 
+                this.NextTurn = this.PathCoordinates[0];
             }
             else
             {

@@ -27,12 +27,12 @@ namespace AutomatedCar
 
         protected override void Tick()
         {
-            if (!Keyboard.IsKeyDown(Key.Up))
+            if (!Keyboard.IsKeyDown(Key.Up) && !World.Instance.ControlledCar.VirtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.DecreaseGasPedalPosition();
             }
 
-            if (!Keyboard.IsKeyDown(Key.Down))
+            if (!Keyboard.IsKeyDown(Key.Down) && !World.Instance.ControlledCar.VirtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning)
             {
                 World.Instance.ControlledCar.DecreaseBrakePedalPosition();
             }

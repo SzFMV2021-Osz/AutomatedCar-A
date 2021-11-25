@@ -34,7 +34,7 @@ namespace AutomatedCar.Models
                 { 40, 0.8 },
                 { 50, 0.7 },
                 { 60, 0.6 },
-                { 75, 0.55 },
+                { 75, 0.5 },
             };
 
         private int gasPedalPosition;
@@ -46,6 +46,7 @@ namespace AutomatedCar.Models
         private VirtualFunctionBus virtualFunctionBus;
         private CollisionDetection collisionDetection;
         private LaneKeepingAssistant laneKeepingAssistant;
+        private AutomaticEmergencyBrake automaticEmergencyBrake;
 
         public AutomatedCar(int x, int y, string filename)
             : base(x, y, filename)
@@ -53,12 +54,12 @@ namespace AutomatedCar.Models
             this.Velocity = new Vector();
             this.Acceleration = new Vector();
             this.virtualFunctionBus = new VirtualFunctionBus();
-
+            this.automaticEmergencyBrake = new AutomaticEmergencyBrake(this.virtualFunctionBus);
             this.collisionDetection = new CollisionDetection(this.virtualFunctionBus);
             this.collisionDetection.OnCollisionWithNpc += this.NpcCollisionEventHandler;
             this.collisionDetection.OnCollisionWithStaticObject += this.ObjectCollisionEventHandler;
-            this.Radar = new (this.virtualFunctionBus);
-            this.Camera = new (this.virtualFunctionBus);
+            this.Radar = new(this.virtualFunctionBus);
+            this.Camera = new(this.virtualFunctionBus);
             this.ZIndex = 10;
             this.Revolution = IDLE_RPM;
             this.Gearbox = new Gearbox(this);
@@ -164,6 +165,13 @@ namespace AutomatedCar.Models
 
         public void CalculateNextPosition()
         {
+            var AEB = this.virtualFunctionBus.AutomaticEmergencyBrakePacket;
+            if (AEB.NeedEmergencyBrakeWarning && this.Gearbox.CurrentExternalGearPosition == Gear.D)
+            {
+                this.gasPedalPosition = MIN_PEDAL_POSITION;
+                this.brakePedalPosition = this.BoundPedalPosition((int)Math.Round((AEB.DecelerationRate / 4) * MAX_PEDAL_POSITION, 0));
+            }
+
             double gasInputForce = this.gasPedalPosition * PEDAL_INPUT_MULTIPLIER;
             double brakeInputForce = this.brakePedalPosition * PEDAL_INPUT_MULTIPLIER;
             double slowingForce = this.Speed * DRAG + (this.Speed > 0 ? brakeInputForce : 0);
