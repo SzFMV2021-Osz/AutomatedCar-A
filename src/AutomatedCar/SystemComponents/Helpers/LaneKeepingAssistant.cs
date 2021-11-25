@@ -34,7 +34,7 @@
                     this.CenterCar();
                 }
 
-                this.ChangeLKAStatus();
+                this.TurnOffLKAFfNeeded();
             }
         }
 
@@ -106,17 +106,17 @@
             return this.car.Rotation > start && this.car.Rotation < end;
         }
 
-        public void ChangeLKAStatus()
+        public void TurnOffLKAFfNeeded()
         {
-            WorldObject carUnderRoad = this.CarUnderRoad();
+            WorldObject roadUnderCar = this.RoadUnderCar();
 
-            if (carUnderRoad == null)
+            if (roadUnderCar == null)
             {
                 this.car.LKAModel.CurrentLaneKeepingStatus = LaneKeepingStatus.Inactive;
             }
             else
             {
-                List<WorldObject> roadsExceptCurrent = this.roads.Where(road => road != carUnderRoad).ToList();
+                List<WorldObject> roadsExceptCurrent = this.roads.Where(road => road != roadUnderCar).ToList();
                 WorldObject closestRoad = Utils.FindClosestObject(roadsExceptCurrent, this.car);
                 if (closestRoad != null && !CanLKAWorkOnRoad(closestRoad.Filename))
                 {
@@ -130,48 +130,48 @@
             return filename == "road_2lane_straight.png" || filename == "road_2lane_6left.png" || filename == "road_2lane_6right.png";
         }
 
-        private WorldObject CarUnderRoad()
+        private WorldObject RoadUnderCar()
         {
-            return World.Instance.WorldObjects
+            List<WorldObject> roads = World.Instance.WorldObjects.Where(wo => wo.WorldObjectType == WorldObjectType.Road).ToList();
+            return roads
                 .Where(wo => CanLKAWorkOnRoad(wo.Filename) && this.RoadGeometryContains(wo))
                 .FirstOrDefault();
         }
 
         private bool RoadGeometryContains(WorldObject currentRoad)
         {
-            List<Point> points = new ();
+            List<Point> points = new();
 
-            Point refPoint = new (0, 0);
+            Point refPoint = new(0, 0);
             if (Utils.ReferencePoints.Any(r => r.Type + ".png" == currentRoad.Filename))
             {
                 ReferencePoint currRefPoint = Utils.ReferencePoints.Where(r => r.Type + ".png" == currentRoad.Filename).FirstOrDefault();
-                refPoint = new (currRefPoint.X, currRefPoint.Y);
+                refPoint = new(currRefPoint.X, currRefPoint.Y);
             }
 
             Point startingPoint = currentRoad.Geometries[0].Points.FirstOrDefault();
 
             foreach (var currPoint in currentRoad.Geometries[0].Points)
             {
-                points.Add(new (currPoint.X + refPoint.X + currentRoad.X, currPoint.Y + refPoint.Y + currentRoad.Y));
+                points.Add(new(currPoint.X - refPoint.X + currentRoad.X, currPoint.Y - refPoint.Y + currentRoad.Y));
             }
 
             foreach (var currPoint in currentRoad.Geometries[2].Points.Reverse())
             {
-                points.Add(new (currPoint.X + refPoint.X + currentRoad.X, currPoint.Y + refPoint.Y + currentRoad.Y));
+                points.Add(new(currPoint.X - refPoint.X + currentRoad.X, currPoint.Y - refPoint.Y + currentRoad.Y));
             }
 
-            points.Add(new (startingPoint.X + refPoint.X + currentRoad.X, startingPoint.Y + refPoint.Y + currentRoad.Y));
+            points.Add(new(startingPoint.X - refPoint.X + currentRoad.X, startingPoint.Y - refPoint.Y + currentRoad.Y));
 
-            PolylineGeometry roadGeometry = new (points, true);
+            PolylineGeometry roadGeometry = new(points, true);
 
-            Point carPoint = new (this.car.X + this.car.RotationPoint.X, this.car.Y + this.car.RotationPoint.Y);
-
+            Point carPoint = new(this.car.X + this.car.RotationPoint.X, this.car.Y + this.car.RotationPoint.Y);
             return roadGeometry.FillContains(carPoint);
         }
 
         private void LKAAvailibility()
         {
-            this.car.LKAModel.LaneKeepingAvailibility = this.CarUnderRoad() != null;
+            this.car.LKAModel.LaneKeepingAvailibility = this.RoadUnderCar() != null;
         }
     }
 }
