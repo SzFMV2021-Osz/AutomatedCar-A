@@ -74,18 +74,18 @@
                                 Source="resm:AutomatedCar.Assets.aeb.png?assembly=AutomatedCar"
                                 RenderTransformOrigin="{Binding RotationPoint, Converter={x:Static visualization:RenderTransformOriginTransformer.Instance}}">
                                 </Image>
-                                <Rectangle IsVisible="false" Fill="Yellow"  Height="90" Width="90">
+                                <Rectangle IsVisible="{Binding VirtualFunctionBus.AutomaticEmergencyBrakePacket.NeedEmergencyBrakeWarning}" Fill="Yellow"  Height="90" Width="90">
                                     <Rectangle.OpacityMask>
                                         <ImageBrush RenderOptions.BitmapInterpolationMode="HighQuality" Source="resm:AutomatedCar.Assets.aeb.png?assembly=AutomatedCar" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <Rectangle IsVisible="false" Fill="Red"  Height="90" Width="90">
+                                <Rectangle IsVisible="{Binding VirtualFunctionBus.AutomaticEmergencyBrakePacket.MightNotWorkProperlyWarning}" Fill="Red"  Height="90" Width="90">
                                     <Rectangle.OpacityMask>
                                         <ImageBrush RenderOptions.BitmapInterpolationMode="HighQuality" Source="resm:AutomatedCar.Assets.aeb.png?assembly=AutomatedCar" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Canvas>
-                            <TextBlock IsVisible="false" HorizontalAlignment="Center" FontSize="20" >Warning! AEB is off!</TextBlock>
+                            <TextBlock IsVisible="{Binding VirtualFunctionBus.AutomaticEmergencyBrakePacket.MightNotWorkProperlyWarning}" HorizontalAlignment="Center" FontSize="20" >Warning! AEB might not work!</TextBlock>
                         </StackPanel>
                     </DataTemplate>
                 </ContentControl.ContentTemplate>
